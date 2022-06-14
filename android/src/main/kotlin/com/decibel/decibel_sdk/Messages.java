@@ -4,18 +4,17 @@
 package com.decibel.decibel_sdk;
 
 import android.util.Log;
-
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.flutter.plugin.common.BasicMessageChannel;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MessageCodec;
 import io.flutter.plugin.common.StandardMessageCodec;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /** Generated class from Pigeon. */
 @SuppressWarnings({"unused", "unchecked", "CodeBlock2Expr", "RedundantSuppression"})
@@ -101,11 +100,16 @@ public class Messages {
     public List<Integer> getConsents() { return consents; }
     public void setConsents(List<Integer> setterArg) { this.consents = setterArg; }
 
+    private String version;
+    public String getVersion() { return version; }
+    public void setVersion(String setterArg) { this.version = setterArg; }
+
     Map<String, Object> toMap() {
       Map<String, Object> toMapResult = new HashMap<>();
       toMapResult.put("account", account);
       toMapResult.put("property", property);
       toMapResult.put("consents", consents);
+      toMapResult.put("version", version);
       return toMapResult;
     }
     static SessionMessage fromMap(Map<String, Object> map) {
@@ -116,6 +120,8 @@ public class Messages {
       fromMapResult.property = (property == null) ? null : ((property instanceof Integer) ? (Integer)property : (Long)property);
       Object consents = map.get("consents");
       fromMapResult.consents = (List<Integer>)consents;
+      Object version = map.get("version");
+      fromMapResult.version = (String)version;
       return fromMapResult;
     }
   }

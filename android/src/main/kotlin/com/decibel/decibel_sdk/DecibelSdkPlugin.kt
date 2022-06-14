@@ -31,9 +31,9 @@ class DecibelSdkPlugin: FlutterPlugin, Messages.DecibelSdkApi {
     arg?.let { sessionMessage ->
       sessionMessage.consents?.let {
         val consents = translateConsenstsFlutterToAndroid(it)
-        Decibel.sdk.initialize(Customer(sessionMessage.account, sessionMessage.property), consents, Multiplatform(PlatformType.FLUTTER))
+        Decibel.sdk.initialize(Customer(sessionMessage.account, sessionMessage.property), consents, Multiplatform(PlatformType.FLUTTER, sessionMessage.version))
       } ?: run {
-        Decibel.sdk.initialize(Customer(sessionMessage.account, sessionMessage.property), Multiplatform(PlatformType.FLUTTER))
+        Decibel.sdk.initialize(Customer(sessionMessage.account, sessionMessage.property), Multiplatform(PlatformType.FLUTTER, sessionMessage.version))
       }
 
     }

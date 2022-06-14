@@ -61,10 +61,12 @@ class Tracking {
     if (tabController.index != tabController.previousIndex &&
         !tabController.indexIsChanging) {
       SessionReplay.instance.stop();
-      Tracking.instance.endScreen(
-        Tracking.instance.visitedScreensList.last
-            .tabBarScreens[tabController.previousIndex],
-      );
+      if (Tracking.instance.visitedScreensList.last.isTabBar) {
+        Tracking.instance.endScreen(
+          Tracking.instance.visitedScreensList.last
+              .tabBarScreens[tabController.previousIndex],
+        );
+      }
 
       Tracking.instance
           .startScreen(tabNames[tabController.index], tabBarNames: tabNames);

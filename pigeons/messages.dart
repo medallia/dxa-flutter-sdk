@@ -24,6 +24,7 @@ class SessionMessage {
   int? account;
   int? property;
   List<int?>? consents;
+  String? version;
 }
 
 class ConsentsMessage {

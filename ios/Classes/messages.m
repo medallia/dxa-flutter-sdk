@@ -118,10 +118,14 @@ static NSDictionary<NSString *, id> *wrapResult(id result, FlutterError *error) 
   if ((NSNull *)result.consents == [NSNull null]) {
     result.consents = nil;
   }
+  result.version = dict[@"version"];
+  if ((NSNull *)result.version == [NSNull null]) {
+    result.version = nil;
+  }
   return result;
 }
 - (NSDictionary *)toMap {
-  return [NSDictionary dictionaryWithObjectsAndKeys:(self.account ? self.account : [NSNull null]), @"account", (self.property ? self.property : [NSNull null]), @"property", (self.consents ? self.consents : [NSNull null]), @"consents", nil];
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.account ? self.account : [NSNull null]), @"account", (self.property ? self.property : [NSNull null]), @"property", (self.consents ? self.consents : [NSNull null]), @"consents", (self.version ? self.version : [NSNull null]), @"version", nil];
 }
 @end
 

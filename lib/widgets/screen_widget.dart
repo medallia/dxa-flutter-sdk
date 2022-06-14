@@ -4,7 +4,6 @@ import 'package:decibel_sdk/features/tracking.dart';
 import 'package:decibel_sdk/utility/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 class ScreenWidget extends StatefulWidget {
   const ScreenWidget({
@@ -29,7 +28,7 @@ class ScreenWidget extends StatefulWidget {
 }
 
 class _ScreenWidgetState extends State<ScreenWidget>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, RouteAware {
   final GlobalKey _globalKey = GlobalKey();
   ModalRoute<Object?>? route;
 
@@ -41,6 +40,12 @@ class _ScreenWidgetState extends State<ScreenWidget>
     } else {
       SessionReplay.instance.isPageTransitioning = true;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    DecibelSdk.routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
 
   @override
@@ -79,47 +84,64 @@ class _ScreenWidgetState extends State<ScreenWidget>
 
   @override
   void dispose() {
+    DecibelSdk.routeObserver.unsubscribe(this);
     WidgetsBinding.instance!.removeObserver(this);
     route?.animation?.removeStatusListener(_animationListener);
     widget.tabController?.removeListener(() => Tracking.instance
         .tabControllerListener(widget.tabController!, widget.tabNames!));
-
     super.dispose();
   }
 
   @override
+  void didPush() {
+    callWhenIsCurrentRoute();
+  }
+
+  @override
+  void didPopNext() {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      callWhenIsCurrentRoute();
+    });
+    // WidgetsBinding.instance!.ensureVisualUpdate();
+  }
+
+  @override
+  void didPop() {
+    callWhenIsNotCurrentRoute();
+  }
+
+  @override
+  void didPushNext() {
+    callWhenIsNotCurrentRoute();
+  }
+
+  void callWhenIsNotCurrentRoute() {
+    SessionReplay.instance.stop();
+  }
+
+  void callWhenIsCurrentRoute() {
+    late String currentScreenName;
+
+    if (widget.tabController != null) {
+      currentScreenName = widget.tabNames![widget.tabController!.index];
+    } else {
+      currentScreenName = widget.screenName;
+    }
+
+    SessionReplay.instance.captureKey = _globalKey;
+    if (Tracking.instance.visitedScreensList.isNotEmpty) {
+      Tracking.instance.endScreen(Tracking.instance.visitedScreensList.last);
+    }
+    Tracking.instance
+        .startScreen(currentScreenName, tabBarNames: widget.tabNames);
+    SessionReplay.instance.start();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: UniqueKey(),
-      onVisibilityChanged: (VisibilityInfo info) {
-        if (info.visibleFraction != VisibilityConst.notVisible) {
-          //Checks if this screen was the last screen being recorded
-
-          late String currentScreenName;
-
-          if (widget.tabController != null) {
-            currentScreenName = widget.tabNames![widget.tabController!.index];
-          } else {
-            currentScreenName = widget.screenName;
-          }
-          if (Tracking.instance.visitedScreensList.isEmpty ||
-              currentScreenName !=
-                  Tracking.instance.visitedScreensList.last.name) {
-            SessionReplay.instance.captureKey = _globalKey;
-            if (Tracking.instance.visitedScreensList.isNotEmpty) {
-              Tracking.instance
-                  .endScreen(Tracking.instance.visitedScreensList.last);
-            }
-            Tracking.instance
-                .startScreen(currentScreenName, tabBarNames: widget.tabNames);
-            SessionReplay.instance.start();
-          }
-        }
-      },
-      child: RepaintBoundary(
-        key: _globalKey,
-        child: widget.child,
-      ),
+    return RepaintBoundary(
+      key: _globalKey,
+      child: widget.child,
     );
   }
 }

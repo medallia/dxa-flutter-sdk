@@ -28,9 +28,7 @@ class SessionReplay {
     if (_timer != null && _timer!.isActive) {
       _timer!.cancel();
     }
-
-    postFrameCallback?.call(maybeTakeScreenshot);
-    _timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
+    _timer ??= Timer.periodic(const Duration(milliseconds: 250), (_) async {
       await maybeTakeScreenshot();
     });
   }
@@ -54,6 +52,7 @@ class SessionReplay {
     if (!isPageTransitioning &&
         captureKey != null &&
         captureKey!.currentContext != null) {
+      _didUiChange(compare: false);
       await _captureImage(captureKey!.currentContext!);
     } else {
       Future.delayed(const Duration(milliseconds: 250), () async {
@@ -62,7 +61,7 @@ class SessionReplay {
     }
   }
 
-  bool _didUiChange() {
+  bool _didUiChange({bool compare = true}) {
     bool didUiChange = false;
     void findChildren(List<Element> list) {
       for (final child in list) {
@@ -73,7 +72,9 @@ class SessionReplay {
 
     if (WidgetsBinding.instance?.renderViewElement != null) {
       findChildren(WidgetsBinding.instance!.renderViewElement!.children);
-      didUiChange = !listEquals(_oldWidgetsList, _newWidgetsList);
+      if (compare) {
+        didUiChange = !listEquals(_oldWidgetsList, _newWidgetsList);
+      }
       _oldWidgetsList.clear();
       _oldWidgetsList.addAll(_newWidgetsList);
       _newWidgetsList.clear();
@@ -134,7 +135,7 @@ class SessionReplay {
         // We compare these lists to check that the masks won't be misplaced
         if (resultImageData != null &&
             listEquals(_previousCoordsList, _currentCoordsList)) {
-          if (_timer != null && !isPageTransitioning) {
+          if (!isPageTransitioning && _timer != null) {
             await _sendScreenshot(
               resultImageData.buffer.asUint8List(),
               Tracking.instance.visitedScreensList.last.id,

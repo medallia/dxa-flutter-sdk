@@ -1,5 +1,4 @@
 group 'com.decibel.decibel_sdk'
-version '1.0.2'
 
 buildscript {
     ext.kotlin_version = '1.4.32'

@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:decibel_sdk/features/session_replay.dart';
-import 'package:decibel_sdk/features/tracking.dart';
 import 'package:decibel_sdk/messages.dart';
 import 'package:decibel_sdk/utility/enums.dart' as enums;
 import 'package:decibel_sdk/utility/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:yaml/yaml.dart';
 
 /// DecibelSdk main class
 class DecibelSdk {
@@ -15,16 +16,24 @@ class DecibelSdk {
     return _apiInstance ??= DecibelSdkApi();
   }
 
+  static RouteObserver<ModalRoute<void>> routeObserver =
+      RouteObserver<ModalRoute<void>>();
+
   /// Initializes DecibelSdk
   static Future<void> initialize(
     int account,
     int property, [
     List<enums.DecibelCustomerConsentType>? consents,
   ]) async {
+    final yamlString =
+        await rootBundle.loadString('packages/decibel_sdk/pubspec.yaml');
+    final YamlMap parsedYaml = loadYaml(yamlString) as YamlMap;
+    final String version = parsedYaml['version'] as String;
     final sessionMessage = SessionMessage()
       ..account = account
       ..property = property
-      ..consents = consents?.toIndexList();
+      ..consents = consents?.toIndexList()
+      ..version = version;
     await _api.initialize(sessionMessage);
     if (consents != null) {
       if (consents.contains(enums.DecibelCustomerConsentType.all) ||

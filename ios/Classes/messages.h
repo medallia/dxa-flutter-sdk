@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) NSNumber * account;
 @property(nonatomic, strong, nullable) NSNumber * property;
 @property(nonatomic, strong, nullable) NSArray<NSNumber *> * consents;
+@property(nonatomic, copy, nullable) NSString * version;
 @end
 
 @interface FLTConsentsMessage : NSObject

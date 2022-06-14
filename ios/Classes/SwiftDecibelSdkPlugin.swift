@@ -10,15 +10,15 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
       }
 
     public func initializeMsg(_ msg: FLTSessionMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        if let account = msg.account, let property = msg.property, let consents = msg.consents as? [Int] {
+        if let account = msg.account, let property = msg.property, let consents = msg.consents as? [Int], let version = msg.version {
             DecibelSDK.multiPlatform.initialize(account: String(describing: account),
                                                 property: String(describing: property),
                                                 consents: consents,
-                                                multiPlatform: SDKMultiPlatform(type: .flutter, version: "1.0.2", language: "Dart"))
-        } else if let account = msg.account, let property = msg.property {
+                                                multiPlatform: SDKMultiPlatform(type: .flutter, version: String(describing: version), language: "Dart"))
+        } else if let account = msg.account, let property = msg.property, let version = msg.version  {
             DecibelSDK.multiPlatform.initialize(account: String(describing: account),
                                                 property: String(describing: property),
-                                                multiPlatform: SDKMultiPlatform(type: .flutter, version: "1.0.2", language: "Dart"))
+                                                multiPlatform: SDKMultiPlatform(type: .flutter, version: String(describing: version), language: "Dart"))
         }
         DecibelSDK.multiPlatform.setLogLevel(.info)
 
