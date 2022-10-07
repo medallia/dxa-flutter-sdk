@@ -1,4 +1,4 @@
-part of 'screen_widget/screen_widget.dart';
+part of './screen_widget.dart';
 
 class MaskWidget extends StatefulWidget {
   const MaskWidget({required this.child});
@@ -23,7 +23,6 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    listOfMasks = _MaskList.of(context)!.listOfMasks;
     CustomRouteObserver.screenWidgetRouteObserver
         .subscribe(this, ModalRoute.of(context)!);
   }
@@ -42,9 +41,9 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
 
   @override
   void didPopNext() {
-    // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
-    addMask(globalKey);
-    // });
+    WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
+      addMask(globalKey);
+    });
   }
 
   @override
@@ -77,11 +76,35 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
     }
   }
 
+  void _debugCheckTabBarConfiguration(BuildContext context) {
+    if (kDebugMode) {
+      final bool isInsideTabBar =
+          _ScreenWidgetInheritedWidget.of(context)?._child.tabController !=
+              null;
+      if (isInsideTabBar) {
+        final bool hasScreenWidgetTabBarParent =
+            context.getElementForInheritedWidgetOfExactType<
+                    ScreenWidgetTabBar>() !=
+                null;
+        assert(
+          hasScreenWidgetTabBarParent,
+          '''
+          This Mask is inside a TabBar that is not configured 
+          correctly, a ScreenWidgetTabBar needs to wrap the body of 
+          the Scaffold''',
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: globalKey,
-      child: widget.child,
+    _debugCheckTabBarConfiguration(context);
+    return Ink(
+      child: KeyedSubtree(
+        key: globalKey,
+        child: widget.child,
+      ),
     );
   }
 }

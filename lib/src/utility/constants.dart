@@ -1,3 +1,3 @@
-class SDKConstants {
-  static const Duration maxReplayDurationPerScreen = Duration(minutes: 5);
+class VisibilityConst {
+  static const double notVisible = 0.0;
 }

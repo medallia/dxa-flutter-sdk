@@ -402,7 +402,6 @@ public class Messages {
     void sendDimensionWithBool(DimensionBoolMessage msg);
     void sendGoal(GoalMessage msg);
     void getWebViewProperties(Result<String> result);
-    void getSessionId(Result<String> result);
 
     /** The codec used by DecibelSdkApi. */
     static MessageCodec<Object> getCodec() {
@@ -670,35 +669,6 @@ public class Messages {
               };
 
               api.getWebViewProperties(resultCallback);
-            }
-            catch (Error | RuntimeException exception) {
-              wrapped.put("error", wrapError(exception));
-              reply.reply(wrapped);
-            }
-          });
-        } else {
-          channel.setMessageHandler(null);
-        }
-      }
-      {
-        BasicMessageChannel<Object> channel =
-            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.getSessionId", getCodec());
-        if (api != null) {
-          channel.setMessageHandler((message, reply) -> {
-            Map<String, Object> wrapped = new HashMap<>();
-            try {
-              Result<String> resultCallback = new Result<String>() {
-                public void success(String result) {
-                  wrapped.put("result", result);
-                  reply.reply(wrapped);
-                }
-                public void error(Throwable error) {
-                  wrapped.put("error", wrapError(error));
-                  reply.reply(wrapped);
-                }
-              };
-
-              api.getSessionId(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

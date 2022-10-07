@@ -97,10 +97,7 @@ class DecibelSdkPlugin: FlutterPlugin, Messages.DecibelSdkApi {
   }
 
   override fun getWebViewProperties(result: Messages.Result<String>){
-    return result.success(Decibel.sdk.getWebViewParams())
-  }
-  override fun getSessionId(result: Messages.Result<String>): Unit{
-    return result.success(Decibel.sdk.getSessionId())
+    Decibel.sdk.onWebViewParamsReceived{queryParams-> result.success(queryParams)}
   }
 
   fun translateConsenstsFlutterToAndroid(consents: MutableList<Int>): List<CustomerConsentType> {

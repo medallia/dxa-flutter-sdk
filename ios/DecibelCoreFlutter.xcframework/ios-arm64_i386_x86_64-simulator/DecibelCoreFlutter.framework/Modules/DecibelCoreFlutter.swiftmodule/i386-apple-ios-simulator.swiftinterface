@@ -1,5 +1,5 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.3.2 (swiftlang-1200.0.45 clang-1200.0.32.28)
+// swift-compiler-version: Apple Swift version 5.6.1 (swiftlang-5.6.0.323.66 clang-1316.0.20.12)
 // swift-module-flags: -target i386-apple-ios10.3-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Osize -module-name DecibelCoreFlutter
 import AVFoundation
 import CommonCrypto
@@ -10,12 +10,13 @@ import Swift
 import SystemConfiguration
 import UIKit
 import WebKit
+import _Concurrency
 @objc public enum SDKMaskView : Swift.Int {
   case automatic
   case mask
   case unmask
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
@@ -23,8 +24,8 @@ import WebKit
 @objc public enum SDKRecordingMode : Swift.Int {
   case defineScreensToRecord
   case defineScreensToStopRecord
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
@@ -32,8 +33,8 @@ import WebKit
 @objc public enum SDKLogLevel : Swift.Int {
   case none
   case info
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
@@ -42,21 +43,16 @@ import WebKit
   case hiFi
   case loFi
   case automatic
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
 }
-@objc public protocol DecibelDelegate : AnyObject {
+@objc public protocol DecibelDelegate {
   @objc func getSessionURL(_ sessionUrl: Swift.String)
 }
-@objc public protocol DecibelMultiPlatform : DecibelCoreFlutter.DecibelProtocol {
-  @objc func initialize(account: Swift.String, property: Swift.String, multiPlatform: DecibelCoreFlutter.SDKMultiPlatform)
-  @objc func initialize(account: Swift.String, property: Swift.String, consents: [Swift.Int], multiPlatform: DecibelCoreFlutter.SDKMultiPlatform)
-  @objc func getSessionId() -> Swift.String?
-}
-@objc public protocol DecibelProtocol : AnyObject {
+@objc public protocol DecibelProtocol {
   @objc var delegate: DecibelCoreFlutter.DecibelDelegate? { get set }
   @objc func initialize(account: Swift.String, property: Swift.String)
   @objc func initialize(account: Swift.String, property: Swift.String, consents: [Swift.Int])
@@ -86,22 +82,24 @@ import WebKit
 @objc public enum SDKPlatformType : Swift.Int {
   case flutter
   case xamarin
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
 }
-extension NSManagedObject {
+extension CoreData.NSManagedObject {
   open class func first(on context: CoreData.NSManagedObjectContext?, with fetchRequest: CoreData.NSFetchRequest<CoreData.NSManagedObject>?) -> CoreData.NSManagedObject?
   open class func last(on context: CoreData.NSManagedObjectContext?, with fetchRequest: CoreData.NSFetchRequest<CoreData.NSManagedObject>?) -> CoreData.NSManagedObject?
   open class func allObjects(on context: CoreData.NSManagedObjectContext?, with fetchRequest: CoreData.NSFetchRequest<CoreData.NSManagedObject>?) -> [CoreData.NSManagedObject]
   open func delete(on context: CoreData.NSManagedObjectContext)
 }
-@objc public protocol DecibelFlutter : DecibelCoreFlutter.DecibelMultiPlatform {
-  @objc func set(screen: Swift.String, id: Swift.Int, fromBackground: Swift.Bool)
+@objc public protocol DecibelFlutter : DecibelCoreFlutter.DecibelProtocol {
+  @objc func initialize(account: Swift.String, property: Swift.String, multiPlatform: DecibelCoreFlutter.SDKMultiPlatform)
+  @objc func initialize(account: Swift.String, property: Swift.String, consents: [Swift.Int], multiPlatform: DecibelCoreFlutter.SDKMultiPlatform)
+  @objc func set(screen: Swift.String, id: Swift.Int)
   @objc func saveScreenShot(screenshot: Foundation.Data, id: Swift.Int, screenName: Swift.String, startFocusTime: Foundation.TimeInterval)
-  @objc func endScreen(goesToBackground: Swift.Bool)
+  @objc func endScreen()
 }
 @objc public enum DecibelUserConsent : Swift.Int {
   case all
@@ -109,29 +107,28 @@ extension NSManagedObject {
   case tracking
   case form
   case none
+  public init?(rawValue: Swift.Int)
   public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
-  public init?(rawValue: Swift.Int)
 }
 @objc public class SDKMultiPlatform : ObjectiveC.NSObject {
   public init(type: DecibelCoreFlutter.SDKPlatformType, version: Swift.String, language: Swift.String)
   @objc deinit
-  @objc override dynamic public init()
 }
 @objc public enum SDKRecordingScreen : Swift.Int {
   case record
   case noRecord
   case undefined
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
 }
-extension UIViewController {
-  @objc dynamic public var diScreenName: Swift.String? {
+extension UIKit.UIViewController {
+  @objc @_Concurrency.MainActor(unsafe) dynamic public var diScreenName: Swift.String? {
     @objc get
     @objc set
   }
@@ -312,8 +309,8 @@ extension UIViewController {
   case ZAR
   case ZMW
   case ZWL
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
@@ -326,10 +323,8 @@ extension UIViewController {
   case forms
   case all
   case noMask
-  case unmaskInputs
-  case unmaskWebViews
-  public typealias RawValue = Swift.Int
   public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
   }
@@ -337,28 +332,28 @@ extension UIViewController {
 @_inheritsConvenienceInitializers @objc public class DecibelSDK : ObjectiveC.NSObject {
   @objc public static let multiPlatform: DecibelCoreFlutter.DecibelFlutter
   @objc public static let settings: DecibelCoreFlutter.SDKSettings
-  @objc deinit
   @objc override dynamic public init()
+  @objc deinit
 }
-extension UIView {
-  @objc dynamic public var diMasking: DecibelCoreFlutter.SDKMaskView {
+extension UIKit.UIView {
+  @objc @_Concurrency.MainActor(unsafe) dynamic public var diMasking: DecibelCoreFlutter.SDKMaskView {
     @objc get
     @objc set
   }
-  @objc dynamic public var diFormTrack: Swift.Bool {
+  @objc @_Concurrency.MainActor(unsafe) dynamic public var diFormTrack: Swift.Bool {
     @objc get
     @objc set
   }
-  @objc dynamic public var diAddScreenForRecording: DecibelCoreFlutter.SDKRecordingScreen {
+  @objc @_Concurrency.MainActor(unsafe) dynamic public var diAddScreenForRecording: DecibelCoreFlutter.SDKRecordingScreen {
     @objc get
     @objc set
   }
-  @objc dynamic public var diSessionReplayType: DecibelCoreFlutter.SDKSessionReplayType {
+  @objc @_Concurrency.MainActor(unsafe) dynamic public var diSessionReplayType: DecibelCoreFlutter.SDKSessionReplayType {
     @objc get
     @objc set
   }
 }
-@objc public protocol SDKSettings : AnyObject {
+@objc public protocol SDKSettings {
   @objc var mobileDataEnable: Swift.Bool { get set }
   @objc var crashReporterEnable: Swift.Bool { get set }
   @objc var recordingMode: DecibelCoreFlutter.SDKRecordingMode { get set }

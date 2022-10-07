@@ -1,20 +1,17 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
+part of 'session_replay.dart';
 
-class FrameTracking {
-  FrameTracking({required this.postFrameCallback});
-  final void Function(void Function(Duration)) postFrameCallback;
-  final StreamController<Duration> newFrameStreamController =
-      StreamController();
-  @visibleForTesting
-  bool alreadyWaiting = false;
+class _FrameTracking {
+  bool _alreadyWaiting = false;
+
   void waitForNextFrame() {
-    if (alreadyWaiting) return;
+    if (_alreadyWaiting) return;
+    if (SessionReplay.instance.uiChange) return;
 
-    alreadyWaiting = true;
-    postFrameCallback((Duration timeStamp) {
-      alreadyWaiting = false;
-      newFrameStreamController.add(timeStamp);
+    _alreadyWaiting = true;
+
+    WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
+      _alreadyWaiting = false;
+      SessionReplay.instance.uiChange = true;
     });
   }
 }
