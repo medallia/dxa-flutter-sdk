@@ -96,6 +96,10 @@ class DecibelSdkPlugin: FlutterPlugin, Messages.DecibelSdkApi {
     }
   }
 
+  override fun getWebViewProperties(result: Messages.Result<String>){
+    Decibel.sdk.onWebViewParamsReceived{queryParams-> result.success(queryParams)}
+  }
+
   fun translateConsenstsFlutterToAndroid(consents: MutableList<Int>): List<CustomerConsentType> {
     val consents: List<CustomerConsentType> = consents.map {
       when(it){

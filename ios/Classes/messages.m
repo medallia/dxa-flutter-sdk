@@ -244,39 +244,39 @@ static NSDictionary<NSString *, id> *wrapResult(id result, FlutterError *error) 
 @interface FLTDecibelSdkApiCodecReader : FlutterStandardReader
 @end
 @implementation FLTDecibelSdkApiCodecReader
-- (nullable id)readValueOfType:(UInt8)type
+- (nullable id)readValueOfType:(UInt8)type 
 {
   switch (type) {
-    case 128:
+    case 128:     
       return [FLTConsentsMessage fromMap:[self readValue]];
-
-    case 129:
+    
+    case 129:     
       return [FLTDimensionBoolMessage fromMap:[self readValue]];
-
-    case 130:
+    
+    case 130:     
       return [FLTDimensionNumberMessage fromMap:[self readValue]];
-
-    case 131:
+    
+    case 131:     
       return [FLTDimensionStringMessage fromMap:[self readValue]];
-
-    case 132:
+    
+    case 132:     
       return [FLTEndScreenMessage fromMap:[self readValue]];
-
-    case 133:
+    
+    case 133:     
       return [FLTGoalMessage fromMap:[self readValue]];
-
-    case 134:
+    
+    case 134:     
       return [FLTScreenshotMessage fromMap:[self readValue]];
-
-    case 135:
+    
+    case 135:     
       return [FLTSessionMessage fromMap:[self readValue]];
-
-    case 136:
+    
+    case 136:     
       return [FLTStartScreenMessage fromMap:[self readValue]];
-
-    default:
+    
+    default:    
       return [super readValueOfType:type];
-
+    
   }
 }
 @end
@@ -284,44 +284,44 @@ static NSDictionary<NSString *, id> *wrapResult(id result, FlutterError *error) 
 @interface FLTDecibelSdkApiCodecWriter : FlutterStandardWriter
 @end
 @implementation FLTDecibelSdkApiCodecWriter
-- (void)writeValue:(id)value
+- (void)writeValue:(id)value 
 {
   if ([value isKindOfClass:[FLTConsentsMessage class]]) {
     [self writeByte:128];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTDimensionBoolMessage class]]) {
     [self writeByte:129];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTDimensionNumberMessage class]]) {
     [self writeByte:130];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTDimensionStringMessage class]]) {
     [self writeByte:131];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTEndScreenMessage class]]) {
     [self writeByte:132];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTGoalMessage class]]) {
     [self writeByte:133];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTScreenshotMessage class]]) {
     [self writeByte:134];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTSessionMessage class]]) {
     [self writeByte:135];
     [self writeValue:[value toMap]];
-  } else
+  } else 
   if ([value isKindOfClass:[FLTStartScreenMessage class]]) {
     [self writeByte:136];
     [self writeValue:[value toMap]];
-  } else
+  } else 
 {
     [super writeValue:value];
   }
@@ -545,6 +545,24 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
         FlutterError *error;
         [api sendGoalMsg:arg_msg error:&error];
         callback(wrapResult(nil, error));
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.DecibelSdkApi.getWebViewProperties"
+        binaryMessenger:binaryMessenger
+        codec:FLTDecibelSdkApiGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getWebViewPropertiesWithCompletion:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(getWebViewPropertiesWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getWebViewPropertiesWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
       }];
     }
     else {

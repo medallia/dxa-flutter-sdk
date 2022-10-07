@@ -103,4 +103,8 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
 
         DecibelSDK.multiPlatform.send(goal: goalName, with: goalValue)
     }
+
+    public func getWebViewProperties(completion: (String?, FlutterError?)->Void) {
+       completion(DecibelSDK.multiPlatform.getWebViewProperties(),nil);
+    }
 }
