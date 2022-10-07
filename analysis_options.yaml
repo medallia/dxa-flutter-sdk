@@ -25,7 +25,7 @@ linter:
     strict-raw-types: true
     prefer_single_quotes: true
     type_annotate_public_apis: true
-
+    unawaited_futures: true
 analyzer:
   exclude:
     - lib/messages.dart

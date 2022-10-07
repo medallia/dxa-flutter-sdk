@@ -288,6 +288,11 @@ public class Messages {
       return fromMapResult;
     }
   }
+
+  public interface Result<T> {
+    void success(T result);
+    void error(Throwable error);
+  }
   private static class DecibelSdkApiCodec extends StandardMessageCodec {
     public static final DecibelSdkApiCodec INSTANCE = new DecibelSdkApiCodec();
     private DecibelSdkApiCodec() {}
@@ -382,6 +387,7 @@ public class Messages {
     void sendDimensionWithNumber(DimensionNumberMessage msg);
     void sendDimensionWithBool(DimensionBoolMessage msg);
     void sendGoal(GoalMessage msg);
+    void getWebViewProperties(Result<String> result);
 
     /** The codec used by DecibelSdkApi. */
     static MessageCodec<Object> getCodec() {
@@ -625,6 +631,35 @@ public class Messages {
               wrapped.put("error", wrapError(exception));
             }
             reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.getWebViewProperties", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<String> resultCallback = new Result<String>() {
+                public void success(String result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.getWebViewProperties(resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
           });
         } else {
           channel.setMessageHandler(null);

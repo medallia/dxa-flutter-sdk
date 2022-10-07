@@ -82,6 +82,7 @@ NSObject<FlutterMessageCodec> *FLTDecibelSdkApiGetCodec(void);
 - (void)sendDimensionWithNumberMsg:(FLTDimensionNumberMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendDimensionWithBoolMsg:(FLTDimensionBoolMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendGoalMsg:(FLTGoalMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)getWebViewPropertiesWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 @end
 
 extern void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTDecibelSdkApi> *_Nullable api);

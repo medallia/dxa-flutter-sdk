@@ -1,4 +1,0 @@
-framework module DecibelCoreFlutter {
-  header "DecibelCoreFlutter-Swift.h"
-  requires objc
-}
