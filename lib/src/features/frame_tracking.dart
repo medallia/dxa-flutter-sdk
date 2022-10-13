@@ -1,17 +1,19 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 class FrameTracking {
   FrameTracking({required this.postFrameCallback});
   final void Function(void Function(Duration)) postFrameCallback;
   final StreamController<Duration> newFrameStreamController =
       StreamController();
-  bool _alreadyWaiting = false;
+  @visibleForTesting
+  bool alreadyWaiting = false;
   void waitForNextFrame() {
-    if (_alreadyWaiting) return;
+    if (alreadyWaiting) return;
 
-    _alreadyWaiting = true;
+    alreadyWaiting = true;
     postFrameCallback((Duration timeStamp) {
-      _alreadyWaiting = false;
+      alreadyWaiting = false;
       newFrameStreamController.add(timeStamp);
     });
   }
