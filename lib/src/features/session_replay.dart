@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
-import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
@@ -11,18 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class SessionReplay {
-  SessionReplay._internal() {
-    autoMasking = AutoMasking();
-    _frameTracking = FrameTracking(
-      postFrameCallback: WidgetsBindingNullSafe.instance!.addPostFrameCallback,
-    )..newFrameStreamController.stream.listen((timeStamp) {
-        _didUiChange = true;
-      });
-  }
+  SessionReplay._internal()
+      : _frameTracking = _FrameTracking(),
+        autoMasking = AutoMasking();
   static final _instance = SessionReplay._internal();
   static SessionReplay get instance => _instance;
-  late FrameTracking _frameTracking;
-  late AutoMasking autoMasking;
+  final _FrameTracking _frameTracking;
+  final AutoMasking autoMasking;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final widgetsToMaskList = List<GlobalKey>.empty(growable: true);
   final _maskColor = Paint()..color = Colors.grey;
