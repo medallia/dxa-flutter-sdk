@@ -4,7 +4,8 @@ import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-part 'mask_widget.dart';
+part '../mask_widget.dart';
+part 'inherited_widgets.dart';
 
 class ScreenWidget extends StatelessWidget {
   const ScreenWidget({
@@ -61,12 +62,18 @@ class _ActiveScreenWidget extends StatefulWidget {
 class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     with WidgetsBindingObserver, RouteAware {
   final GlobalKey _globalKey = GlobalKey();
+  int get screenId => _globalKey.hashCode;
   ModalRoute<Object?>? route;
-
+  bool get isTabBar => widget.tabNames != null && widget.tabController != null;
+  final List<GlobalKey> listOfMasks = [];
   // Defining an internal function to be able to remove the listener
   Future<void> _tabControllerListener() async {
-    await Tracking.instance
-        .tabControllerListener(widget.tabController!, widget.tabNames!);
+    await Tracking.instance.tabControllerListener(
+        screenId.toString(),
+        widget.screenName,
+        listOfMasks,
+        widget.tabController!,
+        widget.tabNames!);
   }
 
   @override
@@ -80,8 +87,9 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   void initState() {
     super.initState();
 
-    SessionReplay.instance.stop();
-    SessionReplay.instance.widgetsToMaskList.clear();
+    // SessionReplay.instance.clearMasks();
+    //TODO maybe we need to update this screenVisited variable
+
     WidgetsBindingNullSafe.instance!
       ..addObserver(this)
       ..addPostFrameCallback((_) async {
@@ -111,6 +119,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void dispose() {
+    callWhenIsNotCurrentRoute();
     CustomRouteObserver.screenWidgetRouteObserver.unsubscribe(this);
     WidgetsBindingNullSafe.instance!.removeObserver(this);
     widget.tabController?.removeListener(_tabControllerListener);
@@ -119,11 +128,14 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didPush() {
+    debugPrint("sw - didPush");
+
     callWhenIsCurrentRoute();
   }
 
   @override
   void didPopNext() {
+    debugPrint("sw - didPopNext");
     WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
       ///Check needed for implementations where instead of replacing the route
       ///with pushReplacement the implementation is like this:
@@ -131,6 +143,9 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       /// Navigator.of(context).pop();
       /// Navigator.of(context).push();
       /// ```
+      debugPrint("sw - addPostFrameCallback");
+
+      ///
       route = ModalRoute.of(context);
       if (route?.isCurrent ?? false) {
         callWhenIsCurrentRoute();
@@ -140,72 +155,53 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didPop() {
+    debugPrint("sw - didPop");
+
     callWhenIsNotCurrentRoute();
   }
 
   @override
   void didPushNext() {
+    debugPrint("sw - didPushNext");
+
     callWhenIsNotCurrentRoute();
   }
 
-  void callWhenIsNotCurrentRoute() {
-    SessionReplay.instance.stop();
+  Future<void> callWhenIsNotCurrentRoute() async {
+    await Tracking.instance.endScreen(screenId.toString(), isTabBar: isTabBar);
   }
 
   Future<void> callWhenIsCurrentRoute() async {
-    late String currentScreenName;
-
-    if (widget.tabController != null) {
-      currentScreenName = widget.tabNames![widget.tabController!.index];
-    } else {
-      currentScreenName = widget.screenName;
-    }
+    // if (widget.tabController != null) {
+    //   currentScreenName = widget.tabNames![widget.tabController!.index];
+    // }
 
     SessionReplay.instance.captureKey = _globalKey;
-
-    if (Tracking.instance.visitedScreensList.isNotEmpty &&
-        Tracking.instance.visitedScreensList.last.name != currentScreenName) {
-      await Tracking.instance
-          .endScreen(Tracking.instance.visitedScreensList.last);
-    }
-
-    if (Tracking.instance.visitedScreensList.isEmpty ||
-        Tracking.instance.visitedScreensList.last.name != currentScreenName) {
-      await Tracking.instance
-          .startScreen(currentScreenName, tabBarNames: widget.tabNames);
-    }
-
-    await SessionReplay.instance.start();
+    final ScreenVisited screenVisited = Tracking.instance.createScreenVisited(
+      screenId.toString(),
+      widget.screenName,
+      listOfMasks,
+      tabBarNames: widget.tabNames,
+      tabBarIndex: widget.tabController?.index,
+    );
+    await Tracking.instance.startScreen(
+      screenVisited,
+    );
+    // listOfMasks.add(_globalKey);
+    // Tracking.instance.visitedScreensList;
+    // }
+    // await SessionReplay.instance.start();
   }
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      key: _globalKey,
-      child: Material(child: Ink(child: widget.child)),
+    return _MaskList(
+      listOfMasks: listOfMasks,
+      child: RepaintBoundary(
+        key: _globalKey,
+        child: Material(child: Ink(child: widget.child)),
+      ),
     );
-  }
-}
-
-///Inherited Widget created to check with [getElementForInheritedWidgetOfExactType]
-///if the current ScreenWidget is inside another ScreenWidget.
-///This is a more performant alternative to using [findAncestorWidgetOfExactType]
-///without an InheritedWidget.
-class _ScreenWidgetInheritedWidget extends InheritedWidget {
-  const _ScreenWidgetInheritedWidget({
-    required _ActiveScreenWidget child,
-  })  : _child = child,
-        super(child: child);
-  final _ActiveScreenWidget _child;
-  static _ScreenWidgetInheritedWidget? of(BuildContext context) {
-    final _ScreenWidgetInheritedWidget? result = context
-        .dependOnInheritedWidgetOfExactType<_ScreenWidgetInheritedWidget>();
-    return result;
-  }
-
-  @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
-    return false;
   }
 }
 

@@ -1,4 +1,4 @@
-part of './screen_widget.dart';
+part of 'screen_widget/screen_widget.dart';
 
 class MaskWidget extends StatefulWidget {
   const MaskWidget({required this.child});
@@ -11,18 +11,19 @@ class MaskWidget extends StatefulWidget {
 
 class _MaskWidgetState extends State<MaskWidget> with RouteAware {
   late GlobalKey globalKey;
-
+  late List<GlobalKey> listOfMasks;
   @override
   void initState() {
     globalKey = GlobalKey();
-    addMask(globalKey);
 
     super.initState();
+    // addMask(globalKey);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    listOfMasks = _MaskList.of(context)!.listOfMasks;
     CustomRouteObserver.screenWidgetRouteObserver
         .subscribe(this, ModalRoute.of(context)!);
   }
@@ -57,14 +58,24 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
   }
 
   void addMask(GlobalKey globalKey) {
-    if (!SessionReplay.instance.widgetsToMaskList.contains(globalKey)) {
-      SessionReplay.instance.widgetsToMaskList.add(globalKey);
+    // if (listOfMasks == null)
+    //   throw (StateError("MaskWidget must have an ancestor ScreenWidget"));
+    if (!listOfMasks.contains(globalKey)) {
+      listOfMasks.add(globalKey);
+      debugPrint("add mask");
     }
+
+    // if (!SessionReplay.instance.widgetsToMaskList.contains(globalKey)) {
+    //   SessionReplay.instance.widgetsToMaskList.add(globalKey);
+    // }
   }
 
   void removeMask(GlobalKey globalKey) {
-    if (SessionReplay.instance.widgetsToMaskList.contains(globalKey)) {
-      SessionReplay.instance.widgetsToMaskList.remove(globalKey);
+    //   final List<GlobalKey>? listOfMasks = _MaskList.of(context)?.listOfMasks;
+    //   if (listOfMasks == null) return;
+    if (listOfMasks.contains(globalKey)) {
+      listOfMasks.remove(globalKey);
+      debugPrint("remove mask");
     }
   }
 

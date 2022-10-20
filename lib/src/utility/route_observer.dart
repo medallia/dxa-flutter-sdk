@@ -11,6 +11,8 @@ class CustomRouteObserver {
 class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    debugPrint("ro - didPush");
+
     if (route is! PopupRoute) {
       (route as ModalRoute).animation?.addStatusListener((status) {
         _animationListener(status, route);
@@ -25,7 +27,7 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
             WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
               SessionReplay.instance.isInPopupRoute = true;
               SessionReplay.instance.popupRouteContext = route.subtreeContext!;
-              SessionReplay.instance.start();
+              SessionReplay.instance.newScreen();
             });
           }
         });
@@ -36,6 +38,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    debugPrint("ro - didReplace");
+
     if (newRoute is ModalRoute) {
       newRoute.animation?.addStatusListener((status) {
         _animationListener(status, newRoute);
@@ -46,6 +50,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    debugPrint("ro - didPop");
+
     if (route is! PopupRoute) {
       (route as ModalRoute).animation?.addStatusListener((status) {
         _animationListener(status, route);
@@ -60,6 +66,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didRemove(Route route, Route? previousRoute) {
+    debugPrint("ro - didRemove");
+
     if (route is! PopupRoute) {
       (route as ModalRoute).animation?.addStatusListener((status) {
         _animationListener(status, route);

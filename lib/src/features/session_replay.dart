@@ -12,6 +12,9 @@ import 'package:flutter/rendering.dart';
 
 class SessionReplay {
   SessionReplay._internal() {
+    _timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
+      await maybeTakeScreenshot();
+    });
     autoMasking = AutoMasking();
     _frameTracking = FrameTracking(
       postFrameCallback: WidgetsBindingNullSafe.instance!.addPostFrameCallback,
@@ -21,10 +24,10 @@ class SessionReplay {
   }
   static final _instance = SessionReplay._internal();
   static SessionReplay get instance => _instance;
-  late FrameTracking _frameTracking;
-  late AutoMasking autoMasking;
+  late final FrameTracking _frameTracking;
+  late final AutoMasking autoMasking;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
-  final widgetsToMaskList = List<GlobalKey>.empty(growable: true);
+  // final widgetsToMaskList = List<GlobalKey>.empty(growable: true);
   final _maskColor = Paint()..color = Colors.grey;
   ScreenshotMessage? lastScreenshotSent;
   bool _isPageTransitioning = false;
@@ -33,10 +36,19 @@ class SessionReplay {
     _isPageTransitioning = value;
   }
 
+  bool get currentlyTracking =>
+      Tracking.instance.visitedUnfinishedScreensList.isNotEmpty;
+  ScreenVisited get currentTrackedSreen {
+    // if (Tracking.instance.visitedUnfinishedScreensList.isNotEmpty) {
+    return Tracking.instance.visitedUnfinishedScreensList.last;
+    // }
+    // return null;
+  }
+
   bool isInPopupRoute = false;
   GlobalKey? captureKey;
   BuildContext? popupRouteContext;
-  Timer? _timer;
+  late Timer _timer;
   bool _didUiChange = false;
   bool get didUiChange => _didUiChange;
   set didUiChange(bool change) {
@@ -55,27 +67,33 @@ class SessionReplay {
   BuildContext? get getCurrentContext =>
       !isInPopupRoute ? captureKey?.currentContext : popupRouteContext;
 
-  Future<void> start() async {
+  Future<void> newScreen() async {
     didUiChange = true;
-    if (_timer != null && _timer!.isActive) {
-      stop();
-    }
+    // if (_timer != null && _timer!.isActive) {
+    //   stop();
+    // }
     try {
       final bool isNotTabbar = Tracking.instance.visitedScreensList.isEmpty ||
           !Tracking.instance.visitedScreensList.last.isTabBar;
       if (isNotTabbar) {
         await forceTakeScreenshot();
       }
-    } finally {
-      _timer ??= Timer.periodic(const Duration(milliseconds: 250), (_) async {
-        await maybeTakeScreenshot();
-      });
-    }
+    } finally {}
+  }
+
+  void start() {
+    if (_timer.isActive) return;
+    _timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
+      await maybeTakeScreenshot();
+    });
   }
 
   void stop() {
-    _timer?.cancel();
-    _timer = null;
+    _timer.cancel();
+  }
+
+  void clearMasks() {
+    // widgetsToMaskList.clear();
     autoMasking.clear();
   }
 
@@ -86,7 +104,7 @@ class SessionReplay {
   }
 
   Future<void> forceTakeScreenshot() async {
-    if (_timer == null || !_timer!.isActive) {
+    if (!currentlyTracking) {
       return;
     }
     if (!isPageTransitioning && getCurrentContext != null) {
@@ -112,14 +130,14 @@ class SessionReplay {
       final Rect frame = renderObject.globalPaintBounds;
 
       final Offset newPosition = Offset(0, frame.top);
-      final int screenShotId = Tracking.instance.visitedScreensList.last.id;
-      final String screenShotName =
-          Tracking.instance.visitedScreensList.last.name;
+      final int screenShotId = currentTrackedSreen.uniqueId;
+      final String screenShotName = currentTrackedSreen.name;
       final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
-      final bool isTabBar = Tracking.instance.visitedScreensList.last.isTabBar;
+
       late ui.Image image;
       autoMasking.setAutoMasking(context);
-      manualMaskCoordinates = _saveMaskPosition();
+      manualMaskCoordinates =
+          _saveMaskPosition(currentTrackedSreen.listOfMasks);
       try {
         didUiChange = false;
         image = await (renderObject as RenderRepaintBoundary).toImage();
@@ -136,6 +154,8 @@ class SessionReplay {
           await resultImage.toByteData(format: ui.ImageByteFormat.png);
 
       if (resultImageData != null) {
+        debugPrint(
+            "screenshot - $screenShotId - $screenShotName - masks: ${manualMaskCoordinates.length}");
         await _sendScreenshot(
           resultImageData.buffer.asUint8List(),
           screenShotId,
@@ -172,17 +192,20 @@ class SessionReplay {
         ..screenId = lastScreenshotSent!.screenId
         ..screenName = lastScreenshotSent!.screenName
         ..startFocusTime = startFocusTime;
+      debugPrint(
+        'close screenshot - ${lastScreenshotSent!.screenId} - ${lastScreenshotSent!.screenName}',
+      );
 
       await _apiInstance.saveScreenshot(screenshotMessage);
     }
   }
 
-  Set<Rect> _saveMaskPosition() {
+  Set<Rect> _saveMaskPosition(List<GlobalKey> widgetsToMaskList) {
     final Set<Rect> coordinates = {};
 
     for (final globalKey in widgetsToMaskList) {
-      final RenderObject renderObject = globalKey.renderObject!;
-
+      final RenderObject? renderObject = globalKey.renderObject;
+      if (renderObject == null) continue;
       coordinates.addAll(_getMaskCoordinates(renderObject));
     }
     autoMasking.renderObjectsToMask
