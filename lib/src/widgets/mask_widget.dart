@@ -1,4 +1,4 @@
-part of './screen_widget.dart';
+part of 'screen_widget/screen_widget.dart';
 
 class MaskWidget extends StatefulWidget {
   const MaskWidget({required this.child});
@@ -23,6 +23,7 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    listOfMasks = _MaskList.of(context)!.listOfMasks;
     CustomRouteObserver.screenWidgetRouteObserver
         .subscribe(this, ModalRoute.of(context)!);
   }
@@ -61,6 +62,7 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
     //   throw (StateError("MaskWidget must have an ancestor ScreenWidget"));
     if (!listOfMasks.contains(globalKey)) {
       listOfMasks.add(globalKey);
+      debugPrint("add mask");
     }
 
     // if (!SessionReplay.instance.widgetsToMaskList.contains(globalKey)) {
@@ -73,6 +75,7 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
     //   if (listOfMasks == null) return;
     if (listOfMasks.contains(globalKey)) {
       listOfMasks.remove(globalKey);
+      debugPrint("remove mask");
     }
   }
 

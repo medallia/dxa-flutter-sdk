@@ -43,10 +43,10 @@ class DecibelSdk {
           consents.contains(
             enums.DecibelCustomerConsentType.recordingAndTracking,
           )) {
-        await SessionReplay.instance.start();
+        await SessionReplay.instance.newScreen();
       }
     } else {
-      await SessionReplay.instance.start();
+      await SessionReplay.instance.newScreen();
     }
   }
 

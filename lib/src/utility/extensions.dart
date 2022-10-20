@@ -1,5 +1,6 @@
+import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/enums.dart';
-import 'package:decibel_sdk/src/widgets/screen_widget.dart';
+import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -67,4 +68,38 @@ extension WidgetsBindingNullSafe on WidgetsBinding {
   static T? _ambiguate<T>(T? value) => value;
 
   static WidgetsBinding? get instance => _ambiguate(WidgetsBinding.instance)!;
+}
+
+extension ScreenVisitedFinder on List<ScreenVisited> {
+  ScreenVisited? findWithId(String screenId) {
+    final int index = getIndex(screenId);
+    if (index != -1) {
+      return this[index];
+    } else {
+      return null;
+    }
+  }
+
+  int getIndex(String screenId) => indexWhere((element) {
+        // if (element.isTabBar) {
+        //   return (element as ScreenVisitedTabBar).tabBarId == screenId;
+        // } else {
+        return element.id == screenId;
+        // }
+      });
+  ScreenVisitedTabBar? findTabBarWithId(String screenId) {
+    final int index = getTabBarIndex(screenId);
+    if (index != -1) {
+      return this[index] as ScreenVisitedTabBar;
+    } else {
+      return null;
+    }
+  }
+
+  int getTabBarIndex(String screenId) => indexWhere((element) {
+        if (element.isTabBar) {
+          return (element as ScreenVisitedTabBar).tabBarId == screenId;
+        }
+        return false;
+      });
 }
