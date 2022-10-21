@@ -42,9 +42,9 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
 
   @override
   void didPopNext() {
-    WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
-      addMask(globalKey);
-    });
+    // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
+    addMask(globalKey);
+    // });
   }
 
   @override

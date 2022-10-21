@@ -45,9 +45,9 @@ class SessionReplay {
     // return null;
   }
 
-  bool isInPopupRoute = false;
-  GlobalKey? captureKey;
-  BuildContext? popupRouteContext;
+  // bool isInPopupRoute = false;
+  // GlobalKey? captureKey;
+  // BuildContext? popupRouteContext;
   late Timer _timer;
   bool _didUiChange = false;
   bool get didUiChange => _didUiChange;
@@ -64,8 +64,9 @@ class SessionReplay {
     });
   }
 
-  BuildContext? get getCurrentContext =>
-      !isInPopupRoute ? captureKey?.currentContext : popupRouteContext;
+  BuildContext? get getCurrentContext => currentTrackedSreen.getCurrentContext;
+  // BuildContext? get getCurrentContext =>
+  //     !isInPopupRoute ? captureKey?.currentContext : popupRouteContext;
 
   Future<void> newScreen() async {
     didUiChange = true;
@@ -205,6 +206,8 @@ class SessionReplay {
 
     for (final globalKey in widgetsToMaskList) {
       final RenderObject? renderObject = globalKey.renderObject;
+      //TODO: this is used for tabbars because they share masks references,
+      //research how to avoid this
       if (renderObject == null) continue;
       coordinates.addAll(_getMaskCoordinates(renderObject));
     }

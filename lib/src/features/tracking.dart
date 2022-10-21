@@ -13,9 +13,8 @@ class Tracking {
   static Tracking get instance => _instance;
 
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
-
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
-  List<ScreenVisited> _visitedScreensList = [];
+  final List<ScreenVisited> _visitedScreensList = [];
   void _addVisitedScreenList(ScreenVisited screenVisited) {
     // final List<ScreenVisited> bufferList =
     //     List.from([..._visitedScreensList, screenVisited], growable: false);
@@ -30,8 +29,12 @@ class Tracking {
   }
 
   ScreenVisited createScreenVisited(
-      String id, String name, List<GlobalKey> listOfMasks,
-      {List<String>? tabBarNames, int? tabBarIndex}) {
+      {required String id,
+      required String name,
+      required List<GlobalKey> listOfMasks,
+      required GlobalKey captureKey,
+      List<String>? tabBarNames,
+      int? tabBarIndex}) {
     assert(
       (tabBarNames != null && tabBarIndex != null) ||
           (tabBarNames == null && tabBarIndex == null),
@@ -45,6 +48,7 @@ class Tracking {
           id: id,
           timestamp: timestamp,
           name: name,
+          captureKey: captureKey,
           tabBarNames: tabBarNames,
           tabIndex: tabBarIndex,
           listOfMasks: listOfMasks);
@@ -56,6 +60,7 @@ class Tracking {
       screenVisited = ScreenVisited(
         id: id,
         listOfMasks: listOfMasks,
+        captureKey: captureKey,
         timestamp: timestamp,
         name: name,
       );
@@ -147,14 +152,15 @@ class Tracking {
   // }
 
   ///Listener for tabBar change of tab
-  Future<void> tabControllerListener(
-    String screenId,
-    String name,
-    List<GlobalKey> listOfMasks,
-    TabController tabController,
-    List<String> tabNames,
-  ) async {
-    SessionReplay.instance.isPageTransitioning = tabController.offset != 0;
+  Future<void> tabControllerListener({
+    required String screenId,
+    required String name,
+    required List<GlobalKey> listOfMasks,
+    required GlobalKey captureKey,
+    required TabController tabController,
+    required List<String> tabNames,
+  }) async {
+    SessionReplay.instance.isPageTransitioning = tabController.indexIsChanging;
 
     if (tabController.index != tabController.previousIndex &&
         !tabController.indexIsChanging) {
@@ -165,9 +171,8 @@ class Tracking {
       });
 
       if (index != -1) {
-        await Tracking.instance.endScreen(
-          visitedScreensList[index].id,
-        );
+        await Tracking.instance
+            .endScreen(visitedScreensList[index].id, isTabBar: true);
       }
       // final ScreenVisited? screenVisitedTabBar =
       //     visitedScreensList.findWithId(screenId);
@@ -182,8 +187,12 @@ class Tracking {
       //   );
       // }
       final ScreenVisited screenVisited = createScreenVisited(
-          screenId, name, listOfMasks,
-          tabBarNames: tabNames, tabBarIndex: tabController.index);
+          id: screenId,
+          name: name,
+          listOfMasks: listOfMasks,
+          captureKey: captureKey,
+          tabBarNames: tabNames,
+          tabBarIndex: tabController.index);
       await startScreen(screenVisited);
     }
   }
@@ -196,7 +205,15 @@ class ScreenVisited {
   final int timestamp;
   final int? endTimestamp;
   final bool isTabBar;
+  final GlobalKey captureKey;
   final List<GlobalKey> listOfMasks;
+  final bool isDialog;
+  final BuildContext? dialogContext;
+  BuildContext? get getCurrentContext {
+    if (!isDialog) return captureKey.currentContext;
+    return dialogContext!;
+  }
+
   // final List<ScreenVisited> tabBarScreens;
   final bool finished;
   int get uniqueId => id.hashCode ^ timestamp.hashCode;
@@ -206,26 +223,45 @@ class ScreenVisited {
     required this.name,
     required this.timestamp,
     required this.listOfMasks,
+    required this.captureKey,
     this.endTimestamp,
   })  : finished = false,
-        isTabBar = false;
+        isDialog = false,
+        isTabBar = false,
+        dialogContext = null;
   const ScreenVisited.finished({
     required this.id,
     required this.timestamp,
     required this.name,
     required this.endTimestamp,
     required this.listOfMasks,
+    required this.captureKey,
   })  : finished = true,
-        isTabBar = false;
+        isDialog = false,
+        isTabBar = false,
+        dialogContext = null;
   const ScreenVisited.tabBarChild({
     required this.id,
     required this.name,
     required this.timestamp,
+    required this.captureKey,
     this.listOfMasks = const [],
     this.endTimestamp,
   })  : finished = false,
-        isTabBar = true;
-
+        isDialog = false,
+        isTabBar = true,
+        dialogContext = null;
+  const ScreenVisited.dialog({
+    required this.id,
+    required this.timestamp,
+    required this.name,
+    required this.listOfMasks,
+    required this.captureKey,
+    required this.dialogContext,
+    this.endTimestamp,
+  })  : finished = false,
+        isDialog = true,
+        isTabBar = false;
   // factory ScreenVisited.tabBar(
   //     {required int id,
   //     required int timestamp,
@@ -255,9 +291,22 @@ class ScreenVisited {
       id: id,
       name: name,
       listOfMasks: listOfMasks,
+      captureKey: captureKey,
       timestamp: timestamp,
       endTimestamp: endTimestamp,
     );
+  }
+
+  ScreenVisited getDialogScreenVisited(
+      String routeId, BuildContext dialogContext) {
+    final int timestamp = DateTime.now().millisecondsSinceEpoch;
+    return ScreenVisited.dialog(
+        id: routeId,
+        name: '$name-dialog',
+        timestamp: timestamp,
+        listOfMasks: listOfMasks,
+        captureKey: captureKey,
+        dialogContext: dialogContext);
   }
 
   @override
@@ -279,6 +328,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required int timestamp,
     required String name,
     required List<GlobalKey> listOfMasks,
+    required GlobalKey captureKey,
     required List<String> tabBarNames,
     required int tabIndex,
   }) {
@@ -290,6 +340,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
         id: '$id-$name',
         timestamp: timestamp,
         name: name,
+        captureKey: captureKey,
       );
     }).toList();
 
@@ -297,6 +348,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
         id: idWithTabName,
         tabBarId: id,
         timestamp: timestamp,
+        captureKey: captureKey,
         name: tabName,
         tabBarScreens: tabBarScreens,
         tabIndex: tabIndex,
@@ -307,6 +359,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
       {required super.id,
       required super.name,
       required super.timestamp,
+      required super.captureKey,
       required this.tabBarScreens,
       required this.tabIndex,
       required this.tabBarId,
