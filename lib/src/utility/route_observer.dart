@@ -1,4 +1,5 @@
 import 'package:decibel_sdk/src/features/session_replay.dart';
+import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:flutter/material.dart';
 
@@ -13,8 +14,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     debugPrint("ro - didPush");
 
-    if (route is! PopupRoute) {
-      (route as ModalRoute).animation?.addStatusListener((status) {
+    if (route is ModalRoute) {
+      route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
     }
@@ -25,9 +26,15 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
         context.visitChildElements((element) {
           if (element.containsScreenWidget()) {
             WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
-              SessionReplay.instance.isInPopupRoute = true;
-              SessionReplay.instance.popupRouteContext = route.subtreeContext!;
-              SessionReplay.instance.newScreen();
+              final BuildContext dialogContext = route.subtreeContext!;
+              final ScreenVisited screenVisited = Tracking
+                  .instance.visitedScreensList.last
+                  .getDialogScreenVisited(
+                route.hashCode.toString(),
+                dialogContext,
+              );
+
+              Tracking.instance.startScreen(screenVisited);
             });
           }
         });
@@ -52,14 +59,13 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     debugPrint("ro - didPop");
 
-    if (route is! PopupRoute) {
-      (route as ModalRoute).animation?.addStatusListener((status) {
+    if (route is ModalRoute) {
+      route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
     }
     if (route is PopupRoute) {
-      SessionReplay.instance.isInPopupRoute = false;
-      SessionReplay.instance.popupRouteContext = null;
+      Tracking.instance.endScreen(route.hashCode.toString());
     }
     super.didPop(route, previousRoute);
   }
@@ -68,8 +74,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   void didRemove(Route route, Route? previousRoute) {
     debugPrint("ro - didRemove");
 
-    if (route is! PopupRoute) {
-      (route as ModalRoute).animation?.addStatusListener((status) {
+    if (route is ModalRoute) {
+      route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
     }
@@ -80,11 +86,14 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
     if (route.offstage) return;
     if (status == AnimationStatus.completed ||
         status == AnimationStatus.dismissed) {
+      debugPrint("Transitioning false");
       SessionReplay.instance.isPageTransitioning = false;
       route.animation?.removeStatusListener((status) {
         _animationListener(status, route);
       });
     } else {
+      debugPrint("Transitioning true");
+
       SessionReplay.instance.isPageTransitioning = true;
     }
   }

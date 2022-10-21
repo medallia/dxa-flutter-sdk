@@ -69,11 +69,12 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   // Defining an internal function to be able to remove the listener
   Future<void> _tabControllerListener() async {
     await Tracking.instance.tabControllerListener(
-        screenId.toString(),
-        widget.screenName,
-        listOfMasks,
-        widget.tabController!,
-        widget.tabNames!);
+        screenId: screenId.toString(),
+        name: widget.screenName,
+        listOfMasks: listOfMasks,
+        captureKey: _globalKey,
+        tabController: widget.tabController!,
+        tabNames: widget.tabNames!);
   }
 
   @override
@@ -136,21 +137,21 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   @override
   void didPopNext() {
     debugPrint("sw - didPopNext");
-    WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
-      ///Check needed for implementations where instead of replacing the route
-      ///with pushReplacement the implementation is like this:
-      /// ```dart
-      /// Navigator.of(context).pop();
-      /// Navigator.of(context).push();
-      /// ```
-      debugPrint("sw - addPostFrameCallback");
+    // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
+    ///Check needed for implementations where instead of replacing the route
+    ///with pushReplacement the implementation is like this:
+    /// ```dart
+    /// Navigator.of(context).pop();
+    /// Navigator.of(context).push();
+    /// ```
+    debugPrint("sw - addPostFrameCallback");
 
-      ///
-      route = ModalRoute.of(context);
-      if (route?.isCurrent ?? false) {
-        callWhenIsCurrentRoute();
-      }
-    });
+    ///
+    route = ModalRoute.of(context);
+    if (route?.isCurrent ?? false) {
+      callWhenIsCurrentRoute();
+    }
+    // });
   }
 
   @override
@@ -176,11 +177,12 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     //   currentScreenName = widget.tabNames![widget.tabController!.index];
     // }
 
-    SessionReplay.instance.captureKey = _globalKey;
+    // SessionReplay.instance.captureKey = _globalKey;
     final ScreenVisited screenVisited = Tracking.instance.createScreenVisited(
-      screenId.toString(),
-      widget.screenName,
-      listOfMasks,
+      id: screenId.toString(),
+      name: widget.screenName,
+      listOfMasks: listOfMasks,
+      captureKey: _globalKey,
       tabBarNames: widget.tabNames,
       tabBarIndex: widget.tabController?.index,
     );
