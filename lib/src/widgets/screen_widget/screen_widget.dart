@@ -95,12 +95,17 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       ..addObserver(this)
       ..addPostFrameCallback((_) async {
         route = ModalRoute.of(context);
-        assert(
-          route is! PopupRoute<dynamic>,
-          '''ScreenWidget should not be used to wrap widgets in Popup Routes, 
-          theses Popups are detected automatically and considered part of the 
-          ScreenWidget that launched them.''',
-        );
+//         if (route is PopupRoute<dynamic>) {
+//           assert(route!.settings.arguments == ScreenWidget, '''
+// When using the method showDialog<T>, please put ScreenWidget as the generic type
+// ''');
+//         }
+        // assert(
+        //   route is! PopupRoute<dynamic>,
+        //   '''ScreenWidget should not be used to wrap widgets in Popup Routes,
+        //   theses Popups are detected automatically and considered part of the
+        //   ScreenWidget that launched them.''',
+        // );
         // route?.animation?.addStatusListener(_animationListener);
       });
     widget.tabController?.addListener(_tabControllerListener);
