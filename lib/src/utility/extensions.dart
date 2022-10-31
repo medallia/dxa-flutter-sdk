@@ -98,6 +98,8 @@ extension ScreenVisitedFinder on List<ScreenVisited> {
 
   int getTabBarIndex(String screenId) => indexWhere((element) {
         if (element.isTabBar) {
+          //first conditional for when we have the screenId of the tab
+          //second one for when we have only the id for the parent TabBar
           return (element as ScreenVisitedTabBar).id == screenId ||
               element.tabBarId == screenId;
         }
