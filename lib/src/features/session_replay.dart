@@ -108,7 +108,9 @@ class SessionReplay {
     if (!currentlyTracking) {
       return;
     }
-    if (!isPageTransitioning && getCurrentContext != null) {
+    if (!isPageTransitioning &&
+        getCurrentContext != null &&
+        Tracking.instance.isReadyForScreenshot) {
       await _captureImage(getCurrentContext!);
     } else {
       _forceScreenshotNextFrame();

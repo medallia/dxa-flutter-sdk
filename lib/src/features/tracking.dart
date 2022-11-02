@@ -13,8 +13,10 @@ class Tracking {
   static Tracking get instance => _instance;
 
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
-  List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   final List<ScreenVisited> _visitedScreensList = [];
+  List<ScreenVisited> get visitedScreensList => _visitedScreensList;
+  bool isReadyForScreenshot = true;
+
   void _addVisitedScreenList(ScreenVisited screenVisited) {
     // final List<ScreenVisited> bufferList =
     //     List.from([..._visitedScreensList, screenVisited], growable: false);
@@ -88,6 +90,7 @@ class Tracking {
   Future<void> endScreen(String screenId, {bool isTabBar = false}) async {
     // final int index =
     //     visitedScreensList.indexWhere((element) => element.id == screenId);
+    isReadyForScreenshot = false;
     SessionReplay.instance.clearMasks();
     late ScreenVisited screenVisited;
     late ScreenVisited? potentialScreenVisited;
@@ -112,6 +115,8 @@ class Tracking {
 
     visitedScreensList[index] = screenVisitedFinished;
     debugPrint("endScreen - $screenVisitedFinished");
+    isReadyForScreenshot = true;
+
     await _apiInstance.endScreen(
       EndScreenMessage()
         ..screenName = screenVisitedFinished.name
