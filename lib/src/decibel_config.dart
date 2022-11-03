@@ -122,4 +122,9 @@ class DecibelSdk {
   static Future<String?> getWebViewProperties() async {
     return _api.getWebViewProperties();
   }
+
+  //Set the automasking configuration
+  static void setAutoMasking(Set<enums.AutoMaskingType> widgetsToMask) {
+    SessionReplay.instance.autoMasking.autoMaskingTypeSet = widgetsToMask;
+  }
 }
