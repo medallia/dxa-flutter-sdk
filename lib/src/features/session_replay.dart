@@ -26,7 +26,6 @@ class SessionReplay {
   late final FrameTracking _frameTracking;
   late final AutoMasking autoMasking;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
-  // final widgetsToMaskList = List<GlobalKey>.empty(growable: true);
   final _maskColor = Paint()..color = Colors.grey;
   ScreenshotMessage? lastScreenshotSent;
   bool _isPageTransitioning = false;
@@ -38,15 +37,9 @@ class SessionReplay {
   bool get currentlyTracking =>
       Tracking.instance.visitedUnfinishedScreensList.isNotEmpty;
   ScreenVisited get currentTrackedSreen {
-    // if (Tracking.instance.visitedUnfinishedScreensList.isNotEmpty) {
     return Tracking.instance.visitedUnfinishedScreensList.last;
-    // }
-    // return null;
   }
 
-  // bool isInPopupRoute = false;
-  // GlobalKey? captureKey;
-  // BuildContext? popupRouteContext;
   late Timer _timer;
   bool _didUiChange = false;
   bool get didUiChange => _didUiChange;
@@ -64,14 +57,9 @@ class SessionReplay {
   }
 
   BuildContext? get getCurrentContext => currentTrackedSreen.getCurrentContext;
-  // BuildContext? get getCurrentContext =>
-  //     !isInPopupRoute ? captureKey?.currentContext : popupRouteContext;
 
   Future<void> newScreen() async {
     didUiChange = true;
-    // if (_timer != null && _timer!.isActive) {
-    //   stop();
-    // }
     try {
       final bool isNotTabbar = Tracking.instance.visitedScreensList.isEmpty ||
           !Tracking.instance.visitedScreensList.last.isTabBar;
@@ -93,7 +81,6 @@ class SessionReplay {
   }
 
   void clearMasks() {
-    // widgetsToMaskList.clear();
     autoMasking.clear();
   }
 
@@ -107,9 +94,7 @@ class SessionReplay {
     if (!currentlyTracking) {
       return;
     }
-    if (!isPageTransitioning &&
-        getCurrentContext != null &&
-        Tracking.instance.isReadyForScreenshot) {
+    if (!isPageTransitioning && getCurrentContext != null) {
       await _captureImage(getCurrentContext!);
     } else {
       _forceScreenshotNextFrame();
@@ -156,8 +141,6 @@ class SessionReplay {
           await resultImage.toByteData(format: ui.ImageByteFormat.png);
 
       if (resultImageData != null) {
-        debugPrint(
-            "screenshot - $screenShotId - $screenShotName - masks: ${manualMaskCoordinates.length}");
         await _sendScreenshot(
           resultImageData.buffer.asUint8List(),
           screenShotId,
@@ -183,6 +166,8 @@ class SessionReplay {
     await _apiInstance.saveScreenshot(screenshotMessage);
   }
 
+  ///Resends the last screenshot to native (with a new focusTime) only
+  ///if there's been a second or more without any new screenshots
   Future<void> closeScreenVideo() async {
     if (lastScreenshotSent != null &&
         DateTime.now().millisecondsSinceEpoch -
@@ -194,9 +179,6 @@ class SessionReplay {
         ..screenId = lastScreenshotSent!.screenId
         ..screenName = lastScreenshotSent!.screenName
         ..startFocusTime = startFocusTime;
-      debugPrint(
-        'close screenshot - ${lastScreenshotSent!.screenId} - ${lastScreenshotSent!.screenName}',
-      );
 
       await _apiInstance.saveScreenshot(screenshotMessage);
     }

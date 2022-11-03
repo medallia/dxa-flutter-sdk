@@ -1,11 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:collection';
-
-import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:flutter/material.dart';
-
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
+import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:flutter/material.dart';
 
 class Tracking {
   Tracking._internal();
@@ -15,28 +12,24 @@ class Tracking {
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final List<ScreenVisited> _visitedScreensList = [];
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
-  bool isReadyForScreenshot = true;
 
   void _addVisitedScreenList(ScreenVisited screenVisited) {
-    // final List<ScreenVisited> bufferList =
-    //     List.from([..._visitedScreensList, screenVisited], growable: false);
-    // _visitedScreensList = bufferList;
     _visitedScreensList.add(screenVisited);
   }
 
   List<ScreenVisited> get visitedUnfinishedScreensList {
     return List<ScreenVisited>.from(visitedScreensList)
       ..removeWhere((element) => element.finished);
-    // visitedScreensList.removeWhere((element) => element.finished);
   }
 
-  ScreenVisited createScreenVisited(
-      {required String id,
-      required String name,
-      required List<GlobalKey> listOfMasks,
-      required GlobalKey captureKey,
-      List<String>? tabBarNames,
-      int? tabBarIndex}) {
+  ScreenVisited createScreenVisited({
+    required String id,
+    required String name,
+    required List<GlobalKey> listOfMasks,
+    required GlobalKey captureKey,
+    List<String>? tabBarNames,
+    int? tabBarIndex,
+  }) {
     assert(
       (tabBarNames != null && tabBarIndex != null) ||
           (tabBarNames == null && tabBarIndex == null),
@@ -47,17 +40,14 @@ class Tracking {
     late ScreenVisited screenVisited;
     if (tabBarNames != null && tabBarIndex != null) {
       screenVisited = ScreenVisitedTabBar(
-          id: id,
-          timestamp: timestamp,
-          name: name,
-          captureKey: captureKey,
-          tabBarNames: tabBarNames,
-          tabIndex: tabBarIndex,
-          listOfMasks: listOfMasks);
-      // _addVisitedScreenList(
-      //   screenVisitedTabBar,
-      // );
-      // screenVisited = screenVisitedTabBar.tabBarScreens[tabBarIndex];
+        id: id,
+        timestamp: timestamp,
+        name: name,
+        captureKey: captureKey,
+        tabBarNames: tabBarNames,
+        tabIndex: tabBarIndex,
+        listOfMasks: listOfMasks,
+      );
     } else {
       screenVisited = ScreenVisited(
         id: id,
@@ -74,9 +64,6 @@ class Tracking {
     _addVisitedScreenList(
       screenVisited,
     );
-    // }
-
-    debugPrint('startScreen - $screenVisited');
 
     await _apiInstance.startScreen(
       StartScreenMessage()
@@ -88,9 +75,6 @@ class Tracking {
   }
 
   Future<void> endScreen(String screenId, {bool isTabBar = false}) async {
-    // final int index =
-    //     visitedScreensList.indexWhere((element) => element.id == screenId);
-    isReadyForScreenshot = false;
     SessionReplay.instance.clearMasks();
     late ScreenVisited screenVisited;
     late ScreenVisited? potentialScreenVisited;
@@ -103,19 +87,19 @@ class Tracking {
     }
     //check to see if this screen has already been closed before
     if (potentialScreenVisited == null) return;
-    screenVisited = potentialScreenVisited;
-    final int index = visitedScreensList.indexOf(screenVisited);
 
-    //check to see if this screen has already been closed before
-    // if (screenVisited.finished) return;
+    screenVisited = potentialScreenVisited;
+    //find the visitedScreen which is not finished, to then get its finished
+    //version and replace the original in the visitedScreensList
+    final int index = visitedScreensList.indexOf(screenVisited);
     final int endTime = DateTime.now().millisecondsSinceEpoch;
-    await SessionReplay.instance.closeScreenVideo();
     final ScreenVisited screenVisitedFinished =
         screenVisited.getScreenVisitedAsFinished(endTime);
-
     visitedScreensList[index] = screenVisitedFinished;
-    debugPrint("endScreen - $screenVisitedFinished");
-    isReadyForScreenshot = true;
+
+    //fire and forget to keep synchronicity
+    //ignore: unawaited_futures
+    SessionReplay.instance.closeScreenVideo();
 
     await _apiInstance.endScreen(
       EndScreenMessage()
@@ -125,38 +109,10 @@ class Tracking {
     );
   }
 
-  // Future<void> startScreenTabBar(
-  //   int id,
-  //   String name,
-  //   List<String> tabBarNames,
-  //   int tabBarIndex,
-  // ) async {
-  //   final int timestamp = DateTime.now().millisecondsSinceEpoch;
-
-  //   final ScreenVisitedTabBar screenVisitedTabBar = ScreenVisitedTabBar(
-  //     id: id,
-  //     timestamp: timestamp,
-  //     name: name,
-  //     tabBarNames: tabBarNames,
-  //     tabIndex: tabBarIndex,
-  //   );
-  //   final ScreenVisited screenVisited =
-  //       screenVisitedTabBar.tabBarScreens[tabBarIndex];
-  //   // await startScreen(screenVisited.id, screenVisited.name);
-  //   _addVisitedScreenList(
-  //     screenVisited,
-  //   );
-  //   debugPrint('startScreenTabBar - $screenVisited');
-
-  //   await _apiInstance.startScreen(
-  //     StartScreenMessage()
-  //       ..screenName = screenVisited.name
-  //       ..screenId = screenVisited.idHashCode
-  //       ..startTime = screenVisited.timestamp,
-  //   );
-  // }
-
-  ///Listener for tabBar change of tab
+  ///Listener for tabBar change of tab.
+  ///Due to how the listener works, everytime a new tab is added as a screen,
+  ///the SDK must check if there was another tab from this TabBar before.
+  ///In normal screens the startScreen and endScreen are independent.
   Future<void> tabControllerListener({
     required String screenId,
     required String name,
@@ -169,28 +125,14 @@ class Tracking {
 
     if (tabController.index != tabController.previousIndex &&
         !tabController.indexIsChanging) {
-      // SessionReplay.instance.clearMasks();
-      final int index = visitedScreensList.indexWhere((element) {
-        if (!element.isTabBar) return false;
-        return (element as ScreenVisitedTabBar).tabBarId == screenId;
-      });
-
+      //Find if this TabBarScreen (NOT the individual Tab) has been visited
+      //and call endScreen on it if so.
+      final int index = visitedScreensList.getTabBarIndex(screenId);
       if (index != -1) {
         await Tracking.instance
             .endScreen(visitedScreensList[index].id, isTabBar: true);
       }
-      // final ScreenVisited? screenVisitedTabBar =
-      //     visitedScreensList.findWithId(screenId);
-      // if (screenVisitedTabBar != null) {
-      //   await Tracking.instance.endScreen(
-      //     screenVisitedTabBar.id,
-      //   );
-      // }
-      // if (Tracking.instance.visitedScreensList.last.isTabBar) {
-      //   await Tracking.instance.endScreen(
-      //     Tracking.instance.visitedScreensList.last.id,
-      //   );
-      // }
+
       final ScreenVisited screenVisited = createScreenVisited(
           id: screenId,
           name: name,
@@ -219,10 +161,8 @@ class ScreenVisited {
     return dialogContext!;
   }
 
-  // final List<ScreenVisited> tabBarScreens;
   final bool finished;
   int get uniqueId => id.hashCode ^ timestamp.hashCode;
-  // int get idHashCode => id.hashCode;
   const ScreenVisited({
     required this.id,
     required this.name,
@@ -234,6 +174,9 @@ class ScreenVisited {
         isDialog = false,
         isTabBar = false,
         dialogContext = null;
+
+  ///Used by [getScreenVisitedAsFinished] to get a finished version
+  ///of a ScreenVisited object
   const ScreenVisited.finished({
     required this.id,
     required this.timestamp,
@@ -267,29 +210,6 @@ class ScreenVisited {
   })  : finished = false,
         isDialog = true,
         isTabBar = false;
-  // factory ScreenVisited.tabBar(
-  //     {required int id,
-  //     required int timestamp,
-  //     required String name,
-  //     required List<String> tabBarNames}) {
-  //   assert(tabBarNames.isNotEmpty);
-  //   //TODO remove this
-  //   // if (tabBarNames.isEmpty) {
-  //   //   return ScreenVisited(id: id, timestamp: timestamp, name: name);
-  //   // }
-  //   final List<ScreenVisited> tabBarScreens =
-  //       tabBarNames.map<ScreenVisited>((name) {
-  //     return ScreenVisited.stringId(
-  //         id: '$id-$name', timestamp: timestamp, name: name);
-  //   }).toList();
-
-  //   return ScreenVisited(
-  //       id: id,
-  //       timestamp: timestamp,
-  //       name: name,
-  //       isTabBar: true,
-  //       tabBarScreens: tabBarScreens);
-  // }
 
   ScreenVisited getScreenVisitedAsFinished(int endTimestamp) {
     return ScreenVisited.finished(
@@ -306,12 +226,13 @@ class ScreenVisited {
       String routeId, BuildContext dialogContext) {
     final int timestamp = DateTime.now().millisecondsSinceEpoch;
     return ScreenVisited.dialog(
-        id: routeId,
-        name: '$name-dialog',
-        timestamp: timestamp,
-        listOfMasks: listOfMasks,
-        captureKey: captureKey,
-        dialogContext: dialogContext);
+      id: routeId,
+      name: '$name-dialog',
+      timestamp: timestamp,
+      listOfMasks: listOfMasks,
+      captureKey: captureKey,
+      dialogContext: dialogContext,
+    );
   }
 
   @override
@@ -320,6 +241,10 @@ class ScreenVisited {
   }
 }
 
+///ScreenVisited version for screens that are tabBars.
+///Used only when the TabBar Screen is still unfinished, when the finished version
+///is used by calling [getScreenVisitedAsFinished] or [ScreenVisited.finished]
+///it's then converted back to a ScreenVisited object.
 @immutable
 class ScreenVisitedTabBar extends ScreenVisited {
   final List<ScreenVisited> tabBarScreens;
@@ -360,17 +285,17 @@ class ScreenVisitedTabBar extends ScreenVisited {
         tabBarname: name,
         listOfMasks: listOfMasks);
   }
-  const ScreenVisitedTabBar.internal(
-      {required super.id,
-      required super.name,
-      required super.timestamp,
-      required super.captureKey,
-      required this.tabBarScreens,
-      required this.tabIndex,
-      required this.tabBarId,
-      required this.tabBarname,
-      required super.listOfMasks})
-      : super.tabBarChild();
+  const ScreenVisitedTabBar.internal({
+    required super.id,
+    required super.name,
+    required super.timestamp,
+    required super.captureKey,
+    required this.tabBarScreens,
+    required this.tabIndex,
+    required this.tabBarId,
+    required this.tabBarname,
+    required super.listOfMasks,
+  }) : super.tabBarChild();
 
   @override
   String toString() {
