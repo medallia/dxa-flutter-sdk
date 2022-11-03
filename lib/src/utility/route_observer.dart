@@ -1,4 +1,5 @@
 import 'package:decibel_sdk/src/features/session_replay.dart';
+import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:flutter/material.dart';
 
@@ -11,23 +12,39 @@ class CustomRouteObserver {
 class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (route is! PopupRoute) {
-      (route as ModalRoute).animation?.addStatusListener((status) {
+    if (route is ModalRoute) {
+      route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
     }
     if (route is PopupRoute) {
-      if (previousRoute != null) {
-        final BuildContext context =
-            (previousRoute as PageRoute).subtreeContext!;
-        context.visitChildElements((element) {
-          if (element.containsScreenWidget()) {
-            WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
-              SessionReplay.instance.isInPopupRoute = true;
-              SessionReplay.instance.popupRouteContext = route.subtreeContext!;
-              SessionReplay.instance.start();
-            });
-          }
+      if (previousRoute != null && previousRoute is PageRoute) {
+        final BuildContext previousContext = previousRoute.subtreeContext!;
+
+        WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
+          final BuildContext currentContext = route.subtreeContext!;
+          // check if the popup has a screenwidget
+          currentContext.visitChildElements((element) {
+            if (element.containsScreenWidget()) {
+              return;
+            } else {
+              previousContext.visitChildElements((previousElement) {
+                if (previousElement.containsScreenWidget()) {
+                  // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
+                  final BuildContext dialogContext = route.subtreeContext!;
+                  final ScreenVisited screenVisited = Tracking
+                      .instance.visitedScreensList.last
+                      .getDialogScreenVisited(
+                    route.hashCode.toString(),
+                    dialogContext,
+                  );
+
+                  Tracking.instance.startScreen(screenVisited);
+                  // });
+                }
+              });
+            }
+          });
         });
       }
     }
@@ -41,30 +58,32 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
         _animationListener(status, newRoute);
       });
     }
+    if (oldRoute != null) {
+      checkForDialogPopOrRemove(oldRoute);
+    }
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (route is! PopupRoute) {
-      (route as ModalRoute).animation?.addStatusListener((status) {
+    if (route is ModalRoute) {
+      route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
     }
-    if (route is PopupRoute) {
-      SessionReplay.instance.isInPopupRoute = false;
-      SessionReplay.instance.popupRouteContext = null;
-    }
+    checkForDialogPopOrRemove(route);
+
     super.didPop(route, previousRoute);
   }
 
   @override
   void didRemove(Route route, Route? previousRoute) {
-    if (route is! PopupRoute) {
-      (route as ModalRoute).animation?.addStatusListener((status) {
+    if (route is ModalRoute) {
+      route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
     }
+
     super.didRemove(route, previousRoute);
   }
 
@@ -78,6 +97,20 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
       });
     } else {
       SessionReplay.instance.isPageTransitioning = true;
+    }
+  }
+
+  void checkForDialogPopOrRemove(Route dialogRoute) {
+    if (dialogRoute is PopupRoute) {
+      final BuildContext currentContext = dialogRoute.subtreeContext!;
+      // check if the popup has a screenwidget
+      currentContext.visitChildElements((element) {
+        if (element.containsScreenWidget()) {
+          return;
+        } else {
+          Tracking.instance.endScreen(dialogRoute.hashCode.toString());
+        }
+      });
     }
   }
 }

@@ -1,5 +1,6 @@
+import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/enums.dart';
-import 'package:decibel_sdk/src/widgets/screen_widget.dart';
+import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -19,7 +20,8 @@ extension ElementExt on Element {
           flag = true;
           return;
         } else {
-          //Commented out because there may be two Scaffolds
+          //TODO: Commented out because there may be two Scaffolds.
+          //Room for improvement.
           // if (element.widget.runtimeType == Scaffold) {
           //   return;
           // }
@@ -67,4 +69,37 @@ extension WidgetsBindingNullSafe on WidgetsBinding {
   static T? _ambiguate<T>(T? value) => value;
 
   static WidgetsBinding? get instance => _ambiguate(WidgetsBinding.instance)!;
+}
+
+extension ScreenVisitedFinder on List<ScreenVisited> {
+  ScreenVisited? findWithId(String screenId) {
+    final int index = getIndex(screenId);
+    if (index != -1) {
+      return this[index];
+    } else {
+      return null;
+    }
+  }
+
+  int getIndex(String screenId) =>
+      indexWhere((element) => element.id == screenId);
+
+  ScreenVisitedTabBar? findTabBarWithId(String screenId) {
+    final int index = getTabBarIndex(screenId);
+    if (index != -1) {
+      return this[index] as ScreenVisitedTabBar;
+    } else {
+      return null;
+    }
+  }
+
+  int getTabBarIndex(String screenId) => indexWhere((element) {
+        if (element.isTabBar) {
+          //first conditional for when we have the screenId of the tab
+          //second one for when we have only the id for the parent TabBar
+          return (element as ScreenVisitedTabBar).id == screenId ||
+              element.tabBarId == screenId;
+        }
+        return false;
+      });
 }
