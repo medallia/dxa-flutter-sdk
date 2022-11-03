@@ -1,4 +1,3 @@
-import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
@@ -87,26 +86,10 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   @override
   void initState() {
     super.initState();
-
-    // SessionReplay.instance.clearMasks();
-    //TODO maybe we need to update this screenVisited variable
-
     WidgetsBindingNullSafe.instance!
       ..addObserver(this)
       ..addPostFrameCallback((_) async {
         route = ModalRoute.of(context);
-//         if (route is PopupRoute<dynamic>) {
-//           assert(route!.settings.arguments == ScreenWidget, '''
-// When using the method showDialog<T>, please put ScreenWidget as the generic type
-// ''');
-//         }
-        // assert(
-        //   route is! PopupRoute<dynamic>,
-        //   '''ScreenWidget should not be used to wrap widgets in Popup Routes,
-        //   theses Popups are detected automatically and considered part of the
-        //   ScreenWidget that launched them.''',
-        // );
-        // route?.animation?.addStatusListener(_animationListener);
       });
     widget.tabController?.addListener(_tabControllerListener);
   }
@@ -134,42 +117,24 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didPush() {
-    debugPrint("sw - didPush");
-
     callWhenIsCurrentRoute();
   }
 
   @override
   void didPopNext() {
-    debugPrint("sw - didPopNext");
-    // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
-    ///Check needed for implementations where instead of replacing the route
-    ///with pushReplacement the implementation is like this:
-    /// ```dart
-    /// Navigator.of(context).pop();
-    /// Navigator.of(context).push();
-    /// ```
-    debugPrint("sw - addPostFrameCallback");
-
-    ///
     route = ModalRoute.of(context);
     if (route?.isCurrent ?? false) {
       callWhenIsCurrentRoute();
     }
-    // });
   }
 
   @override
   void didPop() {
-    debugPrint("sw - didPop");
-
     callWhenIsNotCurrentRoute();
   }
 
   @override
   void didPushNext() {
-    debugPrint("sw - didPushNext");
-
     callWhenIsNotCurrentRoute();
   }
 
@@ -178,11 +143,6 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   }
 
   Future<void> callWhenIsCurrentRoute() async {
-    // if (widget.tabController != null) {
-    //   currentScreenName = widget.tabNames![widget.tabController!.index];
-    // }
-
-    // SessionReplay.instance.captureKey = _globalKey;
     final ScreenVisited screenVisited = Tracking.instance.createScreenVisited(
       id: screenId.toString(),
       name: widget.screenName,
@@ -194,10 +154,6 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     await Tracking.instance.startScreen(
       screenVisited,
     );
-    // listOfMasks.add(_globalKey);
-    // Tracking.instance.visitedScreensList;
-    // }
-    // await SessionReplay.instance.start();
   }
 
   @override

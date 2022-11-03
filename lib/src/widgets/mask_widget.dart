@@ -62,7 +62,6 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
     //   throw (StateError("MaskWidget must have an ancestor ScreenWidget"));
     if (!listOfMasks.contains(globalKey)) {
       listOfMasks.add(globalKey);
-      debugPrint("add mask");
     }
 
     // if (!SessionReplay.instance.widgetsToMaskList.contains(globalKey)) {
@@ -75,7 +74,6 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
     //   if (listOfMasks == null) return;
     if (listOfMasks.contains(globalKey)) {
       listOfMasks.remove(globalKey);
-      debugPrint("remove mask");
     }
   }
 
