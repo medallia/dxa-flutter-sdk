@@ -182,7 +182,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   Widget build(BuildContext context) {
     return RepaintBoundary(
       key: _globalKey,
-      child: widget.child,
+      child: Material(child: Ink(child: widget.child)),
     );
   }
 }

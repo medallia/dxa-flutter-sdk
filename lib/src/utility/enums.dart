@@ -6,3 +6,19 @@ enum DecibelCustomerConsentType {
   tracking,
   none,
 }
+
+enum AutoMaskingType<T extends AutoMaskWidgets> {
+  button(ButtonAutomaskWidgets()),
+  dialog(DialogAutomaskWidgets()),
+  image(ImageAutomaskWidgets()),
+  inputText(InputTextAutomaskWidgets()),
+  text(TextAutomaskWidgets()),
+  icons(IconAutomaskWidgets()),
+  webView(WebviewAutomaskWidgets()),
+
+  all(AllAutomaskWidgets()),
+  none(NoAutomaskWidgets());
+
+  final AutoMaskWidgets autoMaskWidgets;
+  const AutoMaskingType(this.autoMaskWidgets);
+}
