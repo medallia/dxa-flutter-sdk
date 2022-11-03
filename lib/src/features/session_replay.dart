@@ -2,18 +2,27 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
+import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-part 'frame_tracking.dart';
 
 class SessionReplay {
-  SessionReplay._internal() : _frameTracking = _FrameTracking();
+  SessionReplay._internal() {
+    autoMasking = AutoMasking();
+    _frameTracking = FrameTracking(
+      postFrameCallback: WidgetsBindingNullSafe.instance!.addPostFrameCallback,
+    )..newFrameStreamController.stream.listen((timeStamp) {
+        _didUiChange = true;
+      });
+  }
   static final _instance = SessionReplay._internal();
   static SessionReplay get instance => _instance;
-  final _FrameTracking _frameTracking;
+  late FrameTracking _frameTracking;
+  late AutoMasking autoMasking;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final widgetsToMaskList = List<GlobalKey>.empty(growable: true);
   final _maskColor = Paint()..color = Colors.grey;
@@ -29,8 +38,8 @@ class SessionReplay {
   BuildContext? popupRouteContext;
   Timer? _timer;
   bool _didUiChange = false;
-  bool get uiChange => _didUiChange;
-  set uiChange(bool change) {
+  bool get didUiChange => _didUiChange;
+  set didUiChange(bool change) {
     _didUiChange = change;
     if (!change) {
       _frameTracking.waitForNextFrame();
@@ -47,7 +56,7 @@ class SessionReplay {
       !isInPopupRoute ? captureKey?.currentContext : popupRouteContext;
 
   Future<void> start() async {
-    _frameTracking.waitForNextFrame();
+    didUiChange = true;
     if (_timer != null && _timer!.isActive) {
       stop();
     }
@@ -67,10 +76,11 @@ class SessionReplay {
   void stop() {
     _timer?.cancel();
     _timer = null;
+    autoMasking.clear();
   }
 
   Future<void> maybeTakeScreenshot() async {
-    if (uiChange) {
+    if (didUiChange) {
       await forceTakeScreenshot();
     }
   }
@@ -96,13 +106,7 @@ class SessionReplay {
     );
     final renderObject = context.findRenderObject();
 
-    late Set<Rect> maskCoordinates1;
-    try {
-      maskCoordinates1 = _saveMaskPosition();
-    } catch (e) {
-      //Cancel screenshot
-      return;
-    }
+    late Set<Rect> manualMaskCoordinates;
 
     if (renderObject != null) {
       final Rect frame = renderObject.globalPaintBounds;
@@ -114,15 +118,17 @@ class SessionReplay {
       final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
       final bool isTabBar = Tracking.instance.visitedScreensList.last.isTabBar;
       late ui.Image image;
+      autoMasking.setAutoMasking(context);
+      manualMaskCoordinates = _saveMaskPosition();
       try {
-        uiChange = false;
+        didUiChange = false;
         image = await (renderObject as RenderRepaintBoundary).toImage();
       } catch (_) {
         _forceScreenshotNextFrame();
         return;
       }
       canvas.drawImage(image, newPosition, Paint());
-      _paintMaskWithCoordinates(canvas, maskCoordinates1);
+      _paintMaskWithCoordinates(canvas, manualMaskCoordinates);
 
       final resultImage =
           await recorder.endRecording().toImage(width.toInt(), height.toInt());
@@ -177,6 +183,11 @@ class SessionReplay {
     for (final globalKey in widgetsToMaskList) {
       final RenderObject renderObject = globalKey.renderObject!;
 
+      coordinates.addAll(_getMaskCoordinates(renderObject));
+    }
+    autoMasking.renderObjectsToMask
+        .removeWhere((element) => element.attached == false);
+    for (final renderObject in autoMasking.renderObjectsToMask) {
       coordinates.addAll(_getMaskCoordinates(renderObject));
     }
     return coordinates;
