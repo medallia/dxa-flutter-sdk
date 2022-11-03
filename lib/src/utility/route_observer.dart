@@ -1,7 +1,6 @@
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
 
 class CustomRouteObserver {
@@ -13,17 +12,14 @@ class CustomRouteObserver {
 class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    debugPrint("ro - didPush");
-
     if (route is ModalRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
     }
     if (route is PopupRoute) {
-      if (previousRoute != null) {
-        final BuildContext previousContext =
-            (previousRoute as PageRoute).subtreeContext!;
+      if (previousRoute != null && previousRoute is PageRoute) {
+        final BuildContext previousContext = previousRoute.subtreeContext!;
 
         WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
           final BuildContext currentContext = route.subtreeContext!;
@@ -57,8 +53,6 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    debugPrint("ro - didReplace");
-
     if (newRoute is ModalRoute) {
       newRoute.animation?.addStatusListener((status) {
         _animationListener(status, newRoute);
@@ -72,8 +66,6 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    debugPrint("ro - didPop");
-
     if (route is ModalRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route);
@@ -86,8 +78,6 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didRemove(Route route, Route? previousRoute) {
-    debugPrint("ro - didRemove");
-
     if (route is ModalRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route);
@@ -101,14 +91,11 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
     if (route.offstage) return;
     if (status == AnimationStatus.completed ||
         status == AnimationStatus.dismissed) {
-      debugPrint("Transitioning false");
       SessionReplay.instance.isPageTransitioning = false;
       route.animation?.removeStatusListener((status) {
         _animationListener(status, route);
       });
     } else {
-      debugPrint("Transitioning true");
-
       SessionReplay.instance.isPageTransitioning = true;
     }
   }
@@ -121,7 +108,6 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
         if (element.containsScreenWidget()) {
           return;
         } else {
-          debugPrint("pop dialog route: ${dialogRoute.runtimeType}");
           Tracking.instance.endScreen(dialogRoute.hashCode.toString());
         }
       });
