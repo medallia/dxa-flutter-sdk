@@ -20,7 +20,8 @@ extension ElementExt on Element {
           flag = true;
           return;
         } else {
-          //Commented out because there may be two Scaffolds
+          //TODO: Commented out because there may be two Scaffolds.
+          //Room for improvement.
           // if (element.widget.runtimeType == Scaffold) {
           //   return;
           // }
@@ -80,13 +81,9 @@ extension ScreenVisitedFinder on List<ScreenVisited> {
     }
   }
 
-  int getIndex(String screenId) => indexWhere((element) {
-        // if (element.isTabBar) {
-        //   return (element as ScreenVisitedTabBar).tabBarId == screenId;
-        // } else {
-        return element.id == screenId;
-        // }
-      });
+  int getIndex(String screenId) =>
+      indexWhere((element) => element.id == screenId);
+
   ScreenVisitedTabBar? findTabBarWithId(String screenId) {
     final int index = getTabBarIndex(screenId);
     if (index != -1) {
