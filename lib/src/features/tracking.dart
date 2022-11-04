@@ -121,6 +121,16 @@ class Tracking {
     required TabController tabController,
     required List<String> tabNames,
   }) async {
+    //Temporary patch for issue https://github.com/flutter/flutter/issues/113020
+    //Jira ticket DCBLMOB-1725
+    if (!tabController.indexIsChanging) {
+      await Future.delayed(Duration(milliseconds: 200));
+      if (tabController.indexIsChanging) {
+        SessionReplay.instance.isPageTransitioning =
+            tabController.indexIsChanging;
+        return;
+      }
+    }
     SessionReplay.instance.isPageTransitioning = tabController.indexIsChanging;
 
     if (tabController.index != tabController.previousIndex &&
