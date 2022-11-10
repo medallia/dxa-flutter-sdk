@@ -97,12 +97,17 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+
     switch (state) {
       case AppLifecycleState.resumed:
+        Tracking.instance.returnFromBackground();
         break;
-      case AppLifecycleState.paused:
-        break;
+
       default:
+        if (state == AppLifecycleState.paused ||
+            state == AppLifecycleState.inactive) {
+          Tracking.instance.wentToBackground();
+        }
     }
   }
 

@@ -12,7 +12,7 @@ class Tracking {
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final List<ScreenVisited> _visitedScreensList = [];
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
-
+  ScreenVisited? screenVisitedWhenAppWentToBackground;
   void _addVisitedScreenList(ScreenVisited screenVisited) {
     _visitedScreensList.add(screenVisited);
   }
@@ -49,7 +49,7 @@ class Tracking {
         listOfMasks: listOfMasks,
       );
     } else {
-      screenVisited = ScreenVisited(
+      screenVisited = ScreenVisited.standard(
         id: id,
         listOfMasks: listOfMasks,
         captureKey: captureKey,
@@ -64,7 +64,6 @@ class Tracking {
     _addVisitedScreenList(
       screenVisited,
     );
-
     await _apiInstance.startScreen(
       StartScreenMessage()
         ..screenName = screenVisited.name
@@ -100,13 +99,36 @@ class Tracking {
     //fire and forget to keep synchronicity
     //ignore: unawaited_futures
     SessionReplay.instance.closeScreenVideo();
-
     await _apiInstance.endScreen(
       EndScreenMessage()
         ..screenName = screenVisitedFinished.name
         ..screenId = screenVisitedFinished.uniqueId
         ..endTime = screenVisitedFinished.endTimestamp,
     );
+  }
+
+  Future<void> wentToBackground() async {
+    //if we already have saved a screen saved when the app went to background,
+    //it means that we should ignore calls to this method until the app returns
+    //from background
+    if (screenVisitedWhenAppWentToBackground != null) return;
+    //No unfinished screens, so there's no possibility of ending any screen
+    if (visitedUnfinishedScreensList.isEmpty) return;
+    screenVisitedWhenAppWentToBackground = visitedUnfinishedScreensList.last;
+    await endScreen(screenVisitedWhenAppWentToBackground!.id);
+  }
+
+  Future<void> returnFromBackground() async {
+    //no screen to return to
+    if (screenVisitedWhenAppWentToBackground == null) return;
+    assert(visitedUnfinishedScreensList.isEmpty);
+    final ScreenVisited returnFormBackgroundScreenVIsited =
+        screenVisitedWhenAppWentToBackground!
+            .getReturnFormBackgroundScreenVisited(
+      DateTime.now().millisecondsSinceEpoch,
+    );
+    screenVisitedWhenAppWentToBackground = null;
+    await startScreen(returnFormBackgroundScreenVIsited);
   }
 
   ///Listener for tabBar change of tab.
@@ -137,10 +159,10 @@ class Tracking {
         !tabController.indexIsChanging) {
       //Find if this TabBarScreen (NOT the individual Tab) has been visited
       //and call endScreen on it if so.
-      final int index = visitedScreensList.getTabBarIndex(screenId);
+      final int index = visitedUnfinishedScreensList.getTabBarIndex(screenId);
       if (index != -1) {
         await Tracking.instance
-            .endScreen(visitedScreensList[index].id, isTabBar: true);
+            .endScreen(visitedUnfinishedScreensList[index].id, isTabBar: true);
       }
 
       final ScreenVisited screenVisited = createScreenVisited(
@@ -173,7 +195,21 @@ class ScreenVisited {
 
   final bool finished;
   int get uniqueId => id.hashCode ^ timestamp.hashCode;
+
   const ScreenVisited({
+    required this.id,
+    required this.name,
+    required this.timestamp,
+    required this.listOfMasks,
+    required this.captureKey,
+    required this.endTimestamp,
+    required this.finished,
+    required this.isDialog,
+    required this.isTabBar,
+    required this.dialogContext,
+  });
+
+  const ScreenVisited.standard({
     required this.id,
     required this.name,
     required this.timestamp,
@@ -194,10 +230,10 @@ class ScreenVisited {
     required this.endTimestamp,
     required this.listOfMasks,
     required this.captureKey,
-  })  : finished = true,
-        isDialog = false,
-        isTabBar = false,
-        dialogContext = null;
+    required this.isDialog,
+    required this.isTabBar,
+    required this.dialogContext,
+  }) : finished = true;
   const ScreenVisited.tabBarChild({
     required this.id,
     required this.name,
@@ -229,6 +265,24 @@ class ScreenVisited {
       captureKey: captureKey,
       timestamp: timestamp,
       endTimestamp: endTimestamp,
+      isDialog: isDialog,
+      isTabBar: isTabBar,
+      dialogContext: dialogContext,
+    );
+  }
+
+  ScreenVisited getReturnFormBackgroundScreenVisited(int startTimeStamp) {
+    return ScreenVisited(
+      id: id,
+      name: name,
+      timestamp: startTimeStamp,
+      listOfMasks: listOfMasks,
+      captureKey: captureKey,
+      endTimestamp: endTimestamp,
+      finished: finished,
+      isDialog: isDialog,
+      isTabBar: isTabBar,
+      dialogContext: dialogContext,
     );
   }
 
@@ -306,6 +360,21 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required this.tabBarname,
     required super.listOfMasks,
   }) : super.tabBarChild();
+
+  @override
+  ScreenVisited getReturnFormBackgroundScreenVisited(int startTimeStamp) {
+    return ScreenVisitedTabBar.internal(
+      id: id,
+      name: name,
+      timestamp: startTimeStamp,
+      captureKey: captureKey,
+      tabBarScreens: tabBarScreens,
+      tabIndex: tabIndex,
+      tabBarId: tabBarId,
+      tabBarname: tabBarname,
+      listOfMasks: listOfMasks,
+    );
+  }
 
   @override
   String toString() {
