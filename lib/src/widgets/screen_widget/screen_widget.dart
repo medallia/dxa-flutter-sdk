@@ -86,6 +86,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   @override
   void initState() {
     super.initState();
+    Tracking.instance.physicalSize =
+        WidgetsBindingNullSafe.instance!.window.physicalSize;
     WidgetsBindingNullSafe.instance!
       ..addObserver(this)
       ..addPostFrameCallback((_) async {
@@ -109,6 +111,13 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
           Tracking.instance.wentToBackground();
         }
     }
+  }
+
+  @override
+  void didChangeMetrics() {
+    Tracking.instance.physicalSize =
+        WidgetsBinding.instance.window.physicalSize;
+    super.didChangeMetrics();
   }
 
   @override
