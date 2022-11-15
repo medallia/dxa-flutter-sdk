@@ -577,4 +577,22 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
       [channel setMessageHandler:nil];
     }
   }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.DecibelSdkApi.getSessionId"
+        binaryMessenger:binaryMessenger
+        codec:FLTDecibelSdkApiGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getSessionIdWithCompletion:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(getSessionIdWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getSessionIdWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
 }

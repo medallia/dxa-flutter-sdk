@@ -74,4 +74,6 @@ abstract class DecibelSdkApi {
   void sendGoal(GoalMessage msg);
   @async
   String getWebViewProperties();
+  @async
+  String getSessionId();
 }
