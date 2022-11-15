@@ -107,4 +107,7 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
     public func getWebViewProperties(completion: (String?, FlutterError?)->Void) {
        completion(DecibelSDK.multiPlatform.getWebViewProperties(),nil);
     }
+    public func getSessionId(completion: (String?, FlutterError?)->Void) {
+       completion(DecibelSDK.multiPlatform.getSessionId(),nil);
+    }
 }

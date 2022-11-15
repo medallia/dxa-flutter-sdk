@@ -127,4 +127,8 @@ class DecibelSdk {
   static void setAutoMasking(Set<enums.AutoMaskingType> widgetsToMask) {
     SessionReplay.instance.autoMasking.autoMaskingTypeSet = widgetsToMask;
   }
+
+  static Future<String?> getSessionId() async {
+    return _api.getSessionId();
+  }
 }
