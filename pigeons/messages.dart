@@ -12,12 +12,14 @@ class StartScreenMessage {
   String? screenName;
   int? screenId;
   int? startTime;
+  bool? isBackground;
 }
 
 class EndScreenMessage {
   String? screenName;
   int? screenId;
   int? endTime;
+  bool? isBackground;
 }
 
 class SessionMessage {
