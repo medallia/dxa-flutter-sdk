@@ -60,7 +60,17 @@ class Tracking {
     return screenVisited;
   }
 
-  Future<void> startScreen(ScreenVisited screenVisited) async {
+  Future<void> startScreen(
+    ScreenVisited screenVisited, {
+    bool isBackground = false,
+  }) async {
+    assert(
+      visitedUnfinishedScreensList.isEmpty ||
+          visitedUnfinishedScreensList.length == 1,
+    );
+    if (visitedUnfinishedScreensList.isNotEmpty) {
+      await endScreen(visitedUnfinishedScreensList[0].id);
+    }
     _addVisitedScreenList(
       screenVisited,
     );
@@ -68,12 +78,17 @@ class Tracking {
       StartScreenMessage()
         ..screenName = screenVisited.name
         ..screenId = screenVisited.uniqueId
-        ..startTime = screenVisited.timestamp,
+        ..startTime = screenVisited.timestamp
+        ..isBackground = isBackground,
     );
     await SessionReplay.instance.newScreen();
   }
 
-  Future<void> endScreen(String screenId, {bool isTabBar = false}) async {
+  Future<void> endScreen(
+    String screenId, {
+    bool isTabBar = false,
+    bool isBackground = false,
+  }) async {
     SessionReplay.instance.clearMasks();
     late ScreenVisited screenVisited;
     late ScreenVisited? potentialScreenVisited;
@@ -103,7 +118,8 @@ class Tracking {
       EndScreenMessage()
         ..screenName = screenVisitedFinished.name
         ..screenId = screenVisitedFinished.uniqueId
-        ..endTime = screenVisitedFinished.endTimestamp,
+        ..endTime = screenVisitedFinished.endTimestamp
+        ..isBackground = isBackground,
     );
   }
 
@@ -115,7 +131,8 @@ class Tracking {
     //No unfinished screens, so there's no possibility of ending any screen
     if (visitedUnfinishedScreensList.isEmpty) return;
     screenVisitedWhenAppWentToBackground = visitedUnfinishedScreensList.last;
-    await endScreen(screenVisitedWhenAppWentToBackground!.id);
+    await endScreen(screenVisitedWhenAppWentToBackground!.id,
+        isBackground: true);
   }
 
   Future<void> returnFromBackground() async {
@@ -128,7 +145,7 @@ class Tracking {
       DateTime.now().millisecondsSinceEpoch,
     );
     screenVisitedWhenAppWentToBackground = null;
-    await startScreen(returnFormBackgroundScreenVIsited);
+    await startScreen(returnFormBackgroundScreenVIsited, isBackground: true);
   }
 
   ///Listener for tabBar change of tab.

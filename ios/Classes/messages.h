@@ -22,12 +22,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy, nullable) NSString * screenName;
 @property(nonatomic, strong, nullable) NSNumber * screenId;
 @property(nonatomic, strong, nullable) NSNumber * startTime;
+@property(nonatomic, strong, nullable) NSNumber * isBackground;
 @end
 
 @interface FLTEndScreenMessage : NSObject
 @property(nonatomic, copy, nullable) NSString * screenName;
 @property(nonatomic, strong, nullable) NSNumber * screenId;
 @property(nonatomic, strong, nullable) NSNumber * endTime;
+@property(nonatomic, strong, nullable) NSNumber * isBackground;
 @end
 
 @interface FLTSessionMessage : NSObject

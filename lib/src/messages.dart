@@ -12,12 +12,14 @@ class StartScreenMessage {
   String? screenName;
   int? screenId;
   int? startTime;
+  bool? isBackground;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
     pigeonMap['screenName'] = screenName;
     pigeonMap['screenId'] = screenId;
     pigeonMap['startTime'] = startTime;
+    pigeonMap['isBackground'] = isBackground;
     return pigeonMap;
   }
 
@@ -26,7 +28,8 @@ class StartScreenMessage {
     return StartScreenMessage()
       ..screenName = pigeonMap['screenName'] as String?
       ..screenId = pigeonMap['screenId'] as int?
-      ..startTime = pigeonMap['startTime'] as int?;
+      ..startTime = pigeonMap['startTime'] as int?
+      ..isBackground = pigeonMap['isBackground'] as bool?;
   }
 }
 
@@ -34,12 +37,14 @@ class EndScreenMessage {
   String? screenName;
   int? screenId;
   int? endTime;
+  bool? isBackground;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
     pigeonMap['screenName'] = screenName;
     pigeonMap['screenId'] = screenId;
     pigeonMap['endTime'] = endTime;
+    pigeonMap['isBackground'] = isBackground;
     return pigeonMap;
   }
 
@@ -48,7 +53,8 @@ class EndScreenMessage {
     return EndScreenMessage()
       ..screenName = pigeonMap['screenName'] as String?
       ..screenId = pigeonMap['screenId'] as int?
-      ..endTime = pigeonMap['endTime'] as int?;
+      ..endTime = pigeonMap['endTime'] as int?
+      ..isBackground = pigeonMap['isBackground'] as bool?;
   }
 }
 
