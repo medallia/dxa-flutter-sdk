@@ -13,6 +13,20 @@ class Tracking {
   final List<ScreenVisited> _visitedScreensList = [];
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   ScreenVisited? screenVisitedWhenAppWentToBackground;
+
+  Size? _physicalSize;
+  Size get physicalSize => _physicalSize!;
+  set physicalSize(Size newPhysicalSize) {
+    if (newPhysicalSize == _physicalSize) return;
+    //The first time we initialize we don't want to trigger the method
+    if (_physicalSize == null) {
+      _physicalSize = newPhysicalSize;
+    } else {
+      _physicalSize = newPhysicalSize;
+      closeThisScreenAndThenReopen();
+    }
+  }
+
   void _addVisitedScreenList(ScreenVisited screenVisited) {
     _visitedScreensList.add(screenVisited);
   }
@@ -124,11 +138,22 @@ class Tracking {
     assert(visitedUnfinishedScreensList.isEmpty);
     final ScreenVisited returnFormBackgroundScreenVIsited =
         screenVisitedWhenAppWentToBackground!
-            .getReturnFormBackgroundScreenVisited(
+            .getScreenVisitedWithNewStartTimeStamp(
       DateTime.now().millisecondsSinceEpoch,
     );
     screenVisitedWhenAppWentToBackground = null;
     await startScreen(returnFormBackgroundScreenVIsited);
+  }
+
+  Future<void> closeThisScreenAndThenReopen() async {
+    final ScreenVisited screenToClose = visitedUnfinishedScreensList
+        .singleWhere((element) => !element.finished);
+    await endScreen(screenToClose.id);
+    final ScreenVisited screenToOpen =
+        screenToClose.getScreenVisitedWithNewStartTimeStamp(
+      DateTime.now().millisecondsSinceEpoch,
+    );
+    await startScreen(screenToOpen);
   }
 
   ///Listener for tabBar change of tab.
@@ -271,7 +296,9 @@ class ScreenVisited {
     );
   }
 
-  ScreenVisited getReturnFormBackgroundScreenVisited(int startTimeStamp) {
+  //Facilitates the reopening of a screen where everything is the same except
+  //for the start timestamp, and therefore the uniqueId will also change
+  ScreenVisited getScreenVisitedWithNewStartTimeStamp(int startTimeStamp) {
     return ScreenVisited(
       id: id,
       name: name,
@@ -362,7 +389,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
   }) : super.tabBarChild();
 
   @override
-  ScreenVisited getReturnFormBackgroundScreenVisited(int startTimeStamp) {
+  ScreenVisited getScreenVisitedWithNewStartTimeStamp(int startTimeStamp) {
     return ScreenVisitedTabBar.internal(
       id: id,
       name: name,
