@@ -34,11 +34,16 @@ public class Messages {
     public Long getStartTime() { return startTime; }
     public void setStartTime(Long setterArg) { this.startTime = setterArg; }
 
+    private Boolean isBackground;
+    public Boolean getIsBackground() { return isBackground; }
+    public void setIsBackground(Boolean setterArg) { this.isBackground = setterArg; }
+
     Map<String, Object> toMap() {
       Map<String, Object> toMapResult = new HashMap<>();
       toMapResult.put("screenName", screenName);
       toMapResult.put("screenId", screenId);
       toMapResult.put("startTime", startTime);
+      toMapResult.put("isBackground", isBackground);
       return toMapResult;
     }
     static StartScreenMessage fromMap(Map<String, Object> map) {
@@ -49,6 +54,8 @@ public class Messages {
       fromMapResult.screenId = (screenId == null) ? null : ((screenId instanceof Integer) ? (Integer)screenId : (Long)screenId);
       Object startTime = map.get("startTime");
       fromMapResult.startTime = (startTime == null) ? null : ((startTime instanceof Integer) ? (Integer)startTime : (Long)startTime);
+      Object isBackground = map.get("isBackground");
+      fromMapResult.isBackground = (Boolean)isBackground;
       return fromMapResult;
     }
   }
@@ -67,11 +74,16 @@ public class Messages {
     public Long getEndTime() { return endTime; }
     public void setEndTime(Long setterArg) { this.endTime = setterArg; }
 
+    private Boolean isBackground;
+    public Boolean getIsBackground() { return isBackground; }
+    public void setIsBackground(Boolean setterArg) { this.isBackground = setterArg; }
+
     Map<String, Object> toMap() {
       Map<String, Object> toMapResult = new HashMap<>();
       toMapResult.put("screenName", screenName);
       toMapResult.put("screenId", screenId);
       toMapResult.put("endTime", endTime);
+      toMapResult.put("isBackground", isBackground);
       return toMapResult;
     }
     static EndScreenMessage fromMap(Map<String, Object> map) {
@@ -82,6 +94,8 @@ public class Messages {
       fromMapResult.screenId = (screenId == null) ? null : ((screenId instanceof Integer) ? (Integer)screenId : (Long)screenId);
       Object endTime = map.get("endTime");
       fromMapResult.endTime = (endTime == null) ? null : ((endTime instanceof Integer) ? (Integer)endTime : (Long)endTime);
+      Object isBackground = map.get("isBackground");
+      fromMapResult.isBackground = (Boolean)isBackground;
       return fromMapResult;
     }
   }
@@ -388,6 +402,7 @@ public class Messages {
     void sendDimensionWithBool(DimensionBoolMessage msg);
     void sendGoal(GoalMessage msg);
     void getWebViewProperties(Result<String> result);
+    void getSessionId(Result<String> result);
 
     /** The codec used by DecibelSdkApi. */
     static MessageCodec<Object> getCodec() {
@@ -655,6 +670,35 @@ public class Messages {
               };
 
               api.getWebViewProperties(resultCallback);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+              reply.reply(wrapped);
+            }
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.getSessionId", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              Result<String> resultCallback = new Result<String>() {
+                public void success(String result) {
+                  wrapped.put("result", result);
+                  reply.reply(wrapped);
+                }
+                public void error(Throwable error) {
+                  wrapped.put("error", wrapError(error));
+                  reply.reply(wrapped);
+                }
+              };
+
+              api.getSessionId(resultCallback);
             }
             catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));

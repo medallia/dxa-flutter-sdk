@@ -12,12 +12,14 @@ class StartScreenMessage {
   String? screenName;
   int? screenId;
   int? startTime;
+  bool? isBackground;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
     pigeonMap['screenName'] = screenName;
     pigeonMap['screenId'] = screenId;
     pigeonMap['startTime'] = startTime;
+    pigeonMap['isBackground'] = isBackground;
     return pigeonMap;
   }
 
@@ -26,7 +28,8 @@ class StartScreenMessage {
     return StartScreenMessage()
       ..screenName = pigeonMap['screenName'] as String?
       ..screenId = pigeonMap['screenId'] as int?
-      ..startTime = pigeonMap['startTime'] as int?;
+      ..startTime = pigeonMap['startTime'] as int?
+      ..isBackground = pigeonMap['isBackground'] as bool?;
   }
 }
 
@@ -34,12 +37,14 @@ class EndScreenMessage {
   String? screenName;
   int? screenId;
   int? endTime;
+  bool? isBackground;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
     pigeonMap['screenName'] = screenName;
     pigeonMap['screenId'] = screenId;
     pigeonMap['endTime'] = endTime;
+    pigeonMap['isBackground'] = isBackground;
     return pigeonMap;
   }
 
@@ -48,7 +53,8 @@ class EndScreenMessage {
     return EndScreenMessage()
       ..screenName = pigeonMap['screenName'] as String?
       ..screenId = pigeonMap['screenId'] as int?
-      ..endTime = pigeonMap['endTime'] as int?;
+      ..endTime = pigeonMap['endTime'] as int?
+      ..isBackground = pigeonMap['isBackground'] as bool?;
   }
 }
 
@@ -548,7 +554,32 @@ class DecibelSdkApi {
         details: error['details'],
       );
     } else {
-      return (replyMap['result'] as String?);
+      return (replyMap['result'] as String?)!;
+    }
+  }
+
+  Future<String> getSessionId() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.DecibelSdkApi.getSessionId', codec,
+        binaryMessenger: _binaryMessenger);
+    final Map<Object?, Object?>? replyMap =
+        await channel.send(null) as Map<Object?, Object?>?;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object?, Object?> error =
+          (replyMap['error'] as Map<Object?, Object?>?)!;
+      throw PlatformException(
+        code: (error['code'] as String?)!,
+        message: error['message'] as String?,
+        details: error['details'],
+      );
+    } else {
+      return (replyMap['result'] as String?)!;
     }
   }
 }

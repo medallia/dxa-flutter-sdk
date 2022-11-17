@@ -74,10 +74,14 @@ static NSDictionary<NSString *, id> *wrapResult(id result, FlutterError *error) 
   if ((NSNull *)result.startTime == [NSNull null]) {
     result.startTime = nil;
   }
+  result.isBackground = dict[@"isBackground"];
+  if ((NSNull *)result.isBackground == [NSNull null]) {
+    result.isBackground = nil;
+  }
   return result;
 }
 - (NSDictionary *)toMap {
-  return [NSDictionary dictionaryWithObjectsAndKeys:(self.screenName ? self.screenName : [NSNull null]), @"screenName", (self.screenId ? self.screenId : [NSNull null]), @"screenId", (self.startTime ? self.startTime : [NSNull null]), @"startTime", nil];
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.screenName ? self.screenName : [NSNull null]), @"screenName", (self.screenId ? self.screenId : [NSNull null]), @"screenId", (self.startTime ? self.startTime : [NSNull null]), @"startTime", (self.isBackground ? self.isBackground : [NSNull null]), @"isBackground", nil];
 }
 @end
 
@@ -96,10 +100,14 @@ static NSDictionary<NSString *, id> *wrapResult(id result, FlutterError *error) 
   if ((NSNull *)result.endTime == [NSNull null]) {
     result.endTime = nil;
   }
+  result.isBackground = dict[@"isBackground"];
+  if ((NSNull *)result.isBackground == [NSNull null]) {
+    result.isBackground = nil;
+  }
   return result;
 }
 - (NSDictionary *)toMap {
-  return [NSDictionary dictionaryWithObjectsAndKeys:(self.screenName ? self.screenName : [NSNull null]), @"screenName", (self.screenId ? self.screenId : [NSNull null]), @"screenId", (self.endTime ? self.endTime : [NSNull null]), @"endTime", nil];
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.screenName ? self.screenName : [NSNull null]), @"screenName", (self.screenId ? self.screenId : [NSNull null]), @"screenId", (self.endTime ? self.endTime : [NSNull null]), @"endTime", (self.isBackground ? self.isBackground : [NSNull null]), @"isBackground", nil];
 }
 @end
 
@@ -561,6 +569,24 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
       NSCAssert([api respondsToSelector:@selector(getWebViewPropertiesWithCompletion:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(getWebViewPropertiesWithCompletion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         [api getWebViewPropertiesWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.DecibelSdkApi.getSessionId"
+        binaryMessenger:binaryMessenger
+        codec:FLTDecibelSdkApiGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getSessionIdWithCompletion:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(getSessionIdWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getSessionIdWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
           callback(wrapResult(output, error));
         }];
       }];

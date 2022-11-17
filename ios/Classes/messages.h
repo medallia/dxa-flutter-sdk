@@ -22,12 +22,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy, nullable) NSString * screenName;
 @property(nonatomic, strong, nullable) NSNumber * screenId;
 @property(nonatomic, strong, nullable) NSNumber * startTime;
+@property(nonatomic, strong, nullable) NSNumber * isBackground;
 @end
 
 @interface FLTEndScreenMessage : NSObject
 @property(nonatomic, copy, nullable) NSString * screenName;
 @property(nonatomic, strong, nullable) NSNumber * screenId;
 @property(nonatomic, strong, nullable) NSNumber * endTime;
+@property(nonatomic, strong, nullable) NSNumber * isBackground;
 @end
 
 @interface FLTSessionMessage : NSObject
@@ -83,6 +85,7 @@ NSObject<FlutterMessageCodec> *FLTDecibelSdkApiGetCodec(void);
 - (void)sendDimensionWithBoolMsg:(FLTDimensionBoolMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendGoalMsg:(FLTGoalMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)getWebViewPropertiesWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
+- (void)getSessionIdWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 @end
 
 extern void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTDecibelSdkApi> *_Nullable api);

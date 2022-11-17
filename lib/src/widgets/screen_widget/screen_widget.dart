@@ -1,10 +1,10 @@
-import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-part 'mask_widget.dart';
+part '../mask_widget.dart';
+part 'inherited_widgets.dart';
 
 class ScreenWidget extends StatelessWidget {
   const ScreenWidget({
@@ -61,12 +61,19 @@ class _ActiveScreenWidget extends StatefulWidget {
 class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     with WidgetsBindingObserver, RouteAware {
   final GlobalKey _globalKey = GlobalKey();
+  int get screenId => _globalKey.hashCode;
   ModalRoute<Object?>? route;
-
+  bool get isTabBar => widget.tabNames != null && widget.tabController != null;
+  final List<GlobalKey> listOfMasks = [];
   // Defining an internal function to be able to remove the listener
   Future<void> _tabControllerListener() async {
-    await Tracking.instance
-        .tabControllerListener(widget.tabController!, widget.tabNames!);
+    await Tracking.instance.tabControllerListener(
+        screenId: screenId.toString(),
+        name: widget.screenName,
+        listOfMasks: listOfMasks,
+        captureKey: _globalKey,
+        tabController: widget.tabController!,
+        tabNames: widget.tabNames!);
   }
 
   @override
@@ -79,20 +86,12 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   @override
   void initState() {
     super.initState();
-
-    SessionReplay.instance.stop();
-    SessionReplay.instance.widgetsToMaskList.clear();
+    Tracking.instance.physicalSize =
+        WidgetsBindingNullSafe.instance!.window.physicalSize;
     WidgetsBindingNullSafe.instance!
       ..addObserver(this)
       ..addPostFrameCallback((_) async {
         route = ModalRoute.of(context);
-        assert(
-          route is! PopupRoute<dynamic>,
-          '''ScreenWidget should not be used to wrap widgets in Popup Routes, 
-          theses Popups are detected automatically and considered part of the 
-          ScreenWidget that launched them.''',
-        );
-        // route?.animation?.addStatusListener(_animationListener);
       });
     widget.tabController?.addListener(_tabControllerListener);
   }
@@ -100,17 +99,30 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+
     switch (state) {
       case AppLifecycleState.resumed:
+        Tracking.instance.returnFromBackground();
         break;
-      case AppLifecycleState.paused:
-        break;
+
       default:
+        if (state == AppLifecycleState.paused ||
+            state == AppLifecycleState.inactive) {
+          Tracking.instance.wentToBackground();
+        }
     }
   }
 
   @override
+  void didChangeMetrics() {
+    Tracking.instance.physicalSize =
+        WidgetsBinding.instance.window.physicalSize;
+    super.didChangeMetrics();
+  }
+
+  @override
   void dispose() {
+    callWhenIsNotCurrentRoute();
     CustomRouteObserver.screenWidgetRouteObserver.unsubscribe(this);
     WidgetsBindingNullSafe.instance!.removeObserver(this);
     widget.tabController?.removeListener(_tabControllerListener);
@@ -124,18 +136,10 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didPopNext() {
-    WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
-      ///Check needed for implementations where instead of replacing the route
-      ///with pushReplacement the implementation is like this:
-      /// ```dart
-      /// Navigator.of(context).pop();
-      /// Navigator.of(context).push();
-      /// ```
-      route = ModalRoute.of(context);
-      if (route?.isCurrent ?? false) {
-        callWhenIsCurrentRoute();
-      }
-    });
+    route = ModalRoute.of(context);
+    if (route?.isCurrent ?? false) {
+      callWhenIsCurrentRoute();
+    }
   }
 
   @override
@@ -148,64 +152,33 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     callWhenIsNotCurrentRoute();
   }
 
-  void callWhenIsNotCurrentRoute() {
-    SessionReplay.instance.stop();
+  Future<void> callWhenIsNotCurrentRoute() async {
+    await Tracking.instance.endScreen(screenId.toString(), isTabBar: isTabBar);
   }
 
   Future<void> callWhenIsCurrentRoute() async {
-    late String currentScreenName;
-
-    if (widget.tabController != null) {
-      currentScreenName = widget.tabNames![widget.tabController!.index];
-    } else {
-      currentScreenName = widget.screenName;
-    }
-
-    SessionReplay.instance.captureKey = _globalKey;
-
-    if (Tracking.instance.visitedScreensList.isNotEmpty &&
-        Tracking.instance.visitedScreensList.last.name != currentScreenName) {
-      await Tracking.instance
-          .endScreen(Tracking.instance.visitedScreensList.last);
-    }
-
-    if (Tracking.instance.visitedScreensList.isEmpty ||
-        Tracking.instance.visitedScreensList.last.name != currentScreenName) {
-      await Tracking.instance
-          .startScreen(currentScreenName, tabBarNames: widget.tabNames);
-    }
-
-    await SessionReplay.instance.start();
+    final ScreenVisited screenVisited = Tracking.instance.createScreenVisited(
+      id: screenId.toString(),
+      name: widget.screenName,
+      listOfMasks: listOfMasks,
+      captureKey: _globalKey,
+      tabBarNames: widget.tabNames,
+      tabBarIndex: widget.tabController?.index,
+    );
+    await Tracking.instance.startScreen(
+      screenVisited,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      key: _globalKey,
-      child: Material(child: Ink(child: widget.child)),
+    return _MaskList(
+      listOfMasks: listOfMasks,
+      child: RepaintBoundary(
+        key: _globalKey,
+        child: Material(child: Ink(child: widget.child)),
+      ),
     );
-  }
-}
-
-///Inherited Widget created to check with [getElementForInheritedWidgetOfExactType]
-///if the current ScreenWidget is inside another ScreenWidget.
-///This is a more performant alternative to using [findAncestorWidgetOfExactType]
-///without an InheritedWidget.
-class _ScreenWidgetInheritedWidget extends InheritedWidget {
-  const _ScreenWidgetInheritedWidget({
-    required _ActiveScreenWidget child,
-  })  : _child = child,
-        super(child: child);
-  final _ActiveScreenWidget _child;
-  static _ScreenWidgetInheritedWidget? of(BuildContext context) {
-    final _ScreenWidgetInheritedWidget? result = context
-        .dependOnInheritedWidgetOfExactType<_ScreenWidgetInheritedWidget>();
-    return result;
-  }
-
-  @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
-    return false;
   }
 }
 

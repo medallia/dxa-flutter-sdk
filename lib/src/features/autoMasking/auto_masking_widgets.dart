@@ -23,6 +23,7 @@ class AllAutomaskWidgets extends AutoMaskWidgets {
     final Set<AutoMaskingType> allWidgets = {};
     for (final element in AutoMaskingType.values) {
       if (element == AutoMaskingType.none) continue;
+      if (element == AutoMaskingType.all) continue;
       allWidgets.add(element);
     }
     return allWidgets;

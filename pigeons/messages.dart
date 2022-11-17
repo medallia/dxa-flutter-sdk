@@ -12,12 +12,14 @@ class StartScreenMessage {
   String? screenName;
   int? screenId;
   int? startTime;
+  bool? isBackground;
 }
 
 class EndScreenMessage {
   String? screenName;
   int? screenId;
   int? endTime;
+  bool? isBackground;
 }
 
 class SessionMessage {
@@ -72,4 +74,6 @@ abstract class DecibelSdkApi {
   void sendGoal(GoalMessage msg);
   @async
   String getWebViewProperties();
+  @async
+  String getSessionId();
 }

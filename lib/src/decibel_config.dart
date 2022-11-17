@@ -43,10 +43,10 @@ class DecibelSdk {
           consents.contains(
             enums.DecibelCustomerConsentType.recordingAndTracking,
           )) {
-        await SessionReplay.instance.start();
+        await SessionReplay.instance.newScreen();
       }
     } else {
-      await SessionReplay.instance.start();
+      await SessionReplay.instance.newScreen();
     }
   }
 
@@ -126,5 +126,9 @@ class DecibelSdk {
   //Set the automasking configuration
   static void setAutoMasking(Set<enums.AutoMaskingType> widgetsToMask) {
     SessionReplay.instance.autoMasking.autoMaskingTypeSet = widgetsToMask;
+  }
+
+  static Future<String?> getSessionId() async {
+    return _api.getSessionId();
   }
 }

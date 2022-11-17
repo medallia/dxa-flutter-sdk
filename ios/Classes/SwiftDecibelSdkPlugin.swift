@@ -25,15 +25,15 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
     }
 
     public func startScreenMsg(_ msg: FLTStartScreenMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        if let screenName = msg.screenName, let screenId = msg.screenId as? Int{
-            DecibelSDK.multiPlatform.set(screen: screenName, id: screenId)
+        if let screenName = msg.screenName, let screenId = msg.screenId as? Int, let isBackground = msg.isBackground as? Bool{
+            DecibelSDK.multiPlatform.set(screen: screenName, id: screenId, fromBackground: isBackground)
         }
     }
     
     public func endScreenMsg(_ msg: FLTEndScreenMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-//        if let screenName = msg.screenName, let screenId = msg.screenId as? Int{
-//            DecibelSDK.multiPlatform.set(screen: screenName, id: screenId)
-//        }
+       if let screenName = msg.screenName, let screenId = msg.screenId as? Int, let isBackground = msg.isBackground as? Bool{
+           DecibelSDK.multiPlatform.endScreen(goesToBackground: isBackground)
+       }
     }
 
     public func setEnableConsentsMsg(_ msg: FLTConsentsMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
@@ -106,5 +106,8 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
 
     public func getWebViewProperties(completion: (String?, FlutterError?)->Void) {
        completion(DecibelSDK.multiPlatform.getWebViewProperties(),nil);
+    }
+    public func getSessionId(completion: (String?, FlutterError?)->Void) {
+       completion(DecibelSDK.multiPlatform.getSessionId(),nil);
     }
 }
