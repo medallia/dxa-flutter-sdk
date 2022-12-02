@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
+import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -20,22 +21,21 @@ class SessionReplay {
     )..newFrameStreamController.stream.listen((timeStamp) {
         _didUiChange = true;
       });
+    placeholderImageConfig = PlaceholderImageConfig.instance;
   }
   static final _instance = SessionReplay._internal();
   static SessionReplay get instance => _instance;
   late final FrameTracking _frameTracking;
   late final AutoMasking autoMasking;
+  late final PlaceholderImageConfig placeholderImageConfig;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final _maskColor = Paint()..color = Colors.grey;
   ScreenshotMessage? lastScreenshotSent;
-  bool _isPageTransitioning = false;
-  bool get isPageTransitioning => _isPageTransitioning;
-  set isPageTransitioning(bool value) {
-    _isPageTransitioning = value;
-  }
-
+  bool alreadyWaitingForPostFrameCallback = false;
   bool get currentlyTracking =>
       Tracking.instance.visitedUnfinishedScreensList.isNotEmpty;
+  bool get recordingAllowedInThisScreen => currentTrackedSreen.recordingAllowed;
+
   ScreenVisited get currentTrackedSreen {
     return Tracking.instance.visitedUnfinishedScreensList.last;
   }
@@ -51,7 +51,10 @@ class SessionReplay {
   }
 
   void _forceScreenshotNextFrame() {
+    if (alreadyWaitingForPostFrameCallback) return;
+    alreadyWaitingForPostFrameCallback = true;
     WidgetsBindingNullSafe.instance!.addPostFrameCallback((_) async {
+      alreadyWaitingForPostFrameCallback = false;
       await forceTakeScreenshot();
     });
   }
@@ -91,10 +94,12 @@ class SessionReplay {
   }
 
   Future<void> forceTakeScreenshot() async {
-    if (!currentlyTracking) {
-      return;
+    if (!currentlyTracking) return;
+
+    if (!recordingAllowedInThisScreen) {
+      return _sendOnePlaceholderImageForThisScreen(getCurrentContext!);
     }
-    if (!isPageTransitioning && getCurrentContext != null) {
+    if (!Tracking.instance.isPageTransitioning && getCurrentContext != null) {
       await _captureImage(getCurrentContext!);
     } else {
       _forceScreenshotNextFrame();
@@ -102,8 +107,9 @@ class SessionReplay {
   }
 
   Future<void> _captureImage(BuildContext context) async {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final Size size = MediaQuery.of(context).size;
+    final double width = size.width;
+    final double height = size.height;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(
       recorder,
@@ -116,9 +122,8 @@ class SessionReplay {
     if (renderObject != null) {
       final Rect frame = renderObject.globalPaintBounds;
 
+      final ScreenVisited screenVisited = currentTrackedSreen;
       final Offset newPosition = Offset(0, frame.top);
-      final int screenShotId = currentTrackedSreen.uniqueId;
-      final String screenShotName = currentTrackedSreen.name;
       final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
 
       late ui.Image image;
@@ -127,6 +132,7 @@ class SessionReplay {
           _saveMaskPosition(currentTrackedSreen.listOfMasks);
       try {
         didUiChange = false;
+
         image = await (renderObject as RenderRepaintBoundary).toImage();
       } catch (_) {
         _forceScreenshotNextFrame();
@@ -139,7 +145,11 @@ class SessionReplay {
           await recorder.endRecording().toImage(width.toInt(), height.toInt());
       final resultImageData =
           await resultImage.toByteData(format: ui.ImageByteFormat.png);
-
+      final int screenShotId = screenVisited.uniqueId;
+      final String screenShotName = screenVisited.name;
+      screenVisited.screenshotTakenList.add(
+        ScreenShotTaken(startFocusTime: startFocusTime),
+      );
       if (resultImageData != null) {
         await _sendScreenshot(
           resultImageData.buffer.asUint8List(),
@@ -174,14 +184,33 @@ class SessionReplay {
                 lastScreenshotSent!.startFocusTime! >
             1000) {
       final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
-      final ScreenshotMessage screenshotMessage = ScreenshotMessage()
-        ..screenshotData = lastScreenshotSent!.screenshotData
-        ..screenId = lastScreenshotSent!.screenId
-        ..screenName = lastScreenshotSent!.screenName
-        ..startFocusTime = startFocusTime;
-
-      await _apiInstance.saveScreenshot(screenshotMessage);
+      final ScreenshotMessage screenShotMessage = lastScreenshotSent!;
+      lastScreenshotSent = null;
+      await _sendScreenshot(
+        screenShotMessage.screenshotData!,
+        screenShotMessage.screenId!,
+        screenShotMessage.screenName!,
+        startFocusTime,
+      );
     }
+  }
+
+  Future<void> _sendOnePlaceholderImageForThisScreen(
+    BuildContext context,
+  ) async {
+    if (currentTrackedSreen.screenshotTakenList.isNotEmpty) return;
+    final ByteData byteData = await placeholderImageConfig.getPlaceholderImage(
+        context, PlaceholderType.replayDisabled);
+    final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
+    currentTrackedSreen.screenshotTakenList.add(
+      ScreenShotTaken(startFocusTime: startFocusTime),
+    );
+    await _sendScreenshot(
+      byteData.buffer.asUint8List(),
+      currentTrackedSreen.uniqueId,
+      currentTrackedSreen.name,
+      startFocusTime,
+    );
   }
 
   Set<Rect> _saveMaskPosition(List<GlobalKey> widgetsToMaskList) {

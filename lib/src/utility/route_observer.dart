@@ -34,7 +34,7 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
                   final BuildContext dialogContext = route.subtreeContext!;
                   final ScreenVisited screenVisited = Tracking
                       .instance.visitedScreensList.last
-                      .getDialogScreenVisited(
+                      .getAutomaticPopupScreenVisited(
                     route.hashCode.toString(),
                     dialogContext,
                   );
@@ -66,11 +66,6 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (route is ModalRoute) {
-      route.animation?.addStatusListener((status) {
-        _animationListener(status, route);
-      });
-    }
     checkForDialogPopOrRemove(route);
 
     super.didPop(route, previousRoute);
@@ -91,12 +86,12 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
     if (route.offstage) return;
     if (status == AnimationStatus.completed ||
         status == AnimationStatus.dismissed) {
-      SessionReplay.instance.isPageTransitioning = false;
+      Tracking.instance.isPageTransitioning = false;
       route.animation?.removeStatusListener((status) {
         _animationListener(status, route);
       });
     } else {
-      SessionReplay.instance.isPageTransitioning = true;
+      Tracking.instance.isPageTransitioning = true;
     }
   }
 
