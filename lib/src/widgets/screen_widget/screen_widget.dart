@@ -12,16 +12,30 @@ class ScreenWidget extends StatelessWidget {
     required this.screenName,
     this.tabController,
     this.tabNames,
-  })  : assert(tabController != null ? tabNames != null : tabNames == null,
+    this.enableAutomaticPopupRecording = true,
+  })  : isPopup = false,
+        assert(tabController != null ? tabNames != null : tabNames == null,
             'You either have to provide both tab related arguments, or none'),
         assert(tabNames == null || tabNames.length > 0),
         assert(tabController != null
             ? tabController.length == tabNames?.length
             : true);
+
+  const ScreenWidget.popup(
+      {required this.child,
+      required this.screenName,
+      this.enableAutomaticPopupRecording = true})
+      : isPopup = true,
+        tabController = null,
+        tabNames = null;
   final Widget child;
   final String screenName;
   final TabController? tabController;
   final List<String>? tabNames;
+
+  ///Enables automatic screen replay for PopupRoutes without ScreenWidget
+  final bool enableAutomaticPopupRecording;
+  final bool isPopup;
   @override
   Widget build(BuildContext context) {
     final bool isInsideAnotherScreenWidget =
@@ -35,6 +49,8 @@ class ScreenWidget extends StatelessWidget {
               screenName: screenName,
               tabController: tabController,
               tabNames: tabNames,
+              enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+              isPopup: isPopup,
               child: child,
             ),
           );
@@ -45,6 +61,8 @@ class _ActiveScreenWidget extends StatefulWidget {
   const _ActiveScreenWidget({
     required this.child,
     required this.screenName,
+    required this.enableAutomaticPopupRecording,
+    required this.isPopup,
     this.tabController,
     this.tabNames,
   });
@@ -53,6 +71,8 @@ class _ActiveScreenWidget extends StatefulWidget {
   final String screenName;
   final TabController? tabController;
   final List<String>? tabNames;
+  final bool enableAutomaticPopupRecording;
+  final bool isPopup;
 
   @override
   State<StatefulWidget> createState() => _ActiveScreenWidgetState();
@@ -73,7 +93,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
         listOfMasks: listOfMasks,
         captureKey: _globalKey,
         tabController: widget.tabController!,
-        tabNames: widget.tabNames!);
+        tabNames: widget.tabNames!,
+        enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording);
   }
 
   @override
@@ -92,6 +113,12 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       ..addObserver(this)
       ..addPostFrameCallback((_) async {
         route = ModalRoute.of(context);
+        assert(
+          widget.isPopup ? route is RawDialogRoute : route is! RawDialogRoute,
+          route is RawDialogRoute
+              ? 'Please use ScreenWidget.popup in screens with routes of type RawDialogRoutes'
+              : "Don't use ScreenWidget.popup in screens whith routes different than type RawDialogRoutes",
+        );
       });
     widget.tabController?.addListener(_tabControllerListener);
   }
@@ -158,13 +185,13 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   Future<void> callWhenIsCurrentRoute() async {
     final ScreenVisited screenVisited = Tracking.instance.createScreenVisited(
-      id: screenId.toString(),
-      name: widget.screenName,
-      listOfMasks: listOfMasks,
-      captureKey: _globalKey,
-      tabBarNames: widget.tabNames,
-      tabBarIndex: widget.tabController?.index,
-    );
+        id: screenId.toString(),
+        name: widget.screenName,
+        listOfMasks: listOfMasks,
+        captureKey: _globalKey,
+        tabBarNames: widget.tabNames,
+        tabBarIndex: widget.tabController?.index,
+        enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording);
     await Tracking.instance.startScreen(
       screenVisited,
     );
@@ -176,7 +203,9 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       listOfMasks: listOfMasks,
       child: RepaintBoundary(
         key: _globalKey,
-        child: Material(child: Ink(child: widget.child)),
+        child: widget.isPopup
+            ? widget.child
+            : Material(child: Ink(child: widget.child)),
       ),
     );
   }

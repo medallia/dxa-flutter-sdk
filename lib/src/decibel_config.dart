@@ -45,8 +45,6 @@ class DecibelSdk {
           )) {
         await SessionReplay.instance.newScreen();
       }
-    } else {
-      await SessionReplay.instance.newScreen();
     }
   }
 
