@@ -1,5 +1,5 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.6.1 (swiftlang-5.6.0.323.66 clang-1316.0.20.12)
+// swift-compiler-version: Apple Swift version 5.3.2 (swiftlang-1200.0.45 clang-1200.0.32.28)
 // swift-module-flags: -target arm64-apple-ios10.3 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Osize -module-name DecibelCoreFlutter
 import AVFoundation
 import CommonCrypto
@@ -98,12 +98,10 @@ extension NSManagedObject {
   open class func allObjects(on context: CoreData.NSManagedObjectContext?, with fetchRequest: CoreData.NSFetchRequest<CoreData.NSManagedObject>?) -> [CoreData.NSManagedObject]
   open func delete(on context: CoreData.NSManagedObjectContext)
 }
-@objc public protocol DecibelFlutter : DecibelCoreFlutter.DecibelProtocol {
-  @objc func initialize(account: Swift.String, property: Swift.String, multiPlatform: DecibelCoreFlutter.SDKMultiPlatform)
-  @objc func initialize(account: Swift.String, property: Swift.String, consents: [Swift.Int], multiPlatform: DecibelCoreFlutter.SDKMultiPlatform)
-  @objc func set(screen: Swift.String, id: Swift.Int)
+@objc public protocol DecibelFlutter : DecibelCoreFlutter.DecibelMultiPlatform {
+  @objc func set(screen: Swift.String, id: Swift.Int, fromBackground: Swift.Bool)
   @objc func saveScreenShot(screenshot: Foundation.Data, id: Swift.Int, screenName: Swift.String, startFocusTime: Foundation.TimeInterval)
-  @objc func endScreen()
+  @objc func endScreen(goesToBackground: Swift.Bool)
 }
 @objc public enum DecibelUserConsent : Swift.Int {
   case all
@@ -115,6 +113,7 @@ extension NSManagedObject {
   public var rawValue: Swift.Int {
     get
   }
+  public init?(rawValue: Swift.Int)
 }
 @objc public class SDKMultiPlatform : ObjectiveC.NSObject {
   public init(type: DecibelCoreFlutter.SDKPlatformType, version: Swift.String, language: Swift.String)

@@ -13,6 +13,7 @@ class ScreenWidget extends StatelessWidget {
     this.tabController,
     this.tabNames,
     this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticMasking = true,
   })  : isPopup = false,
         assert(tabController != null ? tabNames != null : tabNames == null,
             'You either have to provide both tab related arguments, or none'),
@@ -21,11 +22,12 @@ class ScreenWidget extends StatelessWidget {
             ? tabController.length == tabNames?.length
             : true);
 
-  const ScreenWidget.popup(
-      {required this.child,
-      required this.screenName,
-      this.enableAutomaticPopupRecording = true})
-      : isPopup = true,
+  const ScreenWidget.popup({
+    required this.child,
+    required this.screenName,
+    this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticMasking = true,
+  })  : isPopup = true,
         tabController = null,
         tabNames = null;
   final Widget child;
@@ -35,6 +37,8 @@ class ScreenWidget extends StatelessWidget {
 
   ///Enables automatic screen replay for PopupRoutes without ScreenWidget
   final bool enableAutomaticPopupRecording;
+  //Enables automatic masking for this screen
+  final bool enableAutomaticMasking;
   final bool isPopup;
   @override
   Widget build(BuildContext context) {
@@ -50,6 +54,7 @@ class ScreenWidget extends StatelessWidget {
               tabController: tabController,
               tabNames: tabNames,
               enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+              enableAutomaticMasking: enableAutomaticMasking,
               isPopup: isPopup,
               child: child,
             ),
@@ -62,6 +67,7 @@ class _ActiveScreenWidget extends StatefulWidget {
     required this.child,
     required this.screenName,
     required this.enableAutomaticPopupRecording,
+    required this.enableAutomaticMasking,
     required this.isPopup,
     this.tabController,
     this.tabNames,
@@ -72,6 +78,7 @@ class _ActiveScreenWidget extends StatefulWidget {
   final TabController? tabController;
   final List<String>? tabNames;
   final bool enableAutomaticPopupRecording;
+  final bool enableAutomaticMasking;
   final bool isPopup;
 
   @override
@@ -88,13 +95,15 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   // Defining an internal function to be able to remove the listener
   Future<void> _tabControllerListener() async {
     await Tracking.instance.tabControllerListener(
-        screenId: screenId.toString(),
-        name: widget.screenName,
-        listOfMasks: listOfMasks,
-        captureKey: _globalKey,
-        tabController: widget.tabController!,
-        tabNames: widget.tabNames!,
-        enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording);
+      screenId: screenId.toString(),
+      name: widget.screenName,
+      listOfMasks: listOfMasks,
+      captureKey: _globalKey,
+      tabController: widget.tabController!,
+      tabNames: widget.tabNames!,
+      enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
+      enableAutomaticMasking: widget.enableAutomaticMasking,
+    );
   }
 
   @override
@@ -191,7 +200,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
         captureKey: _globalKey,
         tabBarNames: widget.tabNames,
         tabBarIndex: widget.tabController?.index,
-        enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording);
+        enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
+        enableAutomaticMasking: widget.enableAutomaticMasking);
     await Tracking.instance.startScreen(
       screenVisited,
     );
