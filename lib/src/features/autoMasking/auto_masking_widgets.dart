@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:decibel_sdk/decibel_sdk.dart';
+import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -21,10 +22,11 @@ class AllAutomaskWidgets extends AutoMaskWidgets {
   const AllAutomaskWidgets() : super(widgets: const {});
   Set<AutoMaskingType> getAllTypes() {
     final Set<AutoMaskingType> allWidgets = {};
-    for (final element in AutoMaskingType.values) {
-      if (element == AutoMaskingType.none) continue;
-      if (element == AutoMaskingType.all) continue;
-      allWidgets.add(element);
+
+    for (final element in AutoMaskingTypeEnum.values) {
+      if (element == AutoMaskingTypeEnum.none) continue;
+      if (element == AutoMaskingTypeEnum.all) continue;
+      allWidgets.add(AutoMaskingType(autoMaskingTypeEnum: element));
     }
     return allWidgets;
   }

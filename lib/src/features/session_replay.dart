@@ -6,8 +6,8 @@ import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
-import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -35,9 +35,10 @@ class SessionReplay {
   bool alreadyWaitingForPostFrameCallback = false;
   bool get currentlyTracking =>
       Tracking.instance.visitedUnfinishedScreensList.isNotEmpty;
-  bool get recordingAllowedInThisScreen => currentTrackedSreen.recordingAllowed;
+  bool get recordingAllowedInThisScreen =>
+      currentTrackedScreen.recordingAllowed;
 
-  ScreenVisited get currentTrackedSreen {
+  ScreenVisited get currentTrackedScreen {
     return Tracking.instance.visitedUnfinishedScreensList.last;
   }
 
@@ -60,7 +61,7 @@ class SessionReplay {
     });
   }
 
-  BuildContext? get getCurrentContext => currentTrackedSreen.getCurrentContext;
+  BuildContext? get getCurrentContext => currentTrackedScreen.getCurrentContext;
 
   Future<void> newScreen() async {
     didUiChange = true;
@@ -100,6 +101,7 @@ class SessionReplay {
     if (!recordingAllowedInThisScreen) {
       return _sendOnePlaceholderImageForThisScreen(getCurrentContext!);
     }
+    if (currentTrackedScreen.isCurrentScreenOverMaxDuration) return;
     if (!Tracking.instance.isPageTransitioning && getCurrentContext != null) {
       await _captureImage(getCurrentContext!);
     } else {
@@ -123,14 +125,15 @@ class SessionReplay {
     if (renderObject != null) {
       final Rect frame = renderObject.globalPaintBounds;
 
-      final ScreenVisited screenVisited = currentTrackedSreen;
+      final ScreenVisited screenVisited = currentTrackedScreen;
       final Offset newPosition = Offset(0, frame.top);
       final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
 
       late ui.Image image;
-      autoMasking.setAutoMasking(context);
-      manualMaskCoordinates =
-          _saveMaskPosition(currentTrackedSreen.listOfMasks);
+      if (screenVisited.enableAutomaticMasking) {
+        autoMasking.setAutoMasking(context);
+      }
+      manualMaskCoordinates = _saveMaskPosition(screenVisited.listOfMasks);
       try {
         didUiChange = false;
 
@@ -179,12 +182,18 @@ class SessionReplay {
 
   ///Resends the last screenshot to native (with a new focusTime) only
   ///if there's been a second or more without any new screenshots
-  Future<void> closeScreenVideo() async {
+  Future<void> closeScreenVideo(ScreenVisited screenVisited) async {
     if (lastScreenshotSent != null &&
         DateTime.now().millisecondsSinceEpoch -
                 lastScreenshotSent!.startFocusTime! >
             1000) {
-      final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
+      late int startFocusTime;
+      if (screenVisited.isCurrentScreenOverMaxDuration) {
+        startFocusTime = screenVisited.maximumDurationForLastScreenshot;
+      } else {
+        startFocusTime = DateTime.now().millisecondsSinceEpoch;
+      }
+
       final ScreenshotMessage screenShotMessage = lastScreenshotSent!;
       lastScreenshotSent = null;
       await _sendScreenshot(
@@ -199,17 +208,19 @@ class SessionReplay {
   Future<void> _sendOnePlaceholderImageForThisScreen(
     BuildContext context,
   ) async {
-    if (currentTrackedSreen.screenshotTakenList.isNotEmpty) return;
+    if (currentTrackedScreen.screenshotTakenList.isNotEmpty) return;
     final ByteData byteData = await placeholderImageConfig.getPlaceholderImage(
-        context, PlaceholderType.replayDisabled);
+      context,
+      PlaceholderType(placeholderTypeEnum: PlaceholderTypeEnum.replayDisabled),
+    );
     final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
-    currentTrackedSreen.screenshotTakenList.add(
+    currentTrackedScreen.screenshotTakenList.add(
       ScreenShotTaken(startFocusTime: startFocusTime),
     );
     await _sendScreenshot(
       byteData.buffer.asUint8List(),
-      currentTrackedSreen.uniqueId,
-      currentTrackedSreen.name,
+      currentTrackedScreen.uniqueId,
+      currentTrackedScreen.name,
       startFocusTime,
     );
   }
@@ -222,11 +233,6 @@ class SessionReplay {
       //TODO: this is used for tabbars because they share masks references,
       //research how to avoid this
       if (renderObject == null) continue;
-      coordinates.addAll(_getMaskCoordinates(renderObject));
-    }
-    autoMasking.renderObjectsToMask
-        .removeWhere((element) => element.attached == false);
-    for (final renderObject in autoMasking.renderObjectsToMask) {
       coordinates.addAll(_getMaskCoordinates(renderObject));
     }
     autoMasking.renderObjectsToMask
