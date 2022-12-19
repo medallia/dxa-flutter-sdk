@@ -23,7 +23,8 @@ class _ScreenWidgetInheritedWidget extends InheritedWidget {
 }
 
 class _MaskList extends InheritedWidget {
-  const _MaskList({required this.listOfMasks, required super.child});
+  const _MaskList({required this.listOfMasks, required Widget child})
+      : super(child: child);
   final List<GlobalKey> listOfMasks;
 
   static _MaskList? of(BuildContext context) {

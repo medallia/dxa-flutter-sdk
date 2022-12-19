@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
@@ -122,8 +123,13 @@ class DecibelSdk {
   }
 
   //Set the automasking configuration
-  static void setAutoMasking(Set<enums.AutoMaskingType> widgetsToMask) {
-    SessionReplay.instance.autoMasking.autoMaskingTypeSet = widgetsToMask;
+  static void setAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
+    final Set<AutoMaskingType> allWidgets = {};
+
+    for (final element in widgetsToMask) {
+      allWidgets.add(AutoMaskingType(autoMaskingTypeEnum: element));
+    }
+    SessionReplay.instance.autoMasking.autoMaskingTypeSet = allWidgets;
   }
 
   static Future<String?> getSessionId() async {

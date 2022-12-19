@@ -1,4 +1,5 @@
 import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/utility/constants.dart';
 import 'package:decibel_sdk/src/utility/enums.dart';
 import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
@@ -102,4 +103,14 @@ extension ScreenVisitedFinder on List<ScreenVisited> {
         }
         return false;
       });
+}
+
+extension ScreenVisitedExt on ScreenVisited {
+  bool get isCurrentScreenOverMaxDuration {
+    return DateTime.now().millisecondsSinceEpoch - timestamp >
+        SDKConstants.maxReplayDurationPerScreen.inMilliseconds;
+  }
+
+  int get maximumDurationForLastScreenshot =>
+      timestamp + SDKConstants.maxReplayDurationPerScreen.inMilliseconds;
 }

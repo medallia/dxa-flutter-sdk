@@ -52,6 +52,7 @@ class Tracking {
     required List<GlobalKey> listOfMasks,
     required GlobalKey captureKey,
     required bool enableAutomaticPopupRecording,
+    required bool enableAutomaticMasking,
     List<String>? tabBarNames,
     int? tabBarIndex,
   }) {
@@ -65,22 +66,26 @@ class Tracking {
     late ScreenVisited screenVisited;
     if (tabBarNames != null && tabBarIndex != null) {
       screenVisited = ScreenVisitedTabBar(
-          id: id,
-          timestamp: timestamp,
-          name: name,
-          captureKey: captureKey,
-          tabBarNames: tabBarNames,
-          tabIndex: tabBarIndex,
-          listOfMasks: listOfMasks,
-          enableAutomaticPopupRecording: enableAutomaticPopupRecording);
+        id: id,
+        timestamp: timestamp,
+        name: name,
+        captureKey: captureKey,
+        tabBarNames: tabBarNames,
+        tabIndex: tabBarIndex,
+        listOfMasks: listOfMasks,
+        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+        enableAutomaticMasking: enableAutomaticMasking,
+      );
     } else {
       screenVisited = ScreenVisited.standard(
-          id: id,
-          listOfMasks: listOfMasks,
-          captureKey: captureKey,
-          timestamp: timestamp,
-          name: name,
-          enableAutomaticPopupRecording: enableAutomaticPopupRecording);
+        id: id,
+        listOfMasks: listOfMasks,
+        captureKey: captureKey,
+        timestamp: timestamp,
+        name: name,
+        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+        enableAutomaticMasking: enableAutomaticMasking,
+      );
     }
     return screenVisited;
   }
@@ -138,7 +143,7 @@ class Tracking {
 
     //fire and forget to keep synchronicity
     //ignore: unawaited_futures
-    SessionReplay.instance.closeScreenVideo();
+    SessionReplay.instance.closeScreenVideo(screenVisitedFinished);
     await _apiInstance.endScreen(
       EndScreenMessage()
         ..screenName = screenVisitedFinished.name
@@ -196,6 +201,7 @@ class Tracking {
     required TabController tabController,
     required List<String> tabNames,
     required bool enableAutomaticPopupRecording,
+    required bool enableAutomaticMasking,
   }) async {
     //Temporary patch for issue https://github.com/flutter/flutter/issues/113020
     //Jira ticket DCBLMOB-1725
@@ -227,13 +233,15 @@ class Tracking {
       }
 
       final ScreenVisited screenVisited = createScreenVisited(
-          id: screenId,
-          name: name,
-          listOfMasks: listOfMasks,
-          captureKey: captureKey,
-          tabBarNames: tabNames,
-          tabBarIndex: tabController.index,
-          enableAutomaticPopupRecording: enableAutomaticPopupRecording);
+        id: screenId,
+        name: name,
+        listOfMasks: listOfMasks,
+        captureKey: captureKey,
+        tabBarNames: tabNames,
+        tabBarIndex: tabController.index,
+        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+        enableAutomaticMasking: enableAutomaticMasking,
+      );
       await startScreen(screenVisited);
     }
   }
@@ -253,6 +261,7 @@ class ScreenVisited {
   final bool enableAutomaticPopupRecording;
   final bool recordingAllowed;
   final List<ScreenShotTaken> screenshotTakenList;
+  final bool enableAutomaticMasking;
   BuildContext? get getCurrentContext {
     if (!isDialog) return captureKey.currentContext;
     return dialogContext!;
@@ -273,6 +282,7 @@ class ScreenVisited {
     required this.isTabBar,
     required this.dialogContext,
     required this.enableAutomaticPopupRecording,
+    required this.enableAutomaticMasking,
     this.recordingAllowed = true,
   }) : screenshotTakenList = [];
 
@@ -283,6 +293,7 @@ class ScreenVisited {
     required this.listOfMasks,
     required this.captureKey,
     required this.enableAutomaticPopupRecording,
+    required this.enableAutomaticMasking,
     this.endTimestamp,
   })  : finished = false,
         isDialog = false,
@@ -306,6 +317,7 @@ class ScreenVisited {
     required this.enableAutomaticPopupRecording,
     required this.recordingAllowed,
     required this.screenshotTakenList,
+    required this.enableAutomaticMasking,
   }) : finished = true;
   ScreenVisited.tabBarChild({
     required this.id,
@@ -313,6 +325,7 @@ class ScreenVisited {
     required this.timestamp,
     required this.captureKey,
     required this.enableAutomaticPopupRecording,
+    required this.enableAutomaticMasking,
     this.listOfMasks = const [],
     this.endTimestamp,
   })  : finished = false,
@@ -329,6 +342,7 @@ class ScreenVisited {
     required this.captureKey,
     required this.dialogContext,
     required this.recordingAllowed,
+    required this.enableAutomaticMasking,
     this.endTimestamp,
   })  : finished = false,
         isDialog = true,
@@ -350,6 +364,7 @@ class ScreenVisited {
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       recordingAllowed: recordingAllowed,
       screenshotTakenList: screenshotTakenList,
+      enableAutomaticMasking: enableAutomaticMasking,
     );
   }
 
@@ -369,6 +384,7 @@ class ScreenVisited {
       dialogContext: dialogContext,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       recordingAllowed: recordingAllowed,
+      enableAutomaticMasking: enableAutomaticMasking,
     );
   }
 
@@ -383,6 +399,7 @@ class ScreenVisited {
       captureKey: captureKey,
       dialogContext: dialogContext,
       recordingAllowed: enableAutomaticPopupRecording,
+      enableAutomaticMasking: enableAutomaticMasking,
     );
   }
 
@@ -413,6 +430,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required List<String> tabBarNames,
     required int tabIndex,
     required bool enableAutomaticPopupRecording,
+    required bool enableAutomaticMasking,
   }) {
     final String tabName = tabBarNames[tabIndex];
     final String idWithTabName = '$id-$tabName';
@@ -424,6 +442,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
         name: name,
         captureKey: captureKey,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+        enableAutomaticMasking: enableAutomaticMasking,
       );
     }).toList();
 
@@ -438,35 +457,44 @@ class ScreenVisitedTabBar extends ScreenVisited {
       tabBarname: name,
       listOfMasks: listOfMasks,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+      enableAutomaticMasking: enableAutomaticMasking,
     );
   }
   ScreenVisitedTabBar.internal({
-    required super.id,
-    required super.name,
-    required super.timestamp,
-    required super.captureKey,
+    required String id,
+    required String name,
+    required int timestamp,
+    required GlobalKey<State<StatefulWidget>> captureKey,
     required this.tabBarScreens,
     required this.tabIndex,
     required this.tabBarId,
     required this.tabBarname,
-    required super.enableAutomaticPopupRecording,
-    required super.listOfMasks,
-  }) : super.tabBarChild();
+    required bool enableAutomaticPopupRecording,
+    required List<GlobalKey<State<StatefulWidget>>> listOfMasks,
+    required bool enableAutomaticMasking,
+  }) : super.tabBarChild(
+            id: id,
+            name: name,
+            timestamp: timestamp,
+            captureKey: captureKey,
+            enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+            listOfMasks: listOfMasks,
+            enableAutomaticMasking: enableAutomaticMasking);
 
   @override
   ScreenVisited getScreenVisitedWithNewStartTimeStamp(int startTimeStamp) {
     return ScreenVisitedTabBar.internal(
-      id: id,
-      name: name,
-      timestamp: startTimeStamp,
-      captureKey: captureKey,
-      tabBarScreens: tabBarScreens,
-      tabIndex: tabIndex,
-      tabBarId: tabBarId,
-      tabBarname: tabBarname,
-      listOfMasks: listOfMasks,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-    );
+        id: id,
+        name: name,
+        timestamp: startTimeStamp,
+        captureKey: captureKey,
+        tabBarScreens: tabBarScreens,
+        tabIndex: tabIndex,
+        tabBarId: tabBarId,
+        tabBarname: tabBarname,
+        listOfMasks: listOfMasks,
+        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+        enableAutomaticMasking: enableAutomaticMasking);
   }
 
   @override

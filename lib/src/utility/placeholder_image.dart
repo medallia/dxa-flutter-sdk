@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 import 'dart:collection';
 import 'dart:ui' as ui;
@@ -6,12 +7,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 
-enum PlaceholderType<String> {
-  replayDisabled('Replay Disabled'),
-  noPreviewAvailable('No preview available');
+enum PlaceholderTypeEnum { replayDisabled, noPreviewAvailable }
 
-  final String text;
-  const PlaceholderType(this.text);
+class PlaceholderType {
+  final PlaceholderTypeEnum placeholderTypeEnum;
+  PlaceholderType({
+    required this.placeholderTypeEnum,
+  });
+  String getPlaceholderText() {
+    switch (placeholderTypeEnum) {
+      case PlaceholderTypeEnum.replayDisabled:
+        return 'Replay Disabled';
+
+      case PlaceholderTypeEnum.noPreviewAvailable:
+        return 'No preview available';
+
+      default:
+        return 'No preview available';
+    }
+  }
 }
 
 class PlaceholderImageConfig {
@@ -23,7 +37,7 @@ class PlaceholderImageConfig {
 
   FutureOr<ByteData> getPlaceholderImage(
     BuildContext context,
-    PlaceholderType<String> placeholderType,
+    PlaceholderType placeholderType,
   ) async {
     final Size size = MediaQuery.of(context).size;
     if (placeholderImageByteDataMap.containsKey(size)) {
@@ -37,7 +51,7 @@ class PlaceholderImageConfig {
 
   Future<ByteData> _createPlaceHolderImage(
     BuildContext context,
-    PlaceholderType<String> placeholderType,
+    PlaceholderType placeholderType,
   ) async {
     final Size size = MediaQuery.of(context).size;
     final double screenWidth = size.width;
@@ -53,7 +67,7 @@ class PlaceholderImageConfig {
       fontSize: screenWidth * 0.1,
     );
     final textSpan = TextSpan(
-      text: placeholderType.text,
+      text: placeholderType.getPlaceholderText(),
       style: textStyle,
     );
     final textPainter = TextPainter(
