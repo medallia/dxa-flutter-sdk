@@ -152,7 +152,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   @override
   void didChangeMetrics() {
     Tracking.instance.physicalSize =
-        WidgetsBinding.instance.window.physicalSize;
+        WidgetsBindingNullSafe.instance!.window.physicalSize;
     super.didChangeMetrics();
   }
 
