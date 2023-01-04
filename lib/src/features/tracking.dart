@@ -98,6 +98,19 @@ class Tracking {
       visitedUnfinishedScreensList.isEmpty ||
           visitedUnfinishedScreensList.length == 1,
     );
+    late bool backgroundFlag;
+    //When returning from background there's the possibility that the screen
+    //which went to background isn't the same as the one at the top of the
+    //navigation stack. This checks if there is a screen that went to background
+    //and hasn't returned, and if so then it notifies the native
+    //SDK that it has returned from background (Only for iOS) and cleans
+    //[screenVisitedWhenAppWentToBackground].
+    if (screenVisitedWhenAppWentToBackground != null) {
+      backgroundFlag = true;
+      screenVisitedWhenAppWentToBackground = null;
+    } else {
+      backgroundFlag = isBackground;
+    }
     if (visitedUnfinishedScreensList.isNotEmpty) {
       await endScreen(visitedUnfinishedScreensList[0].id);
     }
@@ -109,7 +122,7 @@ class Tracking {
         ..screenName = screenVisited.name
         ..screenId = screenVisited.uniqueId
         ..startTime = screenVisited.timestamp
-        ..isBackground = isBackground,
+        ..isBackground = backgroundFlag,
     );
     await SessionReplay.instance.newScreen();
   }
