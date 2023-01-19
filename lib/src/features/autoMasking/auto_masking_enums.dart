@@ -54,4 +54,8 @@ class AutoMaskingType {
 
   @override
   int get hashCode => autoMaskingTypeEnum.hashCode;
+
+  @override
+  String toString() =>
+      'AutoMaskingType(autoMaskingTypeEnum: $autoMaskingTypeEnum)';
 }

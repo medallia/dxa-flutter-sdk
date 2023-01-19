@@ -5,6 +5,7 @@ import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -137,5 +138,34 @@ class DecibelSdk {
     return Future.delayed(Duration(seconds: 3)).then((_) {
       return _api.getSessionId();
     });
+  }
+
+  ///Enable Logs for every SDK module.
+  ///Call this BEFORE initialize
+  static void enableAllLogs() => LoggerSDK.all();
+
+  ///Enable Logs only for the selected modules. All modules are disabled by default.
+  ///Call this BEFORE initialize
+  static void enableSelectedLogs({
+    bool tracking = false,
+    bool sessionReplay = false,
+    bool frameTracking = false,
+    bool routeObserver = false,
+    bool autoMasking = false,
+    bool screenWidget = false,
+    bool maskWidget = false,
+  }) =>
+      LoggerSDK.selected(
+        enabled: true,
+        tracking: tracking,
+        sessionReplay: sessionReplay,
+        frameTracking: frameTracking,
+        routeObserver: routeObserver,
+        autoMasking: autoMasking,
+        screenWidget: screenWidget,
+        maskWidget: maskWidget,
+      );
+  static void sendDataOverWifiOnly() {
+    _api.sendDataOverWifiOnly();
   }
 }
