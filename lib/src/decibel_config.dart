@@ -132,7 +132,10 @@ class DecibelSdk {
     SessionReplay.instance.autoMasking.autoMaskingTypeSet = allWidgets;
   }
 
+  ///Only for debug purposes
   static Future<String?> getSessionId() async {
-    return _api.getSessionId();
+    return Future.delayed(Duration(seconds: 3)).then((_) {
+      return _api.getSessionId();
+    });
   }
 }

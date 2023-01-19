@@ -77,35 +77,11 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
     }
   }
 
-  void _debugCheckTabBarConfiguration(BuildContext context) {
-    if (kDebugMode) {
-      final bool isInsideTabBar =
-          _ScreenWidgetInheritedWidget.of(context)?._child.tabController !=
-              null;
-      if (isInsideTabBar) {
-        final bool hasScreenWidgetTabBarParent =
-            context.getElementForInheritedWidgetOfExactType<
-                    ScreenWidgetTabBar>() !=
-                null;
-        assert(
-          hasScreenWidgetTabBarParent,
-          '''
-          This Mask is inside a TabBar that is not configured 
-          correctly, a ScreenWidgetTabBar needs to wrap the body of 
-          the Scaffold''',
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    _debugCheckTabBarConfiguration(context);
-    return Ink(
-      child: KeyedSubtree(
-        key: globalKey,
-        child: widget.child,
-      ),
+    return KeyedSubtree(
+      key: globalKey,
+      child: widget.child,
     );
   }
 }

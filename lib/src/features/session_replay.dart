@@ -9,6 +9,7 @@ import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 
 class SessionReplay {
   SessionReplay._internal() {
@@ -32,6 +33,7 @@ class SessionReplay {
   final _maskColor = Paint()..color = Colors.grey;
   ScreenshotMessage? lastScreenshotSent;
   bool alreadyWaitingForPostFrameCallback = false;
+  bool waitingForEndOfFrame = false;
   bool get currentlyTracking =>
       Tracking.instance.visitedUnfinishedScreensList.isNotEmpty;
   bool get recordingAllowedInThisScreen =>
@@ -102,6 +104,17 @@ class SessionReplay {
     }
     if (currentTrackedScreen.isCurrentScreenOverMaxDuration) return;
     if (!Tracking.instance.isPageTransitioning && getCurrentContext != null) {
+      if (waitingForEndOfFrame) return;
+
+      ///No need to wait for the endOfFrame when we are in other phases.
+      ///Also ensures this is not called in other phases where a frame may not
+      ///be scheduled
+      if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+        waitingForEndOfFrame = true;
+        await WidgetsBindingNullSafe.instance!.endOfFrame;
+        waitingForEndOfFrame = false;
+        if (!currentlyTracking) return;
+      }
       await _captureImage(getCurrentContext!);
     } else {
       _forceScreenshotNextFrame();

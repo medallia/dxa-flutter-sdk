@@ -15,7 +15,6 @@ dependencies:
   logger: ^1.0.0
   webview_flutter: ">=2.0.0 <4.0.0"
   yaml: ^3.0.0
-  
 dev_dependencies:
   flutter_test:
     sdk: flutter
