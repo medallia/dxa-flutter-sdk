@@ -6,13 +6,15 @@ import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:logger/logger.dart';
 
 class SessionReplay {
-  SessionReplay._internal() {
+  SessionReplay._internal() : logger = LoggerSDK.instance.sessionReplayLogger {
     _timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
       await maybeTakeScreenshot();
     });
@@ -26,6 +28,8 @@ class SessionReplay {
   }
   static final _instance = SessionReplay._internal();
   static SessionReplay get instance => _instance;
+
+  final Logger logger;
   late final FrameTracking _frameTracking;
   late final AutoMasking autoMasking;
   late final PlaceholderImageConfig placeholderImageConfig;
@@ -189,6 +193,7 @@ class SessionReplay {
       ..screenName = screenName
       ..startFocusTime = startFocusTime;
     lastScreenshotSent = screenshotMessage;
+    logger.d('Save screenshot - screenName: $screenName - screenId: $screenId');
     await _apiInstance.saveScreenshot(screenshotMessage);
   }
 
@@ -229,6 +234,14 @@ class SessionReplay {
     currentTrackedScreen.screenshotTakenList.add(
       ScreenShotTaken(startFocusTime: startFocusTime),
     );
+    logger.v(
+      '''
+      _sendOnePlaceholderImageForThisScreen - 
+      screenName: ${currentTrackedScreen.name} - 
+      screenId: ${currentTrackedScreen.uniqueId}
+      ''',
+    );
+
     await _sendScreenshot(
       byteData.buffer.asUint8List(),
       currentTrackedScreen.uniqueId,

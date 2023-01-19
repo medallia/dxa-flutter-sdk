@@ -17,8 +17,8 @@ class _ScreenWidgetInheritedWidget extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
-    return false;
+  bool updateShouldNotify(covariant _ScreenWidgetInheritedWidget oldWidget) {
+    return child != oldWidget.child;
   }
 }
 
@@ -34,7 +34,29 @@ class _MaskList extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
-    return true;
+  bool updateShouldNotify(covariant _MaskList oldWidget) {
+    return listOfMasks != oldWidget.listOfMasks;
+  }
+}
+
+class _ScreenWidgetManualTabBar extends InheritedWidget {
+  const _ScreenWidgetManualTabBar(
+      {required this.changeIndex, required Widget child})
+      : super(child: child);
+  final void Function(int index) changeIndex;
+
+  static _ScreenWidgetManualTabBar? of(BuildContext context) {
+    final _ScreenWidgetManualTabBar? result =
+        context.dependOnInheritedWidgetOfExactType<_ScreenWidgetManualTabBar>();
+    assert(
+      result != null,
+      "Couldn't find an ancestor of type ScreenWidget.manualTabBar.",
+    );
+    return result;
+  }
+
+  @override
+  bool updateShouldNotify(covariant _ScreenWidgetManualTabBar oldWidget) {
+    return changeIndex != oldWidget.changeIndex;
   }
 }

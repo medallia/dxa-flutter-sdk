@@ -4,7 +4,6 @@ class MaskWidget extends StatefulWidget {
   const MaskWidget({required this.child});
 
   final Widget child;
-
   @override
   State<StatefulWidget> createState() => _MaskWidgetState();
 }
@@ -12,8 +11,12 @@ class MaskWidget extends StatefulWidget {
 class _MaskWidgetState extends State<MaskWidget> with RouteAware {
   late GlobalKey globalKey;
   late List<GlobalKey> listOfMasks;
+  final Logger logger = LoggerSDK.instance.maskWidgetLogger;
   @override
   void initState() {
+    logger.d(
+        'initState - child runtimeType: ${widget.child.runtimeType.toString()}');
+
     globalKey = GlobalKey();
 
     super.initState();
@@ -26,10 +29,13 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
     listOfMasks = _MaskList.of(context)!.listOfMasks;
     CustomRouteObserver.screenWidgetRouteObserver
         .subscribe(this, ModalRoute.of(context)!);
+    logger.d('didChangeDependencies - listsOfMasks ${listOfMasks.toString()}');
   }
 
   @override
   void dispose() {
+    logger.d('dispose');
+
     removeMask(globalKey);
     CustomRouteObserver.screenWidgetRouteObserver.unsubscribe(this);
     super.dispose();
@@ -37,11 +43,15 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
 
   @override
   void didPush() {
+    logger.d('didPush');
+
     addMask(globalKey);
   }
 
   @override
   void didPopNext() {
+    logger.d('didPopNext');
+
     // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
     addMask(globalKey);
     // });
@@ -49,15 +59,21 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
 
   @override
   void didPop() {
+    logger.d('didPop');
+
     removeMask(globalKey);
   }
 
   @override
   void didPushNext() {
+    logger.d('didPushNext');
+
     removeMask(globalKey);
   }
 
   void addMask(GlobalKey globalKey) {
+    logger.d('addMask ${globalKey.toString()}');
+
     // if (listOfMasks == null)
     //   throw (StateError("MaskWidget must have an ancestor ScreenWidget"));
     if (!listOfMasks.contains(globalKey)) {
@@ -70,6 +86,8 @@ class _MaskWidgetState extends State<MaskWidget> with RouteAware {
   }
 
   void removeMask(GlobalKey globalKey) {
+    logger.d('removeMask ${globalKey.toString()}');
+
     //   final List<GlobalKey>? listOfMasks = _MaskList.of(context)?.listOfMasks;
     //   if (listOfMasks == null) return;
     if (listOfMasks.contains(globalKey)) {

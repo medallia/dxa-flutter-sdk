@@ -72,6 +72,7 @@ abstract class DecibelSdkApi {
   void sendDimensionWithNumber(DimensionNumberMessage msg);
   void sendDimensionWithBool(DimensionBoolMessage msg);
   void sendGoal(GoalMessage msg);
+  void sendDataOverWifiOnly();
   @async
   String getWebViewProperties();
   @async

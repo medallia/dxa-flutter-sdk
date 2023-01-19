@@ -1,8 +1,12 @@
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_widgets.dart';
+import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class AutoMasking with RenderObjectAutoMaskGetter {
+  AutoMasking() : logger = LoggerSDK.instance.autoMaskingLogger;
+  final Logger logger;
   final Set<RenderObject> renderObjectsToMask = Set.of({});
   Set<AutoMaskingType> _autoMaskingTypeSet = Set.unmodifiable(
     {const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none)},
@@ -43,15 +47,18 @@ along with other AutoMaskingType enums
   }
 
   void setAutoMasking(BuildContext context) {
+    logger.d('set AutoMasking ${autoMaskingTypeSet.toString()}');
     if (autoMaskingTypeSet.contains(
         const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none))) {
       return;
     }
     renderObjectsToMask
         .addAll(getRenderObjectsByAutoMaskingType(context, autoMaskingTypeSet));
+    logger.d('renderObjectsToMask ${renderObjectsToMask.toString()}');
   }
 
   void clear() {
+    logger.d('renderObjectsToMask clear');
     renderObjectsToMask.clear();
   }
 }

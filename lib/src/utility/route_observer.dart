@@ -1,17 +1,28 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:decibel_sdk/src/utility/logger_sdk.dart';
+import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:flutter/material.dart';
 
 class CustomRouteObserver {
   static final RouteObserver<ModalRoute<void>> screenWidgetRouteObserver =
       RouteObserver<ModalRoute<void>>();
-  static final RouteObserver generalRouteObserver = MyRouteObserver();
+  static final RouteObserver generalRouteObserver =
+      MyRouteObserver(logger: LoggerSDK.instance.routeObserverLogger);
 }
 
 class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
+  MyRouteObserver({
+    required this.logger,
+  });
+  final Logger logger;
+
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    logger.d('didPush');
     if (route is ModalRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route);
@@ -19,6 +30,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
     }
     if (route is PopupRoute) {
       if (previousRoute != null && previousRoute is PageRoute) {
+        logger.d('is PageRoute');
+
         final BuildContext previousContext = previousRoute.subtreeContext!;
 
         WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
@@ -26,10 +39,14 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
           // check if the popup has a screenwidget
           currentContext.visitChildElements((element) {
             if (element.containsScreenWidget()) {
+              logger.d('currentElement containsScreenWidget');
+
               return;
             } else {
               previousContext.visitChildElements((previousElement) {
                 if (previousElement.containsScreenWidget()) {
+                  logger.d('previousElement containsScreenWidget');
+
                   // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
                   final BuildContext dialogContext = route.subtreeContext!;
                   final ScreenVisited screenVisited = Tracking
@@ -53,6 +70,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    logger.d('didReplace');
+
     if (newRoute is ModalRoute) {
       newRoute.animation?.addStatusListener((status) {
         _animationListener(status, newRoute);
@@ -66,6 +85,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    logger.d('didPop');
+
     checkForDialogPopOrRemove(route);
 
     super.didPop(route, previousRoute);
@@ -73,6 +94,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
 
   @override
   void didRemove(Route route, Route? previousRoute) {
+    logger.d('didRemove');
+
     if (route is ModalRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route);
