@@ -3,13 +3,16 @@ import 'package:collection/collection.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class Tracking {
-  Tracking._internal();
+  Tracking._internal() : logger = LoggerSDK.instance.trackingLogger;
   static final _instance = Tracking._internal();
   static Tracking get instance => _instance;
 
+  final Logger logger;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final List<ScreenVisited> _visitedScreensList = [];
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
@@ -118,6 +121,9 @@ class Tracking {
     _addVisitedScreenList(
       screenVisited,
     );
+    logger.d(
+      'Start Screen - name: ${screenVisited.name} - id: ${screenVisited.uniqueId}',
+    );
     await _apiInstance.startScreen(
       StartScreenMessage()
         ..screenName = screenVisited.name
@@ -158,6 +164,9 @@ class Tracking {
     //fire and forget to keep synchronicity
     //ignore: unawaited_futures
     SessionReplay.instance.closeScreenVideo(screenVisitedFinished);
+    logger.d(
+      'End Screen - name: ${screenVisitedFinished.name} - id: ${screenVisitedFinished.uniqueId}',
+    );
     await _apiInstance.endScreen(
       EndScreenMessage()
         ..screenName = screenVisitedFinished.name
@@ -259,6 +268,34 @@ class Tracking {
       );
       await startScreen(screenVisited);
     }
+  }
+
+  Future<void> manualTabBarIndexHandler({
+    required String screenId,
+    required String name,
+    required List<GlobalKey> listOfMasks,
+    required GlobalKey captureKey,
+    required int manualIndex,
+    required List<String> tabNames,
+    required bool enableAutomaticPopupRecording,
+    required bool enableAutomaticMasking,
+  }) async {
+    final int index = visitedUnfinishedScreensList.getTabBarIndex(screenId);
+    if (index != -1) {
+      await Tracking.instance
+          .endScreen(visitedUnfinishedScreensList[index].id, isTabBar: true);
+    }
+    final ScreenVisited screenVisited = createScreenVisited(
+      id: screenId,
+      name: name,
+      listOfMasks: listOfMasks,
+      captureKey: captureKey,
+      tabBarNames: tabNames,
+      tabBarIndex: manualIndex,
+      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+      enableAutomaticMasking: enableAutomaticMasking,
+    );
+    await startScreen(screenVisited);
   }
 }
 

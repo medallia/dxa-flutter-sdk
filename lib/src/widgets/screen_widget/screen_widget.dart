@@ -1,10 +1,14 @@
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 part '../mask_widget.dart';
 part 'inherited_widgets.dart';
+
+typedef ScreenWidgetBuilder = Widget Function(BuildContext context);
 
 class ScreenWidget extends StatelessWidget {
   const ScreenWidget({
@@ -15,6 +19,8 @@ class ScreenWidget extends StatelessWidget {
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = false,
+        builder = null,
+        initialIndex = null,
         assert(tabController != null ? tabNames != null : tabNames == null,
             'You either have to provide both tab related arguments, or none'),
         assert(tabNames == null || tabNames.length > 0),
@@ -29,57 +35,99 @@ class ScreenWidget extends StatelessWidget {
     this.enableAutomaticMasking = true,
   })  : isPopup = true,
         tabController = null,
-        tabNames = null;
-  final Widget child;
+        tabNames = null,
+        builder = null,
+        initialIndex = null;
+
+  const ScreenWidget.tabBar({
+    required this.child,
+    required this.screenName,
+    required this.tabNames,
+    required this.tabController,
+    this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticMasking = true,
+  })  : isPopup = false,
+        builder = null,
+        initialIndex = null;
+
+  const ScreenWidget.manualTabBar({
+    required this.builder,
+    required this.screenName,
+    required this.tabNames,
+    required this.initialIndex,
+    this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticMasking = true,
+  })  : isPopup = false,
+        tabController = null,
+        child = null;
+
+  final Widget? child;
+  final ScreenWidgetBuilder? builder;
   final String screenName;
   final TabController? tabController;
   final List<String>? tabNames;
+  final int? initialIndex;
 
   ///Enables automatic screen replay for PopupRoutes without ScreenWidget
   final bool enableAutomaticPopupRecording;
   //Enables automatic masking for this screen
   final bool enableAutomaticMasking;
   final bool isPopup;
+
+  static _ScreenWidgetManualTabBar? of(BuildContext context) =>
+      _ScreenWidgetManualTabBar.of(context);
+
   @override
   Widget build(BuildContext context) {
     final bool isInsideAnotherScreenWidget =
         context.getElementForInheritedWidgetOfExactType<
                 _ScreenWidgetInheritedWidget>() !=
             null;
-    return isInsideAnotherScreenWidget
-        ? child
-        : _ScreenWidgetInheritedWidget(
-            child: _ActiveScreenWidget(
-              screenName: screenName,
-              tabController: tabController,
-              tabNames: tabNames,
-              enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-              enableAutomaticMasking: enableAutomaticMasking,
-              isPopup: isPopup,
-              child: child,
-            ),
-          );
+    final _ScreenWidgetInheritedWidget inheritedScreenWidget =
+        _ScreenWidgetInheritedWidget(
+      child: _ActiveScreenWidget(
+        screenName: screenName,
+        tabController: tabController,
+        tabNames: tabNames,
+        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+        enableAutomaticMasking: enableAutomaticMasking,
+        isPopup: isPopup,
+        manualTabBarInitialIndex: initialIndex,
+        builder: builder,
+        child: child,
+      ),
+    );
+    if (child != null) {
+      return isInsideAnotherScreenWidget ? child! : inheritedScreenWidget;
+    } else {
+      if (isInsideAnotherScreenWidget) throw UnimplementedError();
+      return inheritedScreenWidget;
+    }
   }
 }
 
 class _ActiveScreenWidget extends StatefulWidget {
   const _ActiveScreenWidget({
     required this.child,
+    required this.builder,
     required this.screenName,
     required this.enableAutomaticPopupRecording,
     required this.enableAutomaticMasking,
     required this.isPopup,
+    required this.manualTabBarInitialIndex,
     this.tabController,
     this.tabNames,
-  });
+  }) : assert(child != null || builder != null);
 
-  final Widget child;
+  final Widget? child;
+  final ScreenWidgetBuilder? builder;
   final String screenName;
   final TabController? tabController;
   final List<String>? tabNames;
   final bool enableAutomaticPopupRecording;
   final bool enableAutomaticMasking;
   final bool isPopup;
+  final int? manualTabBarInitialIndex;
 
   @override
   State<StatefulWidget> createState() => _ActiveScreenWidgetState();
@@ -88,10 +136,45 @@ class _ActiveScreenWidget extends StatefulWidget {
 class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     with WidgetsBindingObserver, RouteAware {
   final GlobalKey _globalKey = GlobalKey();
-  int get screenId => _globalKey.hashCode;
-  ModalRoute<Object?>? route;
-  bool get isTabBar => widget.tabNames != null && widget.tabController != null;
   final List<GlobalKey> listOfMasks = [];
+  final Logger logger = LoggerSDK.instance.screenWidgetLogger;
+  int get screenId => _globalKey.hashCode;
+  bool get isTabBar => widget.tabNames != null && widget.tabController != null;
+  ModalRoute<Object?>? route;
+  int? currentIndex;
+
+  Future<void> newScreenHandler(int index) async {
+    logger.d('New Screen Handler index: $index');
+    currentIndex = index;
+    if (route?.isCurrent ?? false) {
+      await Tracking.instance.manualTabBarIndexHandler(
+        screenId: screenId.toString(),
+        name: widget.screenName,
+        listOfMasks: listOfMasks,
+        captureKey: _globalKey,
+        manualIndex: index,
+        tabNames: widget.tabNames!,
+        enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
+        enableAutomaticMasking: widget.enableAutomaticMasking,
+      );
+    }
+  }
+
+  Widget get childOrBuilder {
+    if (widget.child != null) return widget.child!;
+    if (widget.builder != null) {
+      return _ScreenWidgetManualTabBar(
+        changeIndex: newScreenHandler,
+        child: Builder(
+          builder: (context) {
+            return widget.builder!(context);
+          },
+        ),
+      );
+    }
+    throw ArgumentError('child and builder cannot be both null');
+  }
+
   // Defining an internal function to be able to remove the listener
   Future<void> _tabControllerListener() async {
     await Tracking.instance.tabControllerListener(
@@ -108,13 +191,17 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didChangeDependencies() {
+    logger.d('didChangeDependencies');
+
     super.didChangeDependencies();
-    CustomRouteObserver.screenWidgetRouteObserver
-        .subscribe(this, ModalRoute.of(context)!);
+    route = ModalRoute.of(context);
+    CustomRouteObserver.screenWidgetRouteObserver.subscribe(this, route!);
   }
 
   @override
   void initState() {
+    logger.d('initState');
+
     super.initState();
     Tracking.instance.physicalSize =
         WidgetsBindingNullSafe.instance!.window.physicalSize;
@@ -129,11 +216,32 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
               : "Don't use ScreenWidget.popup in screens whith routes different than type RawDialogRoutes",
         );
       });
+    currentIndex = widget.manualTabBarInitialIndex;
     widget.tabController?.addListener(_tabControllerListener);
   }
 
   @override
+  void didUpdateWidget(covariant _ActiveScreenWidget oldWidget) {
+    logger.d('didUpdateWidget $oldWidget');
+
+    if (oldWidget.manualTabBarInitialIndex != widget.manualTabBarInitialIndex &&
+        widget.manualTabBarInitialIndex != currentIndex) {
+      currentIndex = widget.manualTabBarInitialIndex;
+
+      if (route?.isCurrent ?? false) {
+        callWhenIsCurrentRoute();
+      }
+    } else {
+      currentIndex = widget.manualTabBarInitialIndex;
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    logger.d('didChangeAppLifecycleState ${state.toString()}');
+
     super.didChangeAppLifecycleState(state);
 
     switch (state) {
@@ -151,6 +259,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didChangeMetrics() {
+    logger.d('didChangeMetrics');
+
     Tracking.instance.physicalSize =
         WidgetsBindingNullSafe.instance!.window.physicalSize;
     super.didChangeMetrics();
@@ -158,6 +268,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void dispose() {
+    logger.d('dispose');
+
     callWhenIsNotCurrentRoute();
     CustomRouteObserver.screenWidgetRouteObserver.unsubscribe(this);
     WidgetsBindingNullSafe.instance!.removeObserver(this);
@@ -167,11 +279,15 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didPush() {
+    logger.d('didPush');
+
     callWhenIsCurrentRoute();
   }
 
   @override
   void didPopNext() {
+    logger.d('didPopNext');
+
     route = ModalRoute.of(context);
     if (route?.isCurrent ?? false) {
       callWhenIsCurrentRoute();
@@ -180,28 +296,45 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didPop() {
+    logger.d('didPop');
+
     callWhenIsNotCurrentRoute();
   }
 
   @override
   void didPushNext() {
+    logger.d('didPushNext');
     callWhenIsNotCurrentRoute();
   }
 
   Future<void> callWhenIsNotCurrentRoute() async {
+    logger.d(
+      'callWhenIsNotCurrentRoute - screenId: ${screenId.toString()} - isTabBar: $isTabBar',
+    );
+
     await Tracking.instance.endScreen(screenId.toString(), isTabBar: isTabBar);
   }
 
   Future<void> callWhenIsCurrentRoute() async {
+    late final int? tabIndex;
+    if (widget.tabController != null) {
+      tabIndex = widget.tabController!.index;
+    } else {
+      tabIndex = currentIndex;
+    }
     final ScreenVisited screenVisited = Tracking.instance.createScreenVisited(
         id: screenId.toString(),
         name: widget.screenName,
         listOfMasks: listOfMasks,
         captureKey: _globalKey,
         tabBarNames: widget.tabNames,
-        tabBarIndex: widget.tabController?.index,
+        tabBarIndex: tabIndex,
         enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
         enableAutomaticMasking: widget.enableAutomaticMasking);
+
+    logger.d(
+        'callWhenIsCurrentRoute - screenVisited ${screenVisited.toString()}');
+
     await Tracking.instance.startScreen(
       screenVisited,
     );
@@ -213,7 +346,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       listOfMasks: listOfMasks,
       child: RepaintBoundary(
         key: _globalKey,
-        child: widget.child,
+        child: childOrBuilder,
       ),
     );
   }
