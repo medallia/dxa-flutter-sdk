@@ -213,27 +213,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       listOfMasks: listOfMasks,
       child: RepaintBoundary(
         key: _globalKey,
-        child: widget.isPopup
-            ? widget.child
-            : Material(child: Ink(child: widget.child)),
+        child: widget.child,
       ),
     );
-  }
-}
-
-//Serves as a wrapper for the TabBar body and allows MaskWidget
-//to search for it in case there is a TabBar
-class ScreenWidgetTabBar extends InheritedWidget {
-  ScreenWidgetTabBar({Key? key, required Widget child})
-      : super(
-          key: key,
-          child: Ink(
-            child: child,
-          ),
-        );
-
-  @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
-    return false;
   }
 }
