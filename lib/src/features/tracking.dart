@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:collection/collection.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
@@ -192,8 +193,9 @@ class Tracking {
   }
 
   Future<void> closeThisScreenAndThenReopen() async {
-    final ScreenVisited screenToClose = visitedUnfinishedScreensList
-        .singleWhere((element) => !element.finished);
+    final ScreenVisited? screenToClose = visitedUnfinishedScreensList
+        .firstWhereOrNull((element) => !element.finished);
+    if (screenToClose == null) return;
     await endScreen(screenToClose.id);
     final ScreenVisited screenToOpen =
         screenToClose.getScreenVisitedWithNewStartTimeStamp(
