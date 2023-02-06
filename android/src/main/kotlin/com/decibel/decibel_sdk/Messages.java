@@ -402,6 +402,7 @@ public class Messages {
     void sendDimensionWithBool(DimensionBoolMessage msg);
     void sendGoal(GoalMessage msg);
     void sendDataOverWifiOnly();
+    void sendHttpError(Integer msg);
     void getWebViewProperties(Result<String> result);
     void getSessionId(Result<String> result);
 
@@ -660,6 +661,30 @@ public class Messages {
             Map<String, Object> wrapped = new HashMap<>();
             try {
               api.sendDataOverWifiOnly();
+              wrapped.put("result", null);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.sendHttpError", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              ArrayList<Object> args = (ArrayList<Object>)message;
+              Number msgArg = (Number)args.get(0);
+              if (msgArg == null) {
+                throw new NullPointerException("msgArg unexpectedly null.");
+              }
+              api.sendHttpError(msgArg.intValue());
               wrapped.put("result", null);
             }
             catch (Error | RuntimeException exception) {

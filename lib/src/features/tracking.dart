@@ -1,13 +1,16 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
+import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
-class Tracking {
+class Tracking with TrackingCompleter {
   Tracking._internal() : logger = LoggerSDK.instance.trackingLogger;
   static final _instance = Tracking._internal();
   static Tracking get instance => _instance;
@@ -15,6 +18,10 @@ class Tracking {
   final Logger logger;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final List<ScreenVisited> _visitedScreensList = [];
+  final StreamController<ScreenVisited> newScreenVisitedStreamController =
+      StreamController.broadcast();
+  final List<Completer> tasksBeforeEndScreenCompleterList = [];
+  Completer? endScreenCompleter;
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   ScreenVisited? screenVisitedWhenAppWentToBackground;
   int _transitioningPages = 0;
@@ -43,6 +50,7 @@ class Tracking {
 
   void _addVisitedScreenList(ScreenVisited screenVisited) {
     _visitedScreensList.add(screenVisited);
+    newScreenVisitedStreamController.add(screenVisited);
   }
 
   List<ScreenVisited> get visitedUnfinishedScreensList {
@@ -121,8 +129,9 @@ class Tracking {
     _addVisitedScreenList(
       screenVisited,
     );
+    await endScreenCompleter?.future;
     logger.d(
-      'Start Screen - name: ${screenVisited.name} - id: ${screenVisited.uniqueId}',
+      ' 🔵 Start Screen - name: ${screenVisited.name} - id: ${screenVisited.uniqueId}',
     );
     await _apiInstance.startScreen(
       StartScreenMessage()
@@ -139,7 +148,6 @@ class Tracking {
     bool isTabBar = false,
     bool isBackground = false,
   }) async {
-    SessionReplay.instance.clearMasks();
     late ScreenVisited screenVisited;
     late ScreenVisited? potentialScreenVisited;
     if (isTabBar) {
@@ -150,8 +158,11 @@ class Tracking {
           visitedUnfinishedScreensList.findWithId(screenId);
     }
     //check to see if this screen has already been closed before
+    //If not, we can start with the logic related to ending the screen
     if (potentialScreenVisited == null) return;
-
+    SessionReplay.instance.clearMasks();
+    final Completer endScreenToComplete = Completer();
+    endScreenCompleter = endScreenToComplete;
     screenVisited = potentialScreenVisited;
     //find the visitedScreen which is not finished, to then get its finished
     //version and replace the original in the visitedScreensList
@@ -161,19 +172,19 @@ class Tracking {
         screenVisited.getScreenVisitedAsFinished(endTime);
     visitedScreensList[index] = screenVisitedFinished;
 
-    //fire and forget to keep synchronicity
-    //ignore: unawaited_futures
-    SessionReplay.instance.closeScreenVideo(screenVisitedFinished);
+    final EndScreenMessage endScreenMessage = EndScreenMessage()
+      ..screenName = screenVisitedFinished.name
+      ..screenId = screenVisitedFinished.uniqueId
+      ..endTime = screenVisitedFinished.endTimestamp
+      ..isBackground = isBackground;
+    await SessionReplay.instance.closeScreenVideo(screenVisitedFinished);
+
+    await waitForEndScreenTasksCompleter();
     logger.d(
-      'End Screen - name: ${screenVisitedFinished.name} - id: ${screenVisitedFinished.uniqueId}',
+      ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId}',
     );
-    await _apiInstance.endScreen(
-      EndScreenMessage()
-        ..screenName = screenVisitedFinished.name
-        ..screenId = screenVisitedFinished.uniqueId
-        ..endTime = screenVisitedFinished.endTimestamp
-        ..isBackground = isBackground,
-    );
+    await _apiInstance.endScreen(endScreenMessage);
+    endScreenToComplete.complete();
   }
 
   Future<void> wentToBackground() async {

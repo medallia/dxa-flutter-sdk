@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
+import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.dart';
+import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
@@ -14,9 +16,19 @@ import 'package:yaml/yaml.dart';
 /// DecibelSdk main class
 class DecibelSdk {
   static DecibelSdkApi? _apiInstance;
+  static GoalsAndDimensions? _goalsAndDimensionsInstance;
+  static HttpErrors? _httpErrosInstance;
 
   static DecibelSdkApi get _api {
     return _apiInstance ??= DecibelSdkApi();
+  }
+
+  static GoalsAndDimensions get _goalsAndDimensions {
+    return _goalsAndDimensionsInstance ??= GoalsAndDimensions(_api);
+  }
+
+  static HttpErrors get _httpErrors {
+    return _httpErrosInstance ??= HttpErrors(_api);
   }
 
   static final List<NavigatorObserver> routeObservers = [
@@ -83,10 +95,7 @@ class DecibelSdk {
     String dimensionName,
     String value,
   ) async {
-    final dimension = DimensionStringMessage()
-      ..dimensionName = dimensionName
-      ..value = value;
-    await _api.sendDimensionWithString(dimension);
+    await _goalsAndDimensions.setDimensionWithString(dimensionName, value);
   }
 
   ///Set custom dimension with number
@@ -94,29 +103,23 @@ class DecibelSdk {
     String dimensionName,
     double value,
   ) async {
-    final dimension = DimensionNumberMessage()
-      ..dimensionName = dimensionName
-      ..value = value;
-    await _api.sendDimensionWithNumber(dimension);
+    await _goalsAndDimensions.setDimensionWithNumber(dimensionName, value);
   }
 
   ///Set custom dimension with bool
   static Future<void> setDimensionWithBool(
     String dimensionName, {
-    bool value = false,
+    required bool value,
   }) async {
-    final dimension = DimensionBoolMessage()
-      ..dimensionName = dimensionName
-      ..value = value;
-    await _api.sendDimensionWithBool(dimension);
+    await _goalsAndDimensions.setDimensionWithBool(
+      dimensionName,
+      value: value,
+    );
   }
 
   ///Send goals
   static Future<void> sendGoal(String goalName, [double? value]) async {
-    final goal = GoalMessage()
-      ..goal = goalName
-      ..value = value;
-    await _api.sendGoal(goal);
+    await _goalsAndDimensions.sendGoal(goalName, value);
   }
 
   static Future<String?> getWebViewProperties() async {
@@ -167,5 +170,11 @@ class DecibelSdk {
       );
   static void sendDataOverWifiOnly() {
     _api.sendDataOverWifiOnly();
+  }
+
+  static Future<void> sendHttpError(
+    int statusCode,
+  ) async {
+    await _httpErrors.sendStatusCode(statusCode);
   }
 }
