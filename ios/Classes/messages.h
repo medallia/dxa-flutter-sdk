@@ -85,6 +85,7 @@ NSObject<FlutterMessageCodec> *FLTDecibelSdkApiGetCodec(void);
 - (void)sendDimensionWithBoolMsg:(FLTDimensionBoolMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendGoalMsg:(FLTGoalMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendDataOverWifiOnlyWithError:(FlutterError *_Nullable *_Nonnull)error;
+- (void)sendHttpErrorMsg:(NSNumber *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)getWebViewPropertiesWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 - (void)getSessionIdWithCompletion:(void(^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 @end

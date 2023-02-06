@@ -6,6 +6,7 @@ import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
+import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
@@ -14,7 +15,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
 
-class SessionReplay {
+class SessionReplay with TrackingCompleter {
   SessionReplay._internal() : logger = LoggerSDK.instance.sessionReplayLogger {
     _timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
       await maybeTakeScreenshot();
@@ -151,34 +152,37 @@ class SessionReplay {
         autoMasking.setAutoMasking(context);
       }
       manualMaskCoordinates = _saveMaskPosition(screenVisited.listOfMasks);
-      try {
-        didUiChange = false;
+      await endScreenTasksCompleterWrapper(() async {
+        try {
+          didUiChange = false;
 
-        image = await (renderObject as RenderRepaintBoundary).toImage();
-      } catch (_) {
-        _forceScreenshotNextFrame();
-        return;
-      }
-      canvas.drawImage(image, newPosition, Paint());
-      _paintMaskWithCoordinates(canvas, manualMaskCoordinates);
+          image = await (renderObject as RenderRepaintBoundary).toImage();
+        } catch (_) {
+          _forceScreenshotNextFrame();
+          return;
+        }
+        canvas.drawImage(image, newPosition, Paint());
+        _paintMaskWithCoordinates(canvas, manualMaskCoordinates);
 
-      final resultImage =
-          await recorder.endRecording().toImage(width.toInt(), height.toInt());
-      final resultImageData =
-          await resultImage.toByteData(format: ui.ImageByteFormat.png);
-      final int screenShotId = screenVisited.uniqueId;
-      final String screenShotName = screenVisited.name;
-      screenVisited.screenshotTakenList.add(
-        ScreenShotTaken(startFocusTime: startFocusTime),
-      );
-      if (resultImageData != null) {
-        await _sendScreenshot(
-          resultImageData.buffer.asUint8List(),
-          screenShotId,
-          screenShotName,
-          startFocusTime,
+        final resultImage = await recorder
+            .endRecording()
+            .toImage(width.toInt(), height.toInt());
+        final resultImageData =
+            await resultImage.toByteData(format: ui.ImageByteFormat.png);
+        final int screenShotId = screenVisited.uniqueId;
+        final String screenShotName = screenVisited.name;
+        screenVisited.screenshotTakenList.add(
+          ScreenShotTaken(startFocusTime: startFocusTime),
         );
-      }
+        if (resultImageData != null) {
+          await _sendScreenshot(
+            resultImageData.buffer.asUint8List(),
+            screenShotId,
+            screenShotName,
+            startFocusTime,
+          );
+        }
+      });
     }
   }
 

@@ -100,6 +100,12 @@ class DecibelSdkPlugin: FlutterPlugin, Messages.DecibelSdkApi {
     Decibel.sdk.sendDataOverWifiOnly()
   }
 
+  override fun sendHttpError(msg: Int) {
+    msg?.let {
+      Decibel.sdk.sendHttpError(msg)
+    }
+  }
+
   override fun getWebViewProperties(result: Messages.Result<String>){
     return result.success(Decibel.sdk.getWebViewParams())
   }
