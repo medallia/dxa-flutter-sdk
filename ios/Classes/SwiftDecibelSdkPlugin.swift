@@ -3,7 +3,7 @@ import UIKit
 import DecibelCoreFlutter
 
 public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
-    
+        
     public static func register(with registrar: FlutterPluginRegistrar) {
         let messenger : FlutterBinaryMessenger = registrar.messenger()
         let api : FLTDecibelSdkApi & NSObjectProtocol = SwiftDecibelSdkPlugin.init()
@@ -107,6 +107,10 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
     
     public func sendDataOverWifiOnlyWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
         DecibelSDK.settings.mobileDataEnable = false;
+    }
+
+    public func sendHttpErrorMsg(_ msg: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+        DecibelSDK.multiPlatform.sendHTTPError(statusCode: Int(truncating: msg))
     }
 
     public func getWebViewProperties(completion: (String?, FlutterError?)->Void) {

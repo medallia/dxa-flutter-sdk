@@ -580,6 +580,26 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.DecibelSdkApi.sendHttpError"
+        binaryMessenger:binaryMessenger
+        codec:FLTDecibelSdkApiGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(sendHttpErrorMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(sendHttpErrorMsg:error:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        NSArray *args = message;
+        NSNumber *arg_msg = args[0];
+        FlutterError *error;
+        [api sendHttpErrorMsg:arg_msg error:&error];
+        callback(wrapResult(nil, error));
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
         messageChannelWithName:@"dev.flutter.pigeon.DecibelSdkApi.getWebViewProperties"
         binaryMessenger:binaryMessenger
         codec:FLTDecibelSdkApiGetCodec()];
