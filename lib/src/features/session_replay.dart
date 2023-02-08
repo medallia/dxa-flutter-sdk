@@ -115,7 +115,8 @@ class SessionReplay with TrackingCompleter {
       ///No need to wait for the endOfFrame when we are in other phases.
       ///Also ensures this is not called in other phases where a frame may not
       ///be scheduled
-      if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+      if (SchedulerBindingNullSafe.instance!.schedulerPhase ==
+          SchedulerPhase.idle) {
         waitingForEndOfFrame = true;
         await WidgetsBindingNullSafe.instance!.endOfFrame;
         waitingForEndOfFrame = false;

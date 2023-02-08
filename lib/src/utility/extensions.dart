@@ -3,6 +3,7 @@ import 'package:decibel_sdk/src/utility/constants.dart';
 import 'package:decibel_sdk/src/utility/enums.dart';
 import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 extension ElementExt on Element {
@@ -70,6 +71,12 @@ extension WidgetsBindingNullSafe on WidgetsBinding {
   static T? _ambiguate<T>(T? value) => value;
 
   static WidgetsBinding? get instance => _ambiguate(WidgetsBinding.instance)!;
+}
+
+extension SchedulerBindingNullSafe on SchedulerBinding {
+  static T? _ambiguate<T>(T? value) => value;
+
+  static SchedulerBinding? get instance => _ambiguate(WidgetsBinding.instance)!;
 }
 
 extension ScreenVisitedFinder on List<ScreenVisited> {
