@@ -1,5 +1,23 @@
+image: cirrusci/flutter:stable
+
+cache:
+  paths:
+    - .pub-cache/global_packages
+
 stages:
+  - test
   - deploy
+
+flutter_test:
+  stage: test 
+  before_script:
+    - export PATH="$PATH":"$HOME/.flutter-sdk/.pub-cache/bin"
+    - flutter pub get
+  script:
+    - flutter test --machine
+  only:
+    - merge_requests
+
 
 git_deploy:
   stage: deploy

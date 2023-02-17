@@ -5,13 +5,14 @@ import 'package:logger/logger.dart';
 
 class FrameTracking {
   FrameTracking({required this.postFrameCallback})
-      : logger = LoggerSDK.instance.frameTrackingLogger;
+      : _logger = LoggerSDK.instance;
   final void Function(void Function(Duration)) postFrameCallback;
   final StreamController<Duration> newFrameStreamController =
       StreamController();
   @visibleForTesting
   bool alreadyWaiting = false;
-  final Logger logger;
+  final LoggerSDK _logger;
+  Logger get logger => _logger.frameTrackingLogger;
 
   void waitForNextFrame() {
     if (alreadyWaiting) return;

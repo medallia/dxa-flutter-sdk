@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 class LoggerSDK {
   static final LoggerSDK _instance = LoggerSDK._internal();
   static LoggerSDK get instance => _instance;
-  factory LoggerSDK.all({
+  void all({
     bool enabled = true,
     bool tracking = true,
     bool sessionReplay = true,
@@ -21,10 +21,10 @@ class LoggerSDK {
     _instance.autoMasking = autoMasking;
     _instance.screenWidget = screenWidget;
     _instance.maskWidget = maskWidget;
-    return _instance;
+    cleanLoggers();
   }
 
-  factory LoggerSDK.selected({
+  void selected({
     required bool enabled,
     required bool tracking,
     required bool sessionReplay,
@@ -42,7 +42,7 @@ class LoggerSDK {
     _instance.autoMasking = autoMasking;
     _instance.screenWidget = screenWidget;
     _instance.maskWidget = maskWidget;
-    return _instance;
+    cleanLoggers();
   }
 
   LoggerSDK._internal();
@@ -57,27 +57,43 @@ class LoggerSDK {
   bool maskWidget = false;
   Logger? _screenWidgetLogger;
   Logger? _maskWidgetLogger;
+  Logger? _trackingLogger;
+  Logger? _sessionReplayLogger;
+  Logger? _frameTrackingLogger;
+  Logger? _routeObserverLogger;
+  Logger? _autoMaskingLogger;
+
+  void cleanLoggers() {
+    _screenWidgetLogger = null;
+    _maskWidgetLogger = null;
+    _trackingLogger = null;
+    _sessionReplayLogger = null;
+    _frameTrackingLogger = null;
+    _routeObserverLogger = null;
+    _autoMaskingLogger = null;
+  }
+
   Logger get screenWidgetLogger =>
       _screenWidgetLogger ??= _plainLogger(screenWidget);
   Logger get maskWidgetLogger => _maskWidgetLogger ??= _plainLogger(maskWidget);
   Logger get trackingLogger {
-    return _plainLogger(tracking);
+    return _trackingLogger ??= _plainLogger(tracking);
   }
 
   Logger get sessionReplayLogger {
-    return _plainLogger(sessionReplay);
+    return _sessionReplayLogger ??= _plainLogger(sessionReplay);
   }
 
   Logger get frameTrackingLogger {
-    return _plainLogger(frameTracking);
+    return _frameTrackingLogger ??= _plainLogger(frameTracking);
   }
 
   Logger get routeObserverLogger {
-    return _plainLogger(routeObserver);
+    return _routeObserverLogger ??= _plainLogger(routeObserver);
   }
 
   Logger get autoMaskingLogger {
-    return _plainLogger(autoMasking);
+    return _autoMaskingLogger ??= _plainLogger(autoMasking);
   }
 
   Logger _plainLogger(bool moduleEnabled) {

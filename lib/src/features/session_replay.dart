@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:decibel_sdk/src/decibel_config.dart';
+import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
@@ -15,7 +17,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
 
 class SessionReplay with TrackingCompleter {
-  SessionReplay._internal() : logger = LoggerSDK.instance.sessionReplayLogger {
+  SessionReplay._internal() : _logger = LoggerSDK.instance {
     _timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
       await maybeTakeScreenshot();
     });
@@ -30,7 +32,9 @@ class SessionReplay with TrackingCompleter {
   static final _instance = SessionReplay._internal();
   static SessionReplay get instance => _instance;
 
-  final Logger logger;
+  late final DecibelConfig decibelConfig;
+  final LoggerSDK _logger;
+  Logger get logger => _logger.sessionReplayLogger;
   late final FrameTracking _frameTracking;
   late final AutoMasking autoMasking;
   late final PlaceholderImageConfig placeholderImageConfig;
@@ -102,6 +106,7 @@ class SessionReplay with TrackingCompleter {
   }
 
   Future<void> forceTakeScreenshot() async {
+    if (!decibelConfig.recordingAllowed) return;
     if (!currentlyTracking) return;
 
     if (!recordingAllowedInThisScreen) {
