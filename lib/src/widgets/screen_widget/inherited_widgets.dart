@@ -30,6 +30,10 @@ class _MaskList extends InheritedWidget {
   static _MaskList? of(BuildContext context) {
     final _MaskList? result =
         context.dependOnInheritedWidgetOfExactType<_MaskList>();
+    assert(
+      result != null,
+      "Couldn't find an ancestor of type ScreenWidget.",
+    );
     return result;
   }
 

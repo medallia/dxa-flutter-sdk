@@ -11,14 +11,15 @@ class CustomRouteObserver {
   static final RouteObserver<ModalRoute<void>> screenWidgetRouteObserver =
       RouteObserver<ModalRoute<void>>();
   static final RouteObserver generalRouteObserver =
-      MyRouteObserver(logger: LoggerSDK.instance.routeObserverLogger);
+      MyRouteObserver(LoggerSDK.instance);
 }
 
 class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
-  MyRouteObserver({
-    required this.logger,
-  });
-  final Logger logger;
+  MyRouteObserver(
+    this._logger,
+  );
+  final LoggerSDK _logger;
+  Logger get logger => _logger.routeObserverLogger;
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {

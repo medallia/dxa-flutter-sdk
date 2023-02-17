@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
@@ -11,14 +12,18 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 class Tracking with TrackingCompleter {
-  Tracking._internal() : logger = LoggerSDK.instance.trackingLogger;
+  Tracking._internal()
+      : _logger = LoggerSDK.instance,
+        decibelConfig = DecibelConfig();
   static final _instance = Tracking._internal();
   static Tracking get instance => _instance;
 
-  final Logger logger;
+  final DecibelConfig decibelConfig;
+  final LoggerSDK _logger;
+  Logger get logger => _logger.trackingLogger;
   final DecibelSdkApi _apiInstance = DecibelSdkApi();
   final List<ScreenVisited> _visitedScreensList = [];
-  final StreamController<ScreenVisited> newScreenVisitedStreamController =
+  final StreamController<ScreenVisited> newScreenSentToNativeStreamController =
       StreamController.broadcast();
   final List<Completer> tasksBeforeEndScreenCompleterList = [];
   Completer? endScreenCompleter;
@@ -50,7 +55,6 @@ class Tracking with TrackingCompleter {
 
   void _addVisitedScreenList(ScreenVisited screenVisited) {
     _visitedScreensList.add(screenVisited);
-    newScreenVisitedStreamController.add(screenVisited);
   }
 
   List<ScreenVisited> get visitedUnfinishedScreensList {
@@ -110,6 +114,7 @@ class Tracking with TrackingCompleter {
       visitedUnfinishedScreensList.isEmpty ||
           visitedUnfinishedScreensList.length == 1,
     );
+    if (!decibelConfig.trackingAllowed) return;
     late bool backgroundFlag;
     //When returning from background there's the possibility that the screen
     //which went to background isn't the same as the one at the top of the
@@ -140,6 +145,7 @@ class Tracking with TrackingCompleter {
         ..startTime = screenVisited.timestamp
         ..isBackground = backgroundFlag,
     );
+    newScreenSentToNativeStreamController.add(screenVisited);
     await SessionReplay.instance.newScreen();
   }
 
@@ -148,6 +154,7 @@ class Tracking with TrackingCompleter {
     bool isTabBar = false,
     bool isBackground = false,
   }) async {
+    if (!decibelConfig.trackingAllowed) return;
     late ScreenVisited screenVisited;
     late ScreenVisited? potentialScreenVisited;
     if (isTabBar) {

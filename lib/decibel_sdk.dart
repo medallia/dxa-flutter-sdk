@@ -1,4 +1,4 @@
-export 'src/decibel_config.dart' show DecibelSdk;
+export 'src/decibel_class_interface.dart' show DecibelSdk;
 export 'src/features/autoMasking/auto_masking_enums.dart'
     show AutoMaskingTypeEnum;
 export 'src/utility/enums.dart' show DecibelCustomerConsentType;
