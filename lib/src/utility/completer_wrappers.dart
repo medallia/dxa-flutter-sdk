@@ -27,9 +27,23 @@ class TrackingCompleter {
 
   FutureOr<void> waitForNewScreenIfThereNoneActive() async {
     if (Tracking.instance.visitedUnfinishedScreensList.isEmpty) {
-      await Tracking.instance.newScreenVisitedStreamController.stream
-          .asBroadcastStream()
-          .first;
+      //Edge case: called before the first screen has started
+      //(unfinishedScreens is empty and no endScreen has ever been called).
+      if (Tracking.instance.endScreenCompleter == null) {
+        await Tracking.instance.newScreenSentToNativeStreamController.stream
+            .asBroadcastStream()
+            .first;
+        return;
+      }
+      //It's possible that no screen is active and endScreen has still not being
+      //sent to native (isCompleted would be false). So if this is the case,
+      //we don't want to wait until next screen
+      if (Tracking.instance.endScreenCompleter!.isCompleted) {
+        await Tracking.instance.newScreenSentToNativeStreamController.stream
+            .asBroadcastStream()
+            .first;
+        return;
+      }
     } else {
       return;
     }

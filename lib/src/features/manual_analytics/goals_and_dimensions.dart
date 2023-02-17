@@ -68,7 +68,6 @@ class GoalsAndDimensions with TrackingCompleter {
       final goal = GoalMessage()
         ..goal = goalName
         ..value = value;
-
       await _api.sendGoal(goal);
     });
   }

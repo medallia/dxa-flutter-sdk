@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 class AutoMasking with RenderObjectAutoMaskGetter {
-  AutoMasking() : logger = LoggerSDK.instance.autoMaskingLogger;
-  final Logger logger;
+  AutoMasking() : _logger = LoggerSDK.instance;
+  final LoggerSDK _logger;
+  Logger get logger => _logger.autoMaskingLogger;
   final Set<RenderObject> renderObjectsToMask = Set.of({});
   Set<AutoMaskingType> _autoMaskingTypeSet = Set.unmodifiable(
     {const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none)},

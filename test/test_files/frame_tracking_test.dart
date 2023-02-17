@@ -1,6 +1,8 @@
+library frame_tracking_test;
+
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'flutter_sdk_mock.dart';
+import '../custom_mocks/flutter_sdk_mock.dart';
 
 void main() {
   group('Frame tracking', () {
