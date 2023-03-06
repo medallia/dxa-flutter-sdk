@@ -1,14 +1,25 @@
 part of 'screen_widget/screen_widget.dart';
 
-class MaskWidget extends StatefulWidget {
+class MaskWidget extends StatelessWidget {
   const MaskWidget({required this.child});
+  bool get isSdkInitialized => DecibelConfig().initialized;
 
   final Widget child;
   @override
-  State<StatefulWidget> createState() => _MaskWidgetState();
+  Widget build(BuildContext context) {
+    return isSdkInitialized ? _ActiveMaskWidget(child: child) : child;
+  }
 }
 
-class _MaskWidgetState extends State<MaskWidget> with RouteAware {
+class _ActiveMaskWidget extends StatefulWidget {
+  const _ActiveMaskWidget({required this.child});
+
+  final Widget child;
+  @override
+  State<StatefulWidget> createState() => _ActiveMaskWidgetState();
+}
+
+class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   late GlobalKey globalKey;
   late List<GlobalKey> listOfMasks;
   final Logger logger = LoggerSDK.instance.maskWidgetLogger;
