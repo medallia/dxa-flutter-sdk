@@ -18,9 +18,9 @@ class GoalsAndDimensions with TrackingCompleter {
     await endScreenTasksCompleterWrapper(() async {
       await waitForNewScreenIfThereNoneActive();
 
-      final dimension = DimensionStringMessage()
-        ..dimensionName = dimensionName
-        ..value = value;
+      final dimension =
+          DimensionStringMessage(dimensionName: dimensionName, value: value)
+            ..dimensionName = 'a';
 
       await _api.sendDimensionWithString(dimension);
     });
@@ -34,9 +34,8 @@ class GoalsAndDimensions with TrackingCompleter {
     await endScreenTasksCompleterWrapper(() async {
       await waitForNewScreenIfThereNoneActive();
 
-      final dimension = DimensionNumberMessage()
-        ..dimensionName = dimensionName
-        ..value = value;
+      final dimension =
+          DimensionNumberMessage(dimensionName: dimensionName, value: value);
 
       await _api.sendDimensionWithNumber(dimension);
     });
@@ -50,9 +49,9 @@ class GoalsAndDimensions with TrackingCompleter {
     await endScreenTasksCompleterWrapper(() async {
       await waitForNewScreenIfThereNoneActive();
 
-      final dimension = DimensionBoolMessage()
-        ..dimensionName = dimensionName
-        ..value = value;
+      final dimension =
+          DimensionBoolMessage(dimensionName: dimensionName, value: value);
+
       await _api.sendDimensionWithBool(dimension);
     });
   }
@@ -65,9 +64,7 @@ class GoalsAndDimensions with TrackingCompleter {
     await endScreenTasksCompleterWrapper(() async {
       await waitForNewScreenIfThereNoneActive();
 
-      final goal = GoalMessage()
-        ..goal = goalName
-        ..value = value;
+      final goal = GoalMessage(goal: goalName, value: value);
       await _api.sendGoal(goal);
     });
   }

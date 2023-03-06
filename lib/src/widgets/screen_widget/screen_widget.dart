@@ -1,8 +1,8 @@
+import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 part '../mask_widget.dart';
@@ -77,12 +77,21 @@ class ScreenWidget extends StatelessWidget {
   static _ScreenWidgetManualTabBar? of(BuildContext context) =>
       _ScreenWidgetManualTabBar.of(context);
 
+  bool get isSdkInitialized => DecibelConfig().initialized;
   @override
   Widget build(BuildContext context) {
+    if (!isSdkInitialized) {
+      return child ?? builder!(context);
+    }
+
     final bool isInsideAnotherScreenWidget =
         context.getElementForInheritedWidgetOfExactType<
                 _ScreenWidgetInheritedWidget>() !=
             null;
+
+    if (child != null && isInsideAnotherScreenWidget) {
+      return child!;
+    }
     final _ScreenWidgetInheritedWidget inheritedScreenWidget =
         _ScreenWidgetInheritedWidget(
       child: _ActiveScreenWidget(
@@ -98,7 +107,7 @@ class ScreenWidget extends StatelessWidget {
       ),
     );
     if (child != null) {
-      return isInsideAnotherScreenWidget ? child! : inheritedScreenWidget;
+      return inheritedScreenWidget;
     } else {
       if (isInsideAnotherScreenWidget) throw UnimplementedError();
       return inheritedScreenWidget;

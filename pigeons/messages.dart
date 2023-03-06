@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:pigeon/pigeon.dart';
 
 // TODO: Enum supported on Pigeon, but not List<Enum>. Waiting to talk about consents change.
@@ -9,55 +10,98 @@ import 'package:pigeon/pigeon.dart';
 // }
 
 class StartScreenMessage {
-  String? screenName;
-  int? screenId;
-  int? startTime;
-  bool? isBackground;
+  final String screenName;
+  final int screenId;
+  final int startTime;
+  final bool isBackground;
+  const StartScreenMessage({
+    required this.screenName,
+    required this.screenId,
+    required this.startTime,
+    required this.isBackground,
+  });
 }
 
 class EndScreenMessage {
-  String? screenName;
-  int? screenId;
-  int? endTime;
-  bool? isBackground;
+  final String screenName;
+  final int screenId;
+  final int endTime;
+  final bool isBackground;
+  EndScreenMessage({
+    required this.screenName,
+    required this.screenId,
+    required this.endTime,
+    required this.isBackground,
+  });
 }
 
 class SessionMessage {
-  int? account;
-  int? property;
-  List<int?>? consents;
-  String? version;
+  final int account;
+  final int property;
+  final List<int?> consents;
+  final String version;
+  const SessionMessage({
+    required this.account,
+    required this.property,
+    required this.consents,
+    required this.version,
+  });
 }
 
 class ConsentsMessage {
-  List<int?>? consents;
+  final List<int?> consents;
+  const ConsentsMessage({
+    required this.consents,
+  });
 }
 
 class ScreenshotMessage {
-  Uint8List? screenshotData;
-  int? screenId;
-  String? screenName;
-  int? startFocusTime;
+  final Uint8List screenshotData;
+  final int screenId;
+  final String screenName;
+  final int startFocusTime;
+  const ScreenshotMessage({
+    required this.screenshotData,
+    required this.screenId,
+    required this.screenName,
+    required this.startFocusTime,
+  });
 }
 
 class DimensionStringMessage {
-  String? dimensionName;
-  String? value;
+  final String dimensionName;
+  final String value;
+  const DimensionStringMessage({
+    required this.dimensionName,
+    required this.value,
+  });
 }
 
 class DimensionNumberMessage {
-  String? dimensionName;
-  double? value;
+  final String dimensionName;
+  final double value;
+  const DimensionNumberMessage({
+    required this.dimensionName,
+    required this.value,
+  });
 }
 
 class DimensionBoolMessage {
-  String? dimensionName;
-  bool? value;
+  final String dimensionName;
+  final bool value;
+  const DimensionBoolMessage({
+    required this.dimensionName,
+    required this.value,
+  });
 }
 
 class GoalMessage {
-  String? goal;
-  double? value;
+  final String goal;
+  final double? value;
+  const GoalMessage({
+    required this.goal,
+    required this.value,
+  });
 }
 
 @HostApi()
@@ -74,6 +118,10 @@ abstract class DecibelSdkApi {
   void sendGoal(GoalMessage msg);
   void sendDataOverWifiOnly();
   void sendHttpError(int msg);
+  void enableSessionForExperience(bool value);
+  void enableSessionForAnalysis(bool value);
+  void enableSessionForReplay(bool value);
+  void enableScreenForAnalysis(bool value);
   @async
   String getWebViewProperties();
   @async

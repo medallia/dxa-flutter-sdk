@@ -1,128 +1,140 @@
 package com.decibel.decibel_sdk
 
-import android.util.Log
-import androidx.annotation.NonNull
-//import com.decibel.builder.dev.Decibel
 import com.decibel.common.enums.CustomerConsentType
 import com.decibel.builder.prod.Decibel
 import com.decibel.common.enums.PlatformType
 import com.decibel.common.internal.models.Customer
 import com.decibel.common.internal.models.Multiplatform
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodChannel
 
 /** DecibelSdkPlugin */
-class DecibelSdkPlugin: FlutterPlugin, Messages.DecibelSdkApi {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    Messages.DecibelSdkApi.setup(flutterPluginBinding.binaryMessenger, this)
-  }
+class DecibelSdkPlugin : FlutterPlugin, Messages.DecibelSdkApi {
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    Messages.DecibelSdkApi.setup(binding.binaryMessenger, null)
-  }
-
-  override fun initialize(arg: Messages.SessionMessage?) {
-//    Log.d("LOGTAG", "init")
-    arg?.let { sessionMessage ->
-      sessionMessage.consents?.let {
-        val consents = translateConsenstsFlutterToAndroid(it)
-        Decibel.sdk.initialize(Customer(sessionMessage.account, sessionMessage.property), consents, Multiplatform(PlatformType.FLUTTER, sessionMessage.version))
-      } ?: run {
-        Decibel.sdk.initialize(Customer(sessionMessage.account, sessionMessage.property), Multiplatform(PlatformType.FLUTTER, sessionMessage.version))
-      }
-
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        Messages.DecibelSdkApi.setup(flutterPluginBinding.binaryMessenger, this)
     }
-  }
 
-  override fun startScreen(msg: Messages.StartScreenMessage?) {
-    msg?.let {
-      Decibel.sdk.startScreen(it.screenId, it.screenName, it.startTime)
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        Messages.DecibelSdkApi.setup(binding.binaryMessenger, null)
     }
-  }
 
-  override fun endScreen(msg: Messages.EndScreenMessage?) {
-    msg?.let {
-      Decibel.sdk.endScreen(it.screenId, it.screenName, it.endTime)
+    override fun initialize(arg: Messages.SessionMessage) {
+        arg.consents.let {
+            val consents = translateConsentsFlutterToAndroid(it.map(Long::toInt))
+            Decibel.sdk.initialize(
+                customer = Customer(arg.account, arg.property),
+                customerConsent = consents,
+                platform = Multiplatform(PlatformType.FLUTTER, arg.version)
+            )
+        }
     }
-  }
 
-  override fun setEnableConsents(arg: Messages.ConsentsMessage?) {
-    arg?.consents?.let {
-      val consents = translateConsenstsFlutterToAndroid(it)
-      Decibel.sdk.enableUserConsent(consents)
+    override fun startScreen(msg: Messages.StartScreenMessage) {
+        msg.let {
+            Decibel.sdk.startScreen(it.screenId, it.screenName, it.startTime)
+        }
     }
-  }
 
-  override fun setDisableConsents(arg: Messages.ConsentsMessage?) {
-    arg?.consents?.let {
-      val consents = translateConsenstsFlutterToAndroid(it)
-      Decibel.sdk.disableUserConsent(consents)
+    override fun endScreen(msg: Messages.EndScreenMessage) {
+        msg.let {
+            Decibel.sdk.endScreen(it.screenId, it.screenName, it.endTime)
+        }
     }
-  }
 
-  override fun saveScreenshot(arg: Messages.ScreenshotMessage?) {
-    arg?.let {
-//      Log.d("LOGTAG", "sendScreenshot with bytearray.size ${it.screenshotData.size}")
-      Decibel.sdk.saveScreenShot(it.screenshotData, it.screenId, it.screenName, it.startFocusTime)
+    override fun setEnableConsents(arg: Messages.ConsentsMessage) {
+        arg.consents.let {
+            val consents = translateConsentsFlutterToAndroid(it.map(Long::toInt))
+            Decibel.sdk.enableUserConsent(consents)
+        }
     }
-  }
 
-  override fun sendDimensionWithString(msg: Messages.DimensionStringMessage?) {
-    msg?.let {
-      Decibel.sdk.sendCustomDimension(msg.dimensionName, msg.value)
+    override fun setDisableConsents(arg: Messages.ConsentsMessage) {
+        arg.consents.let {
+            val consents = translateConsentsFlutterToAndroid(it.map(Long::toInt))
+            Decibel.sdk.disableUserConsent(consents)
+        }
     }
-  }
 
-  override fun sendDimensionWithNumber(msg: Messages.DimensionNumberMessage?) {
-    msg?.let {
-      Decibel.sdk.sendCustomDimension(msg.dimensionName, msg.value)
+    override fun saveScreenshot(arg: Messages.ScreenshotMessage) {
+        arg.let {
+            Decibel.sdk.saveScreenShot(it.screenshotData, it.screenId, it.screenName, it.startFocusTime)
+        }
     }
-  }
 
-  override fun sendDimensionWithBool(msg: Messages.DimensionBoolMessage?) {
-    msg?.let {
-      Decibel.sdk.sendCustomDimension(msg.dimensionName, msg.value)
+    override fun sendDimensionWithString(msg: Messages.DimensionStringMessage) {
+        msg.let {
+            Decibel.sdk.sendCustomDimension(it.dimensionName, it.value)
+        }
     }
-  }
 
-  override fun sendGoal(msg: Messages.GoalMessage?) {
-    msg?.let {
-      Decibel.sdk.sendGoal(msg.goal, msg.value)
+    override fun sendDimensionWithNumber(msg: Messages.DimensionNumberMessage) {
+        msg.let {
+            Decibel.sdk.sendCustomDimension(it.dimensionName, it.value)
+        }
     }
-  }
 
-  override fun sendDataOverWifiOnly() {
-    Decibel.sdk.sendDataOverWifiOnly()
-  }
-
-  override fun sendHttpError(msg: Int) {
-    msg?.let {
-      Decibel.sdk.sendHttpError(msg)
+      
+    override fun sendDimensionWithBool(msg: Messages.DimensionBoolMessage) {
+        msg.let {
+            Decibel.sdk.sendCustomDimension(it.dimensionName, it.value)
+        }
     }
-  }
 
-  override fun getWebViewProperties(result: Messages.Result<String>){
-    return result.success(Decibel.sdk.getWebViewParams())
-  }
-  override fun getSessionId(result: Messages.Result<String>): Unit{
-    return result.success(Decibel.sdk.getSessionId())
-  }
-
-  fun translateConsenstsFlutterToAndroid(consents: MutableList<Int>): List<CustomerConsentType> {
-    val consents: List<CustomerConsentType> = consents.map {
-      when(it){
-        0 -> CustomerConsentType.ALL
-        1 -> CustomerConsentType.RECORD_SCREEN
-        2 -> CustomerConsentType.TRACK_SCREEN
-        3 -> CustomerConsentType.NONE
-        else -> CustomerConsentType.ALL
-      }
+    override fun sendGoal(msg: Messages.GoalMessage) {
+        msg.let {
+            Decibel.sdk.sendGoal(msg.goal, msg.value)
+        }
     }
-    return consents
-  }
+
+    override fun sendDataOverWifiOnly() {
+        Decibel.sdk.sendDataOverWifiOnly()
+    }
+
+    override fun sendHttpError(msg: Long) {
+        msg.toInt().let(Decibel.sdk::sendHttpError)
+    }
+      
+    override fun getWebViewProperties(result: Messages.Result<String>) {
+        result.success(Decibel.sdk.getWebViewParams())
+    }
+
+    override fun getSessionId(result: Messages.Result<String>) {
+        result.success(Decibel.sdk.getSessionId())
+    }
+
+    override fun enableSessionForExperience(msg: Boolean) {
+        msg.let {
+            Decibel.sdk.enableSessionForExperience(it)
+        } 
+    }
+
+    override fun enableSessionForAnalysis(msg: Boolean) {
+        msg.let {
+            Decibel.sdk.enableSessionForAnalysis(it)
+        }
+    }
+
+    override fun enableSessionForReplay(msg: Boolean) {
+        msg.let {
+            Decibel.sdk.enableSessionForReplay(it)
+        }
+    }
+
+    override fun enableScreenForAnalysis(msg: Boolean) {
+        msg.let {
+            Decibel.sdk.enableSessionForExperience(it)
+        }
+    }
+
+    private fun translateConsentsFlutterToAndroid(consents: List<Int>): List<CustomerConsentType> {
+        return consents.map {
+            when (it) {
+                0 -> CustomerConsentType.ALL
+                1 -> CustomerConsentType.RECORD_SCREEN
+                2 -> CustomerConsentType.TRACK_SCREEN
+                3 -> CustomerConsentType.NONE
+                else -> CustomerConsentType.ALL
+            }
+        }
+    }
 }

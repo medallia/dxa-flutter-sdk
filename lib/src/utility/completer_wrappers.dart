@@ -26,7 +26,7 @@ class TrackingCompleter {
   }
 
   FutureOr<void> waitForNewScreenIfThereNoneActive() async {
-    if (Tracking.instance.visitedUnfinishedScreensList.isEmpty) {
+    if (Tracking.instance.visitedUnfinishedScreen == null) {
       //Edge case: called before the first screen has started
       //(unfinishedScreens is empty and no endScreen has ever been called).
       if (Tracking.instance.endScreenCompleter == null) {

@@ -4,6 +4,10 @@ import 'package:decibel_sdk/src/utility/enums.dart' as enums;
 import 'package:flutter/material.dart';
 
 class DecibelSdk {
+  static void disableAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
+    return DecibelConfig().disableAutoMasking(widgetsToMask);
+  }
+
   static void enableAllLogs() {
     DecibelConfig().enableAllLogs();
   }
@@ -47,7 +51,7 @@ class DecibelSdk {
   }
 
   static List<NavigatorObserver> get routeObservers =>
-      DecibelConfig().routeObservers;
+      DecibelConfig().currentRouteObservers;
 
   static void sendDataOverWifiOnly() {
     return DecibelConfig().sendDataOverWifiOnly();
@@ -96,5 +100,21 @@ class DecibelSdk {
     List<enums.DecibelCustomerConsentType> consents,
   ) {
     return DecibelConfig().setEnableConsents(consents);
+  }
+
+  static Future<void> enableSessionForExperience(bool value) async {
+    return DecibelConfig().enableSessionForExperience(value);
+  }
+
+  static Future<void> enableSessionForAnalysis(bool value) async {
+    return DecibelConfig().enableSessionForAnalysis(value);
+  }
+
+  static Future<void> enableSessionForReplay(bool value) async {
+    return DecibelConfig().enableSessionForReplay(value);
+  }
+
+  static Future<void> enableScreenForAnalysis(bool value) async {
+    return DecibelConfig().enableScreenForAnalysis(value);
   }
 }

@@ -44,12 +44,12 @@ class SessionReplay with TrackingCompleter {
   bool alreadyWaitingForPostFrameCallback = false;
   bool waitingForEndOfFrame = false;
   bool get currentlyTracking =>
-      Tracking.instance.visitedUnfinishedScreensList.isNotEmpty;
+      Tracking.instance.visitedUnfinishedScreen != null;
   bool get recordingAllowedInThisScreen =>
       currentTrackedScreen.recordingAllowed;
 
   ScreenVisited get currentTrackedScreen {
-    return Tracking.instance.visitedUnfinishedScreensList.last;
+    return Tracking.instance.visitedUnfinishedScreen!;
   }
 
   late Timer _timer;
@@ -197,11 +197,13 @@ class SessionReplay with TrackingCompleter {
     String screenName,
     int startFocusTime,
   ) async {
-    final ScreenshotMessage screenshotMessage = ScreenshotMessage()
-      ..screenshotData = screenshotData
-      ..screenId = screenId
-      ..screenName = screenName
-      ..startFocusTime = startFocusTime;
+    final ScreenshotMessage screenshotMessage = ScreenshotMessage(
+      screenshotData: screenshotData,
+      screenId: screenId,
+      screenName: screenName,
+      startFocusTime: startFocusTime,
+    );
+
     lastScreenshotSent = screenshotMessage;
     logger.d('Save screenshot - screenName: $screenName - screenId: $screenId');
     await _apiInstance.saveScreenshot(screenshotMessage);
@@ -212,7 +214,7 @@ class SessionReplay with TrackingCompleter {
   Future<void> closeScreenVideo(ScreenVisited screenVisited) async {
     if (lastScreenshotSent != null &&
         DateTime.now().millisecondsSinceEpoch -
-                lastScreenshotSent!.startFocusTime! >
+                lastScreenshotSent!.startFocusTime >
             1000) {
       late int startFocusTime;
       if (screenVisited.isCurrentScreenOverMaxDuration) {
@@ -224,9 +226,9 @@ class SessionReplay with TrackingCompleter {
       final ScreenshotMessage screenShotMessage = lastScreenshotSent!;
       lastScreenshotSent = null;
       await _sendScreenshot(
-        screenShotMessage.screenshotData!,
-        screenShotMessage.screenId!,
-        screenShotMessage.screenName!,
+        screenShotMessage.screenshotData,
+        screenShotMessage.screenId,
+        screenShotMessage.screenName,
         startFocusTime,
       );
     }

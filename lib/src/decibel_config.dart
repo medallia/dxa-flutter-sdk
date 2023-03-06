@@ -48,10 +48,11 @@ class DecibelConfig {
   final LoggerSDK _loggerSDK;
   late final GoalsAndDimensions _goalsAndDimensions;
   late final HttpErrors _httpErrors;
-  final List<NavigatorObserver> routeObservers = [
+  final List<NavigatorObserver> _routeObserversToUse = [
     CustomRouteObserver.screenWidgetRouteObserver,
     CustomRouteObserver.generalRouteObserver
   ];
+  final List<NavigatorObserver> currentRouteObservers = [];
 
   bool _trackingAllowed = false;
   bool _recordingAllowed = false;
@@ -66,6 +67,7 @@ class DecibelConfig {
 
   bool get recordingAllowed => _recordingAllowed;
   bool get trackingAllowed => _trackingAllowed;
+  bool initialized = false;
 
   /// Initializes DecibelSdk
   Future<void> initialize(
@@ -73,18 +75,32 @@ class DecibelConfig {
     int property,
     List<enums.DecibelCustomerConsentType> consents,
   ) async {
+    final String version = await _getVersion();
+    _setObservers();
+    _setEnableConsentsForFlutter(consents);
+    final sessionMessage = SessionMessage(
+      account: account,
+      property: property,
+      consents: consents.toIndexList(),
+      version: version,
+    );
+
+    await _api.initialize(sessionMessage);
+    initialized = true;
+  }
+
+  void _setObservers() {
+    if (currentRouteObservers.isEmpty) {
+      currentRouteObservers.addAll(_routeObserversToUse);
+    }
+  }
+
+  Future<String> _getVersion() async {
     final yamlString =
         await _rootBundle.loadString('packages/decibel_sdk/pubspec.yaml');
     final yaml_parser.YamlMap parsedYaml =
         _loadYaml(yamlString) as yaml_parser.YamlMap;
-    final String version = parsedYaml['version'] as String;
-    _setEnableConsentsForFlutter(consents);
-    final sessionMessage = SessionMessage()
-      ..account = account
-      ..property = property
-      ..consents = consents.toIndexList()
-      ..version = version;
-    await _api.initialize(sessionMessage);
+    return parsedYaml['version'] as String;
   }
 
   /// Enable the Customer Consents list passed as parameter
@@ -93,7 +109,7 @@ class DecibelConfig {
   ) async {
     _setEnableConsentsForFlutter(consents);
     await _api.setEnableConsents(
-      ConsentsMessage()..consents = consents.toIndexList(),
+      ConsentsMessage(consents: consents.toIndexList()),
     );
   }
 
@@ -115,7 +131,7 @@ class DecibelConfig {
       }
     }
     await _api.setDisableConsents(
-      ConsentsMessage()..consents = consents.toIndexList(),
+      ConsentsMessage(consents: consents.toIndexList()),
     );
   }
 
@@ -152,6 +168,7 @@ class DecibelConfig {
   }
 
   Future<String?> getWebViewProperties() async {
+    assert(initialized);
     return _api.getWebViewProperties();
   }
 
@@ -165,11 +182,20 @@ class DecibelConfig {
     _sessionReplay.autoMasking.autoMaskingTypeSet = allWidgets;
   }
 
+  void disableAutoMasking(Set<AutoMaskingTypeEnum> widgetsToUnmask) {
+    final Set<AutoMaskingType> allWidgets = {};
+
+    for (final element in widgetsToUnmask) {
+      allWidgets.add(AutoMaskingType(autoMaskingTypeEnum: element));
+    }
+    _sessionReplay.autoMasking
+        .removeUnmaskedTypesFromAutoMaskingTypeSet(allWidgets);
+  }
+
   ///Only for debug purposes
-  Future<String?> getSessionId() async {
-    return Future.delayed(Duration(seconds: 3)).then((_) {
-      return _api.getSessionId();
-    });
+  Future<String> getSessionId() async {
+    assert(initialized);
+    return _api.getSessionId();
   }
 
   ///Enable Logs for every SDK module.
@@ -205,6 +231,22 @@ class DecibelConfig {
     int statusCode,
   ) async {
     await _httpErrors.sendStatusCode(statusCode);
+  }
+
+  Future<void> enableSessionForExperience(bool value) async {
+    return _api.enableSessionForExperience(value);
+  }
+
+  Future<void> enableSessionForAnalysis(bool value) async {
+    return _api.enableSessionForAnalysis(value);
+  }
+
+  Future<void> enableSessionForReplay(bool value) async {
+    return _api.enableSessionForReplay(value);
+  }
+
+  Future<void> enableScreenForAnalysis(bool value) async {
+    return _api.enableScreenForAnalysis(value);
   }
 
   void _setEnableConsentsForFlutter(
