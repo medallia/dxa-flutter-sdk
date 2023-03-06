@@ -9,8 +9,13 @@ class AutoMasking with RenderObjectAutoMaskGetter {
   final LoggerSDK _logger;
   Logger get logger => _logger.autoMaskingLogger;
   final Set<RenderObject> renderObjectsToMask = Set.of({});
-  Set<AutoMaskingType> _autoMaskingTypeSet = Set.unmodifiable(
-    {const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none)},
+  //Webbview and input text masking by default
+  static final Set<AutoMaskingType> _defaultAutoMaskingTypeSet = {
+    const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.webView),
+    const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.inputText)
+  };
+  Set<AutoMaskingType> _autoMaskingTypeSet = Set.from(
+    _defaultAutoMaskingTypeSet,
   );
   Set<AutoMaskingType> get autoMaskingTypeSet => _autoMaskingTypeSet;
   set autoMaskingTypeSet(Set<AutoMaskingType> value) {
@@ -30,9 +35,8 @@ along with other AutoMaskingType enums
     }
 
     if (value.contains(
-          const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
-        ) ||
-        value.isEmpty) {
+      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+    )) {
       if (value.length > 1) {
         throw ArgumentError('''
 AutoMaskingType.none cannot be selected
@@ -44,13 +48,32 @@ along with other AutoMaskingType enums
       };
       return;
     }
-    _autoMaskingTypeSet = value;
+    _autoMaskingTypeSet.addAll(value);
+    logger.d('After setAutoMaskingTypeSet ${autoMaskingTypeSet.toString()}');
+  }
+
+  void removeUnmaskedTypesFromAutoMaskingTypeSet(Set<AutoMaskingType> set) {
+    if (set.contains(
+      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+    )) {
+      return;
+    }
+    if (set.contains(
+      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.all),
+    )) {
+      _autoMaskingTypeSet = {};
+      return;
+    }
+
+    _autoMaskingTypeSet.removeAll(set);
+    logger.d('After  Unmasking ${autoMaskingTypeSet.toString()}');
   }
 
   void setAutoMasking(BuildContext context) {
     logger.d('set AutoMasking ${autoMaskingTypeSet.toString()}');
     if (autoMaskingTypeSet.contains(
-        const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none))) {
+      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+    )) {
       return;
     }
     renderObjectsToMask

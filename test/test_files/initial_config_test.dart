@@ -51,8 +51,34 @@ void main() {
     );
     when(mockSessionReplay.autoMasking).thenReturn(mockAutoMasking);
   });
+
   group('initalize method', () {
     // setUpAll(() {});
+
+    test('''
+WHEN getSessionId is called 
+AND the decibelSdk.initalize method has not been called
+THEN the method throws an assertion error
+    ''', () async {
+      expect(
+        () async {
+          await decibelSdk.getSessionId();
+        },
+        throwsAssertionError,
+      );
+    });
+    test('''
+WHEN getWebViewProperties is called 
+AND the decibelSdk.initalize method has not been called
+THEN the method throws an assertion error
+    ''', () async {
+      expect(
+        () async {
+          await decibelSdk.getWebViewProperties();
+        },
+        throwsAssertionError,
+      );
+    });
 
     test(
       '''
@@ -79,6 +105,24 @@ void main() {
         verify(mockSessionReplay.start());
       },
     );
+    test('''
+WHEN getSessionId is called
+AND the initialize method has been called before
+THEN the _api method is called
+AND it returns a Future of type nullable string 
+    ''', () async {
+      expect(decibelSdk.getSessionId(), isA<Future<String>>());
+      verify(mockApi.getSessionId());
+    });
+    test('''
+WHEN getWebViewProperties is called
+AND the initialize method has been called before
+THEN the _api method is called
+AND it returns a Future of type string 
+    ''', () async {
+      expect(decibelSdk.getWebViewProperties(), isA<Future<String?>>());
+      verify(mockApi.getWebViewProperties());
+    });
   });
 
   group('enable consents', () {
@@ -211,16 +255,6 @@ THEN the _goalsAndDimensions method is called
       verify(mockGoalsAndDimensions.sendGoal(goalName, goalValue));
     });
   });
-  group('get webView properties', () {
-    test('''
-WHEN getWebViewProperties is called
-THEN the _api method is called
-AND it returns a Future of type nullable string 
-    ''', () async {
-      expect(decibelSdk.getWebViewProperties(), isA<Future<String?>>());
-      verify(mockApi.getWebViewProperties());
-    });
-  });
   group('automasking', () {
     test('''
 WHEN setAutoMasking is called with a set of every AutoMaskingTypEnum
@@ -274,17 +308,6 @@ AND has honored every enum passed
     });
   });
 
-  group('getSessionId', () {
-    test('''
-WHEN getSessionId is called 
-THEN the _api method is called
-
-    ''', () async {
-      //TODO add this test when the getSessionId delay is no longer needed
-      // await decibelSdk.getSessionId();
-      // verify(mockApi.getSessionId());
-    });
-  });
   group('logger', () {
     test('''
 WHEN enableAllLogs is called 

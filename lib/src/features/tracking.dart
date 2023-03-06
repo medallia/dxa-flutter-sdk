@@ -57,9 +57,12 @@ class Tracking with TrackingCompleter {
     _visitedScreensList.add(screenVisited);
   }
 
-  List<ScreenVisited> get visitedUnfinishedScreensList {
-    return List<ScreenVisited>.from(visitedScreensList)
-      ..removeWhere((element) => element.finished);
+  ScreenVisited? get visitedUnfinishedScreen {
+    final List<ScreenVisited> unfinshedList =
+        List<ScreenVisited>.from(visitedScreensList)
+          ..removeWhere((element) => element.finished);
+    if (unfinshedList.isEmpty) return null;
+    return unfinshedList.single;
   }
 
   ScreenVisited createScreenVisited({
@@ -110,10 +113,6 @@ class Tracking with TrackingCompleter {
     ScreenVisited screenVisited, {
     bool isBackground = false,
   }) async {
-    assert(
-      visitedUnfinishedScreensList.isEmpty ||
-          visitedUnfinishedScreensList.length == 1,
-    );
     if (!decibelConfig.trackingAllowed) return;
     late bool backgroundFlag;
     //When returning from background there's the possibility that the screen
@@ -128,8 +127,8 @@ class Tracking with TrackingCompleter {
     } else {
       backgroundFlag = isBackground;
     }
-    if (visitedUnfinishedScreensList.isNotEmpty) {
-      await endScreen(visitedUnfinishedScreensList[0].id);
+    if (visitedUnfinishedScreen != null) {
+      await endScreen(visitedUnfinishedScreen!.id);
     }
     _addVisitedScreenList(
       screenVisited,
@@ -138,13 +137,12 @@ class Tracking with TrackingCompleter {
     logger.d(
       ' 🔵 Start Screen - name: ${screenVisited.name} - id: ${screenVisited.uniqueId}',
     );
-    await _apiInstance.startScreen(
-      StartScreenMessage()
-        ..screenName = screenVisited.name
-        ..screenId = screenVisited.uniqueId
-        ..startTime = screenVisited.timestamp
-        ..isBackground = backgroundFlag,
-    );
+    await _apiInstance.startScreen(StartScreenMessage(
+      screenName: screenVisited.name,
+      screenId: screenVisited.uniqueId,
+      startTime: screenVisited.timestamp,
+      isBackground: backgroundFlag,
+    ));
     newScreenSentToNativeStreamController.add(screenVisited);
     await SessionReplay.instance.newScreen();
   }
@@ -159,10 +157,13 @@ class Tracking with TrackingCompleter {
     late ScreenVisited? potentialScreenVisited;
     if (isTabBar) {
       potentialScreenVisited =
-          visitedUnfinishedScreensList.findTabBarWithId(screenId);
+          visitedUnfinishedScreen?.maybeScreenVisitedTabBar(screenId);
     } else {
-      potentialScreenVisited =
-          visitedUnfinishedScreensList.findWithId(screenId);
+      if (visitedUnfinishedScreen?.id == screenId) {
+        potentialScreenVisited = visitedUnfinishedScreen;
+      } else {
+        potentialScreenVisited = null;
+      }
     }
     //check to see if this screen has already been closed before
     //If not, we can start with the logic related to ending the screen
@@ -179,19 +180,21 @@ class Tracking with TrackingCompleter {
         screenVisited.getScreenVisitedAsFinished(endTime);
     visitedScreensList[index] = screenVisitedFinished;
 
-    final EndScreenMessage endScreenMessage = EndScreenMessage()
-      ..screenName = screenVisitedFinished.name
-      ..screenId = screenVisitedFinished.uniqueId
-      ..endTime = screenVisitedFinished.endTimestamp
-      ..isBackground = isBackground;
+    final EndScreenMessage endScreenMessage = EndScreenMessage(
+      screenName: screenVisitedFinished.name,
+      screenId: screenVisitedFinished.uniqueId,
+      endTime: screenVisitedFinished.endTimestamp!,
+      isBackground: isBackground,
+    );
+
     await SessionReplay.instance.closeScreenVideo(screenVisitedFinished);
 
     await waitForEndScreenTasksCompleter();
     logger.d(
       ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId}',
     );
-    await _apiInstance.endScreen(endScreenMessage);
     endScreenToComplete.complete();
+    await _apiInstance.endScreen(endScreenMessage);
   }
 
   Future<void> wentToBackground() async {
@@ -200,8 +203,8 @@ class Tracking with TrackingCompleter {
     //from background
     if (screenVisitedWhenAppWentToBackground != null) return;
     //No unfinished screens, so there's no possibility of ending any screen
-    if (visitedUnfinishedScreensList.isEmpty) return;
-    screenVisitedWhenAppWentToBackground = visitedUnfinishedScreensList.last;
+    if (visitedUnfinishedScreen == null) return;
+    screenVisitedWhenAppWentToBackground = visitedUnfinishedScreen;
     await endScreen(screenVisitedWhenAppWentToBackground!.id,
         isBackground: true);
   }
@@ -209,7 +212,7 @@ class Tracking with TrackingCompleter {
   Future<void> returnFromBackground() async {
     //no screen to return to
     if (screenVisitedWhenAppWentToBackground == null) return;
-    assert(visitedUnfinishedScreensList.isEmpty);
+    assert(visitedUnfinishedScreen == null);
     final ScreenVisited returnFormBackgroundScreenVIsited =
         screenVisitedWhenAppWentToBackground!
             .getScreenVisitedWithNewStartTimeStamp(
@@ -220,8 +223,8 @@ class Tracking with TrackingCompleter {
   }
 
   Future<void> closeThisScreenAndThenReopen() async {
-    final ScreenVisited? screenToClose = visitedUnfinishedScreensList
-        .firstWhereOrNull((element) => !element.finished);
+    final ScreenVisited? screenToClose = visitedUnfinishedScreen;
+
     if (screenToClose == null) return;
     await endScreen(screenToClose.id);
     final ScreenVisited screenToOpen =
@@ -266,12 +269,13 @@ class Tracking with TrackingCompleter {
 
     if (tabController.index != tabController.previousIndex &&
         !tabController.indexIsChanging) {
-      //Find if this TabBarScreen (NOT the individual Tab) has been visited
-      //and call endScreen on it if so.
-      final int index = visitedUnfinishedScreensList.getTabBarIndex(screenId);
-      if (index != -1) {
+      //Find if this TabBarScreen (NOT the individual Tab) is the visited
+      //unfinished screen and call endScreen on it if so.
+      final bool isTabBarAndUnfinished =
+          visitedUnfinishedScreen?.isTabBarWithId(screenId) ?? false;
+      if (isTabBarAndUnfinished) {
         await Tracking.instance
-            .endScreen(visitedUnfinishedScreensList[index].id, isTabBar: true);
+            .endScreen(visitedUnfinishedScreen!.id, isTabBar: true);
       }
 
       final ScreenVisited screenVisited = createScreenVisited(
@@ -298,10 +302,11 @@ class Tracking with TrackingCompleter {
     required bool enableAutomaticPopupRecording,
     required bool enableAutomaticMasking,
   }) async {
-    final int index = visitedUnfinishedScreensList.getTabBarIndex(screenId);
-    if (index != -1) {
+    final bool isTabBarAndUnfinished =
+        visitedUnfinishedScreen?.isTabBarWithId(screenId) ?? false;
+    if (isTabBarAndUnfinished) {
       await Tracking.instance
-          .endScreen(visitedUnfinishedScreensList[index].id, isTabBar: true);
+          .endScreen(visitedUnfinishedScreen!.id, isTabBar: true);
     }
     final ScreenVisited screenVisited = createScreenVisited(
       id: screenId,
