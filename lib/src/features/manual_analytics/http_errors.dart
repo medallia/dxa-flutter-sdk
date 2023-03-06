@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 class HttpErrors with TrackingCompleter {
   HttpErrors(this._api);
 
-  final DecibelSdkApi _api;
+  final MedalliaDxaNativeApi _api;
 
   ///Send goals
   Future<void> sendStatusCode(

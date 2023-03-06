@@ -860,10 +860,10 @@ public class Messages {
     void error(Throwable error);
   }
 
-  private static class DecibelSdkApiCodec extends StandardMessageCodec {
-    public static final DecibelSdkApiCodec INSTANCE = new DecibelSdkApiCodec();
+  private static class MedalliaDxaNativeApiCodec extends StandardMessageCodec {
+    public static final MedalliaDxaNativeApiCodec INSTANCE = new MedalliaDxaNativeApiCodec();
 
-    private DecibelSdkApiCodec() {}
+    private MedalliaDxaNativeApiCodec() {}
 
     @Override
     protected Object readValueOfType(byte type, @NonNull ByteBuffer buffer) {
@@ -927,7 +927,7 @@ public class Messages {
   }
 
   /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-  public interface DecibelSdkApi {
+  public interface MedalliaDxaNativeApi {
 
     void initialize(@NonNull SessionMessage msg);
 
@@ -965,16 +965,16 @@ public class Messages {
 
     void getSessionId(Result<String> result);
 
-    /** The codec used by DecibelSdkApi. */
+    /** The codec used by MedalliaDxaNativeApi. */
     static MessageCodec<Object> getCodec() {
-      return DecibelSdkApiCodec.INSTANCE;
+      return MedalliaDxaNativeApiCodec.INSTANCE;
     }
-    /**Sets up an instance of `DecibelSdkApi` to handle messages through the `binaryMessenger`. */
-    static void setup(BinaryMessenger binaryMessenger, DecibelSdkApi api) {
+    /**Sets up an instance of `MedalliaDxaNativeApi` to handle messages through the `binaryMessenger`. */
+    static void setup(BinaryMessenger binaryMessenger, MedalliaDxaNativeApi api) {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.initialize", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.initialize", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1001,7 +1001,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.startScreen", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.startScreen", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1028,7 +1028,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.endScreen", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.endScreen", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1055,7 +1055,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.setEnableConsents", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.setEnableConsents", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1082,7 +1082,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.setDisableConsents", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.setDisableConsents", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1109,7 +1109,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.saveScreenshot", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.saveScreenshot", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1136,7 +1136,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithString", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithString", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1163,7 +1163,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithNumber", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithNumber", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1190,7 +1190,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithBool", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithBool", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1217,7 +1217,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.sendGoal", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.sendGoal", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1244,7 +1244,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.sendDataOverWifiOnly", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.sendDataOverWifiOnly", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1265,7 +1265,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.sendHttpError", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.sendHttpError", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1292,7 +1292,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.enableSessionForExperience", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForExperience", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1319,7 +1319,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.enableSessionForAnalysis", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForAnalysis", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1346,7 +1346,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.enableSessionForReplay", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForReplay", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1373,7 +1373,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.enableScreenForAnalysis", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.enableScreenForAnalysis", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1400,7 +1400,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.getWebViewProperties", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.getWebViewProperties", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1432,7 +1432,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.DecibelSdkApi.getSessionId", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionId", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {

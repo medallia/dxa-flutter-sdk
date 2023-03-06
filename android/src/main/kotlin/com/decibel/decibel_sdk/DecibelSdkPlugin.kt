@@ -8,14 +8,14 @@ import com.decibel.common.internal.models.Multiplatform
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 
 /** DecibelSdkPlugin */
-class DecibelSdkPlugin : FlutterPlugin, Messages.DecibelSdkApi {
+class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        Messages.DecibelSdkApi.setup(flutterPluginBinding.binaryMessenger, this)
+        Messages.MedalliaDxaNativeApi.setup(flutterPluginBinding.binaryMessenger, this)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        Messages.DecibelSdkApi.setup(binding.binaryMessenger, null)
+        Messages.MedalliaDxaNativeApi.setup(binding.binaryMessenger, null)
     }
 
     override fun initialize(arg: Messages.SessionMessage) {

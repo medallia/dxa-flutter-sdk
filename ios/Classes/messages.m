@@ -352,9 +352,9 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 }
 @end
 
-@interface FLTDecibelSdkApiCodecReader : FlutterStandardReader
+@interface FLTMedalliaDxaNativeApiCodecReader : FlutterStandardReader
 @end
-@implementation FLTDecibelSdkApiCodecReader
+@implementation FLTMedalliaDxaNativeApiCodecReader
 - (nullable id)readValueOfType:(UInt8)type {
   switch (type) {
     case 128: 
@@ -381,9 +381,9 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 }
 @end
 
-@interface FLTDecibelSdkApiCodecWriter : FlutterStandardWriter
+@interface FLTMedalliaDxaNativeApiCodecWriter : FlutterStandardWriter
 @end
-@implementation FLTDecibelSdkApiCodecWriter
+@implementation FLTMedalliaDxaNativeApiCodecWriter
 - (void)writeValue:(id)value {
   if ([value isKindOfClass:[FLTConsentsMessage class]]) {
     [self writeByte:128];
@@ -418,36 +418,36 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 }
 @end
 
-@interface FLTDecibelSdkApiCodecReaderWriter : FlutterStandardReaderWriter
+@interface FLTMedalliaDxaNativeApiCodecReaderWriter : FlutterStandardReaderWriter
 @end
-@implementation FLTDecibelSdkApiCodecReaderWriter
+@implementation FLTMedalliaDxaNativeApiCodecReaderWriter
 - (FlutterStandardWriter *)writerWithData:(NSMutableData *)data {
-  return [[FLTDecibelSdkApiCodecWriter alloc] initWithData:data];
+  return [[FLTMedalliaDxaNativeApiCodecWriter alloc] initWithData:data];
 }
 - (FlutterStandardReader *)readerWithData:(NSData *)data {
-  return [[FLTDecibelSdkApiCodecReader alloc] initWithData:data];
+  return [[FLTMedalliaDxaNativeApiCodecReader alloc] initWithData:data];
 }
 @end
 
-NSObject<FlutterMessageCodec> *FLTDecibelSdkApiGetCodec() {
+NSObject<FlutterMessageCodec> *FLTMedalliaDxaNativeApiGetCodec() {
   static FlutterStandardMessageCodec *sSharedObject = nil;
   static dispatch_once_t sPred = 0;
   dispatch_once(&sPred, ^{
-    FLTDecibelSdkApiCodecReaderWriter *readerWriter = [[FLTDecibelSdkApiCodecReaderWriter alloc] init];
+    FLTMedalliaDxaNativeApiCodecReaderWriter *readerWriter = [[FLTMedalliaDxaNativeApiCodecReaderWriter alloc] init];
     sSharedObject = [FlutterStandardMessageCodec codecWithReaderWriter:readerWriter];
   });
   return sSharedObject;
 }
 
-void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTDecibelSdkApi> *api) {
+void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTMedalliaDxaNativeApi> *api) {
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.initialize"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.initialize"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(initializeMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(initializeMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(initializeMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(initializeMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTSessionMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -462,11 +462,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.startScreen"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.startScreen"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(startScreenMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(startScreenMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(startScreenMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(startScreenMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTStartScreenMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -481,11 +481,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.endScreen"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.endScreen"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(endScreenMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(endScreenMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(endScreenMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(endScreenMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTEndScreenMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -500,11 +500,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.setEnableConsents"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.setEnableConsents"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(setEnableConsentsMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(setEnableConsentsMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(setEnableConsentsMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(setEnableConsentsMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTConsentsMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -519,11 +519,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.setDisableConsents"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.setDisableConsents"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(setDisableConsentsMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(setDisableConsentsMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(setDisableConsentsMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(setDisableConsentsMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTConsentsMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -538,11 +538,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.saveScreenshot"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.saveScreenshot"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(saveScreenshotMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(saveScreenshotMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(saveScreenshotMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(saveScreenshotMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTScreenshotMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -557,11 +557,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithString"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithString"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(sendDimensionWithStringMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(sendDimensionWithStringMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(sendDimensionWithStringMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(sendDimensionWithStringMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTDimensionStringMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -576,11 +576,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithNumber"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithNumber"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(sendDimensionWithNumberMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(sendDimensionWithNumberMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(sendDimensionWithNumberMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(sendDimensionWithNumberMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTDimensionNumberMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -595,11 +595,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithBool"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithBool"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(sendDimensionWithBoolMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(sendDimensionWithBoolMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(sendDimensionWithBoolMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(sendDimensionWithBoolMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTDimensionBoolMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -614,11 +614,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.sendGoal"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.sendGoal"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(sendGoalMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(sendGoalMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(sendGoalMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(sendGoalMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTGoalMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -633,11 +633,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.sendDataOverWifiOnly"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.sendDataOverWifiOnly"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(sendDataOverWifiOnlyWithError:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(sendDataOverWifiOnlyWithError:)", api);
+      NSCAssert([api respondsToSelector:@selector(sendDataOverWifiOnlyWithError:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(sendDataOverWifiOnlyWithError:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         FlutterError *error;
         [api sendDataOverWifiOnlyWithError:&error];
@@ -650,11 +650,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.sendHttpError"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.sendHttpError"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(sendHttpErrorMsg:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(sendHttpErrorMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(sendHttpErrorMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(sendHttpErrorMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         NSNumber *arg_msg = GetNullableObjectAtIndex(args, 0);
@@ -669,11 +669,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.enableSessionForExperience"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForExperience"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(enableSessionForExperienceValue:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(enableSessionForExperienceValue:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(enableSessionForExperienceValue:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(enableSessionForExperienceValue:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         NSNumber *arg_value = GetNullableObjectAtIndex(args, 0);
@@ -688,11 +688,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.enableSessionForAnalysis"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForAnalysis"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(enableSessionForAnalysisValue:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(enableSessionForAnalysisValue:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(enableSessionForAnalysisValue:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(enableSessionForAnalysisValue:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         NSNumber *arg_value = GetNullableObjectAtIndex(args, 0);
@@ -707,11 +707,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.enableSessionForReplay"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForReplay"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(enableSessionForReplayValue:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(enableSessionForReplayValue:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(enableSessionForReplayValue:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(enableSessionForReplayValue:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         NSNumber *arg_value = GetNullableObjectAtIndex(args, 0);
@@ -726,11 +726,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.enableScreenForAnalysis"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.enableScreenForAnalysis"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(enableScreenForAnalysisValue:error:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(enableScreenForAnalysisValue:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(enableScreenForAnalysisValue:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(enableScreenForAnalysisValue:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         NSNumber *arg_value = GetNullableObjectAtIndex(args, 0);
@@ -745,11 +745,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.getWebViewProperties"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.getWebViewProperties"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(getWebViewPropertiesWithCompletion:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(getWebViewPropertiesWithCompletion:)", api);
+      NSCAssert([api respondsToSelector:@selector(getWebViewPropertiesWithCompletion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(getWebViewPropertiesWithCompletion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         [api getWebViewPropertiesWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
           callback(wrapResult(output, error));
@@ -762,11 +762,11 @@ void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.DecibelSdkApi.getSessionId"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionId"
         binaryMessenger:binaryMessenger
-        codec:FLTDecibelSdkApiGetCodec()];
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(getSessionIdWithCompletion:)], @"FLTDecibelSdkApi api (%@) doesn't respond to @selector(getSessionIdWithCompletion:)", api);
+      NSCAssert([api respondsToSelector:@selector(getSessionIdWithCompletion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(getSessionIdWithCompletion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         [api getSessionIdWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
           callback(wrapResult(output, error));

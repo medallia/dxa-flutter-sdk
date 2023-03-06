@@ -277,8 +277,8 @@ class GoalMessage {
   }
 }
 
-class _DecibelSdkApiCodec extends StandardMessageCodec {
-  const _DecibelSdkApiCodec();
+class _MedalliaDxaNativeApiCodec extends StandardMessageCodec {
+  const _MedalliaDxaNativeApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
     if (value is ConsentsMessage) {
@@ -340,19 +340,19 @@ class _DecibelSdkApiCodec extends StandardMessageCodec {
   }
 }
 
-class DecibelSdkApi {
-  /// Constructor for [DecibelSdkApi].  The [binaryMessenger] named argument is
+class MedalliaDxaNativeApi {
+  /// Constructor for [MedalliaDxaNativeApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  DecibelSdkApi({BinaryMessenger? binaryMessenger})
+  MedalliaDxaNativeApi({BinaryMessenger? binaryMessenger})
       : _binaryMessenger = binaryMessenger;
   final BinaryMessenger? _binaryMessenger;
 
-  static const MessageCodec<Object?> codec = _DecibelSdkApiCodec();
+  static const MessageCodec<Object?> codec = _MedalliaDxaNativeApiCodec();
 
   Future<void> initialize(SessionMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.initialize', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.initialize', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -374,7 +374,7 @@ class DecibelSdkApi {
 
   Future<void> startScreen(StartScreenMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.startScreen', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.startScreen', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -396,7 +396,7 @@ class DecibelSdkApi {
 
   Future<void> endScreen(EndScreenMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.endScreen', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.endScreen', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -418,7 +418,7 @@ class DecibelSdkApi {
 
   Future<void> setEnableConsents(ConsentsMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.setEnableConsents', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.setEnableConsents', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -440,7 +440,7 @@ class DecibelSdkApi {
 
   Future<void> setDisableConsents(ConsentsMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.setDisableConsents', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.setDisableConsents', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -462,7 +462,7 @@ class DecibelSdkApi {
 
   Future<void> saveScreenshot(ScreenshotMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.saveScreenshot', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.saveScreenshot', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -484,7 +484,7 @@ class DecibelSdkApi {
 
   Future<void> sendDimensionWithString(DimensionStringMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithString', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithString', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -506,7 +506,7 @@ class DecibelSdkApi {
 
   Future<void> sendDimensionWithNumber(DimensionNumberMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithNumber', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithNumber', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -528,7 +528,7 @@ class DecibelSdkApi {
 
   Future<void> sendDimensionWithBool(DimensionBoolMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.sendDimensionWithBool', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithBool', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -550,7 +550,7 @@ class DecibelSdkApi {
 
   Future<void> sendGoal(GoalMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.sendGoal', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendGoal', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -572,7 +572,7 @@ class DecibelSdkApi {
 
   Future<void> sendDataOverWifiOnly() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.sendDataOverWifiOnly', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDataOverWifiOnly', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;
@@ -594,7 +594,7 @@ class DecibelSdkApi {
 
   Future<void> sendHttpError(int arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.sendHttpError', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendHttpError', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -616,7 +616,7 @@ class DecibelSdkApi {
 
   Future<void> enableSessionForExperience(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.enableSessionForExperience', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForExperience', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_value]) as List<Object?>?;
@@ -638,7 +638,7 @@ class DecibelSdkApi {
 
   Future<void> enableSessionForAnalysis(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.enableSessionForAnalysis', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForAnalysis', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_value]) as List<Object?>?;
@@ -660,7 +660,7 @@ class DecibelSdkApi {
 
   Future<void> enableSessionForReplay(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.enableSessionForReplay', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForReplay', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_value]) as List<Object?>?;
@@ -682,7 +682,7 @@ class DecibelSdkApi {
 
   Future<void> enableScreenForAnalysis(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.enableScreenForAnalysis', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableScreenForAnalysis', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_value]) as List<Object?>?;
@@ -704,7 +704,7 @@ class DecibelSdkApi {
 
   Future<String> getWebViewProperties() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.getWebViewProperties', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.getWebViewProperties', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;
@@ -731,7 +731,7 @@ class DecibelSdkApi {
 
   Future<String> getSessionId() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.DecibelSdkApi.getSessionId', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionId', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;

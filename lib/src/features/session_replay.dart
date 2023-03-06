@@ -32,13 +32,13 @@ class SessionReplay with TrackingCompleter {
   static final _instance = SessionReplay._internal();
   static SessionReplay get instance => _instance;
 
-  late final DecibelConfig decibelConfig;
+  late final MedalliaDxaConfig medalliaDxaConfig;
   final LoggerSDK _logger;
   Logger get logger => _logger.sessionReplayLogger;
   late final FrameTracking _frameTracking;
   late final AutoMasking autoMasking;
   late final PlaceholderImageConfig placeholderImageConfig;
-  final DecibelSdkApi _apiInstance = DecibelSdkApi();
+  final MedalliaDxaNativeApi _apiInstance = MedalliaDxaNativeApi();
   final _maskColor = Paint()..color = Colors.grey;
   ScreenshotMessage? lastScreenshotSent;
   bool alreadyWaitingForPostFrameCallback = false;
@@ -106,7 +106,7 @@ class SessionReplay with TrackingCompleter {
   }
 
   Future<void> forceTakeScreenshot() async {
-    if (!decibelConfig.recordingAllowed) return;
+    if (!medalliaDxaConfig.recordingAllowed) return;
     if (!currentlyTracking) return;
 
     if (!recordingAllowedInThisScreen) {

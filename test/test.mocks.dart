@@ -34,8 +34,9 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeDecibelConfig_0 extends _i1.SmartFake implements _i2.DecibelConfig {
-  _FakeDecibelConfig_0(
+class _FakeMedalliaDxaConfig_0 extends _i1.SmartFake
+    implements _i2.MedalliaDxaConfig {
+  _FakeMedalliaDxaConfig_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -85,10 +86,11 @@ class _FakeScreenVisited_4 extends _i1.SmartFake implements _i6.ScreenVisited {
         );
 }
 
-/// A class which mocks [DecibelSdkApi].
+/// A class which mocks [MedalliaDxaNativeApi].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockDecibelSdkApi extends _i1.Mock implements _i7.DecibelSdkApi {
+class MockMedalliaDxaNativeApi extends _i1.Mock
+    implements _i7.MedalliaDxaNativeApi {
   @override
   _i8.Future<void> initialize(_i7.SessionMessage? arg_msg) =>
       (super.noSuchMethod(
@@ -209,6 +211,46 @@ class MockDecibelSdkApi extends _i1.Mock implements _i7.DecibelSdkApi {
         returnValueForMissingStub: _i8.Future<void>.value(),
       ) as _i8.Future<void>);
   @override
+  _i8.Future<void> enableSessionForExperience(bool? arg_value) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #enableSessionForExperience,
+          [arg_value],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+  @override
+  _i8.Future<void> enableSessionForAnalysis(bool? arg_value) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #enableSessionForAnalysis,
+          [arg_value],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+  @override
+  _i8.Future<void> enableSessionForReplay(bool? arg_value) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #enableSessionForReplay,
+          [arg_value],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+  @override
+  _i8.Future<void> enableScreenForAnalysis(bool? arg_value) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #enableScreenForAnalysis,
+          [arg_value],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+  @override
   _i8.Future<String> getWebViewProperties() => (super.noSuchMethod(
         Invocation.method(
           #getWebViewProperties,
@@ -233,22 +275,23 @@ class MockDecibelSdkApi extends _i1.Mock implements _i7.DecibelSdkApi {
 /// See the documentation for Mockito's code generation for more information.
 class MockSessionReplay extends _i1.Mock implements _i9.SessionReplay {
   @override
-  _i2.DecibelConfig get decibelConfig => (super.noSuchMethod(
-        Invocation.getter(#decibelConfig),
-        returnValue: _FakeDecibelConfig_0(
+  _i2.MedalliaDxaConfig get medalliaDxaConfig => (super.noSuchMethod(
+        Invocation.getter(#medalliaDxaConfig),
+        returnValue: _FakeMedalliaDxaConfig_0(
           this,
-          Invocation.getter(#decibelConfig),
+          Invocation.getter(#medalliaDxaConfig),
         ),
-        returnValueForMissingStub: _FakeDecibelConfig_0(
+        returnValueForMissingStub: _FakeMedalliaDxaConfig_0(
           this,
-          Invocation.getter(#decibelConfig),
+          Invocation.getter(#medalliaDxaConfig),
         ),
-      ) as _i2.DecibelConfig);
+      ) as _i2.MedalliaDxaConfig);
   @override
-  set decibelConfig(_i2.DecibelConfig? _decibelConfig) => super.noSuchMethod(
+  set medalliaDxaConfig(_i2.MedalliaDxaConfig? _medalliaDxaConfig) =>
+      super.noSuchMethod(
         Invocation.setter(
-          #decibelConfig,
-          _decibelConfig,
+          #medalliaDxaConfig,
+          _medalliaDxaConfig,
         ),
         returnValueForMissingStub: null,
       );

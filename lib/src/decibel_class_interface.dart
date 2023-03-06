@@ -3,13 +3,13 @@ import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
 import 'package:flutter/material.dart';
 
-class DecibelSdk {
+class MedalliaDxa {
   static void disableAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
-    return DecibelConfig().disableAutoMasking(widgetsToMask);
+    return MedalliaDxaConfig().disableAutoMasking(widgetsToMask);
   }
 
   static void enableAllLogs() {
-    DecibelConfig().enableAllLogs();
+    MedalliaDxaConfig().enableAllLogs();
   }
 
   static void enableSelectedLogs({
@@ -21,7 +21,7 @@ class DecibelSdk {
     bool screenWidget = false,
     bool maskWidget = false,
   }) {
-    return DecibelConfig().enableSelectedLogs(
+    return MedalliaDxaConfig().enableSelectedLogs(
       tracking: tracking,
       sessionReplay: sessionReplay,
       frameTracking: frameTracking,
@@ -33,88 +33,89 @@ class DecibelSdk {
   }
 
   static Future<String?> getSessionId() async {
-    return DecibelConfig().getSessionId();
+    return MedalliaDxaConfig().getSessionId();
   }
 
   static Future<String?> getWebViewProperties() async {
-    return DecibelConfig().getWebViewProperties();
+    return MedalliaDxaConfig().getWebViewProperties();
   }
 
   static Future<void> initialize(
     int account,
     int property, [
-    List<enums.DecibelCustomerConsentType> consents = const [
-      enums.DecibelCustomerConsentType.all
+    List<enums.MedalliaDxaCustomerConsentType> consents = const [
+      enums.MedalliaDxaCustomerConsentType.all
     ],
   ]) async {
-    await DecibelConfig().initialize(account, property, consents);
+    await MedalliaDxaConfig().initialize(account, property, consents);
   }
 
   static List<NavigatorObserver> get routeObservers =>
-      DecibelConfig().currentRouteObservers;
+      MedalliaDxaConfig().currentRouteObservers;
 
   static void sendDataOverWifiOnly() {
-    return DecibelConfig().sendDataOverWifiOnly();
+    return MedalliaDxaConfig().sendDataOverWifiOnly();
   }
 
   static Future<void> sendGoal(String goalName, [double? value]) {
-    return DecibelConfig().sendGoal(goalName, value);
+    return MedalliaDxaConfig().sendGoal(goalName, value);
   }
 
   static Future<void> sendHttpError(int statusCode) {
-    return DecibelConfig().sendHttpError(statusCode);
+    return MedalliaDxaConfig().sendHttpError(statusCode);
   }
 
   static void setAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
-    return DecibelConfig().setAutoMasking(widgetsToMask);
+    return MedalliaDxaConfig().setAutoMasking(widgetsToMask);
   }
 
   static Future<void> setDimensionWithBool(
     String dimensionName, {
     required bool value,
   }) {
-    return DecibelConfig().setDimensionWithBool(dimensionName, value: value);
+    return MedalliaDxaConfig()
+        .setDimensionWithBool(dimensionName, value: value);
   }
 
   static Future<void> setDimensionWithNumber(
     String dimensionName,
     double value,
   ) {
-    return DecibelConfig().setDimensionWithNumber(dimensionName, value);
+    return MedalliaDxaConfig().setDimensionWithNumber(dimensionName, value);
   }
 
   static Future<void> setDimensionWithString(
     String dimensionName,
     String value,
   ) {
-    return DecibelConfig().setDimensionWithString(dimensionName, value);
+    return MedalliaDxaConfig().setDimensionWithString(dimensionName, value);
   }
 
   static Future<void> setDisableConsents(
-    List<enums.DecibelCustomerConsentType> consents,
+    List<enums.MedalliaDxaCustomerConsentType> consents,
   ) {
-    return DecibelConfig().setDisableConsents(consents);
+    return MedalliaDxaConfig().setDisableConsents(consents);
   }
 
   static Future<void> setEnableConsents(
-    List<enums.DecibelCustomerConsentType> consents,
+    List<enums.MedalliaDxaCustomerConsentType> consents,
   ) {
-    return DecibelConfig().setEnableConsents(consents);
+    return MedalliaDxaConfig().setEnableConsents(consents);
   }
 
   static Future<void> enableSessionForExperience(bool value) async {
-    return DecibelConfig().enableSessionForExperience(value);
+    return MedalliaDxaConfig().enableSessionForExperience(value);
   }
 
   static Future<void> enableSessionForAnalysis(bool value) async {
-    return DecibelConfig().enableSessionForAnalysis(value);
+    return MedalliaDxaConfig().enableSessionForAnalysis(value);
   }
 
   static Future<void> enableSessionForReplay(bool value) async {
-    return DecibelConfig().enableSessionForReplay(value);
+    return MedalliaDxaConfig().enableSessionForReplay(value);
   }
 
   static Future<void> enableScreenForAnalysis(bool value) async {
-    return DecibelConfig().enableScreenForAnalysis(value);
+    return MedalliaDxaConfig().enableScreenForAnalysis(value);
   }
 }
