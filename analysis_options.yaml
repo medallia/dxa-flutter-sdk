@@ -10,7 +10,7 @@ linter:
     # Use parameter order as in json response
     always_put_required_named_parameters_first: false
 
-    # DecibelSdk class must contain static methods because it's a plugin
+    # MedalliaDxa class must contain static methods because it's a plugin
     avoid_classes_with_only_static_members: false
 
 

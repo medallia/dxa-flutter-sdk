@@ -56,8 +56,8 @@ extension RenderObjectPaintBounds on RenderObject {
   }
 }
 
-extension ListDecibelCustomerConsentTypeExt
-    on List<DecibelCustomerConsentType> {
+extension ListMedalliaDxaCustomerConsentTypeExt
+    on List<MedalliaDxaCustomerConsentType> {
   List<int> toIndexList() {
     return map((consent) => consent.index).toList();
   }

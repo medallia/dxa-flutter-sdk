@@ -115,10 +115,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) NSNumber * value;
 @end
 
-/// The codec used by FLTDecibelSdkApi.
-NSObject<FlutterMessageCodec> *FLTDecibelSdkApiGetCodec(void);
+/// The codec used by FLTMedalliaDxaNativeApi.
+NSObject<FlutterMessageCodec> *FLTMedalliaDxaNativeApiGetCodec(void);
 
-@protocol FLTDecibelSdkApi
+@protocol FLTMedalliaDxaNativeApi
 - (void)initializeMsg:(FLTSessionMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)startScreenMsg:(FLTStartScreenMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)endScreenMsg:(FLTEndScreenMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
@@ -139,6 +139,6 @@ NSObject<FlutterMessageCodec> *FLTDecibelSdkApiGetCodec(void);
 - (void)getSessionIdWithCompletion:(void (^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 @end
 
-extern void FLTDecibelSdkApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTDecibelSdkApi> *_Nullable api);
+extern void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTMedalliaDxaNativeApi> *_Nullable api);
 
 NS_ASSUME_NONNULL_END

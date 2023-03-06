@@ -2,7 +2,7 @@ part of 'screen_widget/screen_widget.dart';
 
 class MaskWidget extends StatelessWidget {
   const MaskWidget({required this.child});
-  bool get isSdkInitialized => DecibelConfig().initialized;
+  bool get isSdkInitialized => MedalliaDxaConfig().initialized;
 
   final Widget child;
   @override

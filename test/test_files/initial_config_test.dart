@@ -14,8 +14,8 @@ import '../custom_mocks/asset_bundle_mock.dart';
 import '../test.mocks.dart';
 
 void main() {
-  late DecibelConfig decibelSdk;
-  late MockDecibelSdkApi mockApi;
+  late MedalliaDxaConfig medalliaDxaConfig;
+  late MockMedalliaDxaNativeApi mockApi;
   late MockGoalsAndDimensions mockGoalsAndDimensions;
   late MockSessionReplay mockSessionReplay;
   late MockAutoMasking mockAutoMasking;
@@ -32,7 +32,7 @@ void main() {
   setUpAll(() {
     WidgetsFlutterBinding.ensureInitialized();
 
-    mockApi = MockDecibelSdkApi();
+    mockApi = MockMedalliaDxaNativeApi();
     mockGoalsAndDimensions = MockGoalsAndDimensions();
     mockSessionReplay = MockSessionReplay();
     mockAutoMasking = MockAutoMasking();
@@ -40,7 +40,7 @@ void main() {
     mockLoggerSDK = MockLoggerSDK();
     loadYaml = (yaml) => YamlMap.wrap({'version': version});
     assetBundleMock = MockAssetBundle();
-    decibelSdk = DecibelConfig.testing(
+    medalliaDxaConfig = MedalliaDxaConfig.testing(
       mockApi,
       loadYaml,
       mockGoalsAndDimensions,
@@ -57,24 +57,24 @@ void main() {
 
     test('''
 WHEN getSessionId is called 
-AND the decibelSdk.initalize method has not been called
+AND the medalliaDxaConfig.initalize method has not been called
 THEN the method throws an assertion error
     ''', () async {
       expect(
         () async {
-          await decibelSdk.getSessionId();
+          await medalliaDxaConfig.getSessionId();
         },
         throwsAssertionError,
       );
     });
     test('''
 WHEN getWebViewProperties is called 
-AND the decibelSdk.initalize method has not been called
+AND the medalliaDxaConfig.initalize method has not been called
 THEN the method throws an assertion error
     ''', () async {
       expect(
         () async {
-          await decibelSdk.getWebViewProperties();
+          await medalliaDxaConfig.getWebViewProperties();
         },
         throwsAssertionError,
       );
@@ -86,12 +86,12 @@ THEN the method throws an assertion error
       AND consent is all
       AND the version in the pubspec is '1'
       THEN the properties in the sessionMessage should match these
-      AND the the initialize method from DecibelSdkApi should be called with
+      AND the the initialize method from MedalliaDxaNativeApi should be called with
       the sessionMessage
       AND the method start() should be called''',
       () async {
-        final consents = [DecibelCustomerConsentType.all];
-        await decibelSdk.initialize(account, property, consents);
+        final consents = [MedalliaDxaCustomerConsentType.all];
+        await medalliaDxaConfig.initialize(account, property, consents);
 
         //get SessionMessage sent to the Api
         final SessionMessage sessionMessage =
@@ -111,7 +111,7 @@ AND the initialize method has been called before
 THEN the _api method is called
 AND it returns a Future of type nullable string 
     ''', () async {
-      expect(decibelSdk.getSessionId(), isA<Future<String>>());
+      expect(medalliaDxaConfig.getSessionId(), isA<Future<String>>());
       verify(mockApi.getSessionId());
     });
     test('''
@@ -120,7 +120,7 @@ AND the initialize method has been called before
 THEN the _api method is called
 AND it returns a Future of type string 
     ''', () async {
-      expect(decibelSdk.getWebViewProperties(), isA<Future<String?>>());
+      expect(medalliaDxaConfig.getWebViewProperties(), isA<Future<String?>>());
       verify(mockApi.getWebViewProperties());
     });
   });
@@ -129,14 +129,14 @@ AND it returns a Future of type string
     test('''
 WHEN set enable consents is called
 AND the consent parameters list includes .none
-THEN the DecibelSdkApi method setEnableConsents is called
+THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is NOT called
 AND the method stop from sessionReplay is called''', () async {
       final consents = [
-        DecibelCustomerConsentType.all,
-        DecibelCustomerConsentType.none
+        MedalliaDxaCustomerConsentType.all,
+        MedalliaDxaCustomerConsentType.none
       ];
-      await decibelSdk.setEnableConsents(consents);
+      await medalliaDxaConfig.setEnableConsents(consents);
       verifyNever(mockSessionReplay.start());
       verify(mockSessionReplay.stop());
     });
@@ -144,24 +144,24 @@ AND the method stop from sessionReplay is called''', () async {
 WHEN set enable consents is called
 AND the consent parameters list includes .all
 AND it doens't include .none
-THEN the DecibelSdkApi method setEnableConsents is called
+THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is called''', () async {
       final consents = [
-        DecibelCustomerConsentType.all,
-        DecibelCustomerConsentType.tracking
+        MedalliaDxaCustomerConsentType.all,
+        MedalliaDxaCustomerConsentType.tracking
       ];
-      await decibelSdk.setEnableConsents(consents);
+      await medalliaDxaConfig.setEnableConsents(consents);
       verify(mockSessionReplay.start());
     });
     test('''
 WHEN set enable consents is called
 AND the consent parameters list includes .recordAndTracking
-THEN the DecibelSdkApi method setEnableConsents is called
+THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is called''', () async {
       final consents = [
-        DecibelCustomerConsentType.recordingAndTracking,
+        MedalliaDxaCustomerConsentType.recordingAndTracking,
       ];
-      await decibelSdk.setEnableConsents(consents);
+      await medalliaDxaConfig.setEnableConsents(consents);
       verify(mockSessionReplay.start());
     });
   });
@@ -170,33 +170,33 @@ AND the method start from sessionReplay is called''', () async {
 WHEN set disable consents is called
 AND the consent parameters list includes .none
 AND it doens't include .all
-THEN the DecibelSdkApi method setDisableConsents is called
+THEN the MedalliaDxaNativeApi method setDisableConsents is called
 AND the method stop from sessionReplay is not called''', () async {
-      final consents = [DecibelCustomerConsentType.none];
-      await decibelSdk.setDisableConsents(consents);
+      final consents = [MedalliaDxaCustomerConsentType.none];
+      await medalliaDxaConfig.setDisableConsents(consents);
       verifyNever(mockSessionReplay.stop());
     });
     test('''
 WHEN set disable consents is called
 AND the consent parameters list includes .all
-THEN the DecibelSdkApi method setDisableConsents is called
+THEN the MedalliaDxaNativeApi method setDisableConsents is called
 AND the method stop from sessionReplay is called''', () async {
       final consents = [
-        DecibelCustomerConsentType.none,
-        DecibelCustomerConsentType.all
+        MedalliaDxaCustomerConsentType.none,
+        MedalliaDxaCustomerConsentType.all
       ];
-      await decibelSdk.setDisableConsents(consents);
+      await medalliaDxaConfig.setDisableConsents(consents);
       verify(mockSessionReplay.stop());
     });
     test('''
 WHEN set disable consents is called
 AND the consent parameters list includes .recordAndTracking
-THEN the DecibelSdkApi method setEnableConsents is called
+THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method stop from sessionReplay is called''', () async {
       final consents = [
-        DecibelCustomerConsentType.recordingAndTracking,
+        MedalliaDxaCustomerConsentType.recordingAndTracking,
       ];
-      await decibelSdk.setDisableConsents(consents);
+      await medalliaDxaConfig.setDisableConsents(consents);
       verify(mockSessionReplay.stop());
     });
   });
@@ -208,7 +208,8 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String dimensionName = 'dimensionName';
       const String dimensionValue = 'dimensionValue';
-      await decibelSdk.setDimensionWithString(dimensionName, dimensionValue);
+      await medalliaDxaConfig.setDimensionWithString(
+          dimensionName, dimensionValue);
       verify(
         mockGoalsAndDimensions.setDimensionWithString(
           dimensionName,
@@ -222,7 +223,8 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String dimensionName = 'dimensionName';
       const double dimensionValue = 1;
-      await decibelSdk.setDimensionWithNumber(dimensionName, dimensionValue);
+      await medalliaDxaConfig.setDimensionWithNumber(
+          dimensionName, dimensionValue);
       verify(
         mockGoalsAndDimensions.setDimensionWithNumber(
           dimensionName,
@@ -236,7 +238,7 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String dimensionName = 'dimensionName';
       const bool dimensionValue = true;
-      await decibelSdk.setDimensionWithBool(dimensionName,
+      await medalliaDxaConfig.setDimensionWithBool(dimensionName,
           value: dimensionValue);
       verify(
         mockGoalsAndDimensions.setDimensionWithBool(
@@ -251,7 +253,7 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String goalName = 'goalName';
       const double goalValue = 2;
-      await decibelSdk.sendGoal(goalName, goalValue);
+      await medalliaDxaConfig.sendGoal(goalName, goalValue);
       verify(mockGoalsAndDimensions.sendGoal(goalName, goalValue));
     });
   });
@@ -273,7 +275,7 @@ AND has honored every enum passed
         AutoMaskingTypeEnum.all,
         AutoMaskingTypeEnum.none
       };
-      decibelSdk.setAutoMasking(setOfEnums);
+      medalliaDxaConfig.setAutoMasking(setOfEnums);
       verify(
         mockAutoMasking.autoMaskingTypeSet = {
           const AutoMaskingType(
@@ -314,7 +316,7 @@ WHEN enableAllLogs is called
 THEN the loggerSDK all() method is called
 
     ''', () async {
-      decibelSdk.enableAllLogs();
+      medalliaDxaConfig.enableAllLogs();
       verify(mockLoggerSDK.all());
     });
     test('''
@@ -322,7 +324,7 @@ WHEN enableSelectedLogs is called
 THEN the loggerSDK selected() method is called with the appropiate arguments
 
     ''', () async {
-      decibelSdk.enableSelectedLogs(tracking: true, autoMasking: true);
+      medalliaDxaConfig.enableSelectedLogs(tracking: true, autoMasking: true);
       verify(
         mockLoggerSDK.selected(
           enabled: true,
@@ -343,7 +345,7 @@ WHEN sendHttpError is called
 THEN the _api method  is called
 
     ''', () async {
-      decibelSdk.sendDataOverWifiOnly();
+      medalliaDxaConfig.sendDataOverWifiOnly();
       verify(mockApi.sendDataOverWifiOnly());
     });
   });
@@ -354,7 +356,7 @@ THEN the _httpErrors method sendStatusCode is called
 AND has the statusCode passed as an argument
     ''', () async {
       const int statusCode = 500;
-      await decibelSdk.sendHttpError(statusCode);
+      await medalliaDxaConfig.sendHttpError(statusCode);
       verify(mockHttpErrors.sendStatusCode(statusCode));
     });
   });

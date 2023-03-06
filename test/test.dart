@@ -10,7 +10,7 @@ import 'test_files/frame_tracking_test.dart' as frame_tracking_test;
 import 'test_files/initial_config_test.dart' as initial_config_test;
 
 @GenerateNiceMocks([
-  MockSpec<DecibelSdkApi>(),
+  MockSpec<MedalliaDxaNativeApi>(),
   MockSpec<SessionReplay>(),
   MockSpec<GoalsAndDimensions>(),
   MockSpec<AutoMasking>(),

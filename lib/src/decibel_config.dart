@@ -13,23 +13,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' as services;
 import 'package:yaml/yaml.dart' as yaml_parser;
 
-/// DecibelSdk main class
-class DecibelConfig {
-  static final DecibelConfig _singleton = DecibelConfig._internal();
-  factory DecibelConfig() {
+/// MedalliaDxa main class
+class MedalliaDxaConfig {
+  static final MedalliaDxaConfig _singleton = MedalliaDxaConfig._internal();
+  factory MedalliaDxaConfig() {
     return _singleton;
   }
-  DecibelConfig._internal()
-      : _api = DecibelSdkApi(),
+  MedalliaDxaConfig._internal()
+      : _api = MedalliaDxaNativeApi(),
         _loadYaml = yaml_parser.loadYaml,
         _rootBundle = services.rootBundle,
         _loggerSDK = LoggerSDK.instance {
-    _sessionReplay = SessionReplay.instance..decibelConfig = this;
+    _sessionReplay = SessionReplay.instance..medalliaDxaConfig = this;
     _goalsAndDimensions = GoalsAndDimensions(_api);
     _httpErrors = HttpErrors(_api);
   }
   @visibleForTesting
-  DecibelConfig.testing(
+  MedalliaDxaConfig.testing(
     this._api,
     this._loadYaml,
     this._goalsAndDimensions,
@@ -39,7 +39,7 @@ class DecibelConfig {
     this._loggerSDK,
   );
 
-  final DecibelSdkApi _api;
+  final MedalliaDxaNativeApi _api;
   final AssetBundle _rootBundle;
   final dynamic Function(
     String yaml,
@@ -69,11 +69,11 @@ class DecibelConfig {
   bool get trackingAllowed => _trackingAllowed;
   bool initialized = false;
 
-  /// Initializes DecibelSdk
+  /// Initializes MedalliaDxa
   Future<void> initialize(
     int account,
     int property,
-    List<enums.DecibelCustomerConsentType> consents,
+    List<enums.MedalliaDxaCustomerConsentType> consents,
   ) async {
     final String version = await _getVersion();
     _setObservers();
@@ -105,7 +105,7 @@ class DecibelConfig {
 
   /// Enable the Customer Consents list passed as parameter
   Future<void> setEnableConsents(
-    List<enums.DecibelCustomerConsentType> consents,
+    List<enums.MedalliaDxaCustomerConsentType> consents,
   ) async {
     _setEnableConsentsForFlutter(consents);
     await _api.setEnableConsents(
@@ -115,17 +115,17 @@ class DecibelConfig {
 
   /// Disable the Customer Consents list passed as parameter
   Future<void> setDisableConsents(
-    List<enums.DecibelCustomerConsentType> consents,
+    List<enums.MedalliaDxaCustomerConsentType> consents,
   ) async {
-    if (consents.contains(enums.DecibelCustomerConsentType.all)) {
+    if (consents.contains(enums.MedalliaDxaCustomerConsentType.all)) {
       setRecordingAllowed(false);
       _trackingAllowed = false;
     } else {
-      if (consents.contains(enums.DecibelCustomerConsentType.tracking)) {
+      if (consents.contains(enums.MedalliaDxaCustomerConsentType.tracking)) {
         _trackingAllowed = false;
       }
-      if (consents
-          .contains(enums.DecibelCustomerConsentType.recordingAndTracking)) {
+      if (consents.contains(
+          enums.MedalliaDxaCustomerConsentType.recordingAndTracking)) {
         setRecordingAllowed(false);
         _trackingAllowed = false;
       }
@@ -250,21 +250,21 @@ class DecibelConfig {
   }
 
   void _setEnableConsentsForFlutter(
-    List<enums.DecibelCustomerConsentType> consents,
+    List<enums.MedalliaDxaCustomerConsentType> consents,
   ) {
-    if (consents.contains(enums.DecibelCustomerConsentType.none)) {
+    if (consents.contains(enums.MedalliaDxaCustomerConsentType.none)) {
       _trackingAllowed = false;
       setRecordingAllowed(false);
       return;
     }
-    if (consents
-            .contains(enums.DecibelCustomerConsentType.recordingAndTracking) ||
-        consents.contains(enums.DecibelCustomerConsentType.all)) {
+    if (consents.contains(
+            enums.MedalliaDxaCustomerConsentType.recordingAndTracking) ||
+        consents.contains(enums.MedalliaDxaCustomerConsentType.all)) {
       setRecordingAllowed(true);
       _trackingAllowed = true;
       return;
     }
-    if (consents.contains(enums.DecibelCustomerConsentType.tracking)) {
+    if (consents.contains(enums.MedalliaDxaCustomerConsentType.tracking)) {
       setRecordingAllowed(false);
       _trackingAllowed = true;
     }
