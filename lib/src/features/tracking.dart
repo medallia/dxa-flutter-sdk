@@ -14,14 +14,14 @@ import 'package:logger/logger.dart';
 class Tracking with TrackingCompleter {
   Tracking._internal()
       : _logger = LoggerSDK.instance,
-        decibelConfig = DecibelConfig();
+        medalliaDxaConfig = MedalliaDxaConfig();
   static final _instance = Tracking._internal();
   static Tracking get instance => _instance;
 
-  final DecibelConfig decibelConfig;
+  final MedalliaDxaConfig medalliaDxaConfig;
   final LoggerSDK _logger;
   Logger get logger => _logger.trackingLogger;
-  final DecibelSdkApi _apiInstance = DecibelSdkApi();
+  final MedalliaDxaNativeApi _apiInstance = MedalliaDxaNativeApi();
   final List<ScreenVisited> _visitedScreensList = [];
   final StreamController<ScreenVisited> newScreenSentToNativeStreamController =
       StreamController.broadcast();
@@ -113,7 +113,7 @@ class Tracking with TrackingCompleter {
     ScreenVisited screenVisited, {
     bool isBackground = false,
   }) async {
-    if (!decibelConfig.trackingAllowed) return;
+    if (!medalliaDxaConfig.trackingAllowed) return;
     late bool backgroundFlag;
     //When returning from background there's the possibility that the screen
     //which went to background isn't the same as the one at the top of the
@@ -152,7 +152,7 @@ class Tracking with TrackingCompleter {
     bool isTabBar = false,
     bool isBackground = false,
   }) async {
-    if (!decibelConfig.trackingAllowed) return;
+    if (!medalliaDxaConfig.trackingAllowed) return;
     late ScreenVisited screenVisited;
     late ScreenVisited? potentialScreenVisited;
     if (isTabBar) {

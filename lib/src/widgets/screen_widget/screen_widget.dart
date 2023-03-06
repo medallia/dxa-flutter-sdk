@@ -77,7 +77,7 @@ class ScreenWidget extends StatelessWidget {
   static _ScreenWidgetManualTabBar? of(BuildContext context) =>
       _ScreenWidgetManualTabBar.of(context);
 
-  bool get isSdkInitialized => DecibelConfig().initialized;
+  bool get isSdkInitialized => MedalliaDxaConfig().initialized;
   @override
   Widget build(BuildContext context) {
     if (!isSdkInitialized) {

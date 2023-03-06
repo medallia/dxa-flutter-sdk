@@ -105,7 +105,7 @@ class GoalMessage {
 }
 
 @HostApi()
-abstract class DecibelSdkApi {
+abstract class MedalliaDxaNativeApi {
   void initialize(SessionMessage msg);
   void startScreen(StartScreenMessage msg);
   void endScreen(EndScreenMessage msg);

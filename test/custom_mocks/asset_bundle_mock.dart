@@ -28,7 +28,7 @@ class MockAssetBundle implements AssetBundle {
     // TODO: implement loadString
     return Future.value("""
 name: decibel_sdk
-description: Decibel SDK flutter binding
+description: MedalliaDxa SDK flutter binding
 version: 1.1.0
 homepage: 'https://decibel-documentation.gitbook.io/decibelsdk/flutter/getstarted'
 

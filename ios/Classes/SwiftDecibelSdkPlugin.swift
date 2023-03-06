@@ -2,12 +2,12 @@ import Flutter
 import UIKit
 import DecibelCoreFlutter
 
-public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTDecibelSdkApi {
+public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativeApi {
         
     public static func register(with registrar: FlutterPluginRegistrar) {
         let messenger : FlutterBinaryMessenger = registrar.messenger()
-        let api : FLTDecibelSdkApi & NSObjectProtocol = SwiftDecibelSdkPlugin.init()
-        FLTDecibelSdkApiSetup(messenger, api);
+        let api : FLTMedalliaDxaNativeApi & NSObjectProtocol = SwiftDecibelSdkPlugin.init()
+        FLTMedalliaDxaNativeApiSetup(messenger, api);
       }
 
     public func initializeMsg(_ msg: FLTSessionMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {

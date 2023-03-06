@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class GoalsAndDimensions with TrackingCompleter {
   GoalsAndDimensions(this._api);
 
-  final DecibelSdkApi _api;
+  final MedalliaDxaNativeApi _api;
 
   ///Set custom dimension with string
   Future<void> setDimensionWithString(
@@ -19,8 +19,7 @@ class GoalsAndDimensions with TrackingCompleter {
       await waitForNewScreenIfThereNoneActive();
 
       final dimension =
-          DimensionStringMessage(dimensionName: dimensionName, value: value)
-            ..dimensionName = 'a';
+          DimensionStringMessage(dimensionName: dimensionName, value: value);
 
       await _api.sendDimensionWithString(dimension);
     });
