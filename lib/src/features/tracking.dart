@@ -1,25 +1,22 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
+import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 class Tracking with TrackingCompleter {
-  Tracking._internal()
-      : _logger = LoggerSDK.instance,
-        medalliaDxaConfig = MedalliaDxaConfig();
-  static final _instance = Tracking._internal();
-  static Tracking get instance => _instance;
+  Tracking(this.medalliaDxaConfig, this._logger, this._sessionReplay);
 
   final MedalliaDxaConfig medalliaDxaConfig;
   final LoggerSDK _logger;
+  final SessionReplay _sessionReplay;
   Logger get logger => _logger.trackingLogger;
   final MedalliaDxaNativeApi _apiInstance = MedalliaDxaNativeApi();
   final List<ScreenVisited> _visitedScreensList = [];
@@ -137,14 +134,16 @@ class Tracking with TrackingCompleter {
     logger.d(
       ' 🔵 Start Screen - name: ${screenVisited.name} - id: ${screenVisited.uniqueId}',
     );
-    await _apiInstance.startScreen(StartScreenMessage(
-      screenName: screenVisited.name,
-      screenId: screenVisited.uniqueId,
-      startTime: screenVisited.timestamp,
-      isBackground: backgroundFlag,
-    ));
+    await _apiInstance.startScreen(
+      StartScreenMessage(
+        screenName: screenVisited.name,
+        screenId: screenVisited.uniqueId,
+        startTime: screenVisited.timestamp,
+        isBackground: backgroundFlag,
+      ),
+    );
     newScreenSentToNativeStreamController.add(screenVisited);
-    await SessionReplay.instance.newScreen();
+    await _sessionReplay.newScreen();
   }
 
   Future<void> endScreen(
@@ -168,7 +167,7 @@ class Tracking with TrackingCompleter {
     //check to see if this screen has already been closed before
     //If not, we can start with the logic related to ending the screen
     if (potentialScreenVisited == null) return;
-    SessionReplay.instance.clearMasks();
+    _sessionReplay.clearMasks();
     final Completer endScreenToComplete = Completer();
     endScreenCompleter = endScreenToComplete;
     screenVisited = potentialScreenVisited;
@@ -187,14 +186,14 @@ class Tracking with TrackingCompleter {
       isBackground: isBackground,
     );
 
-    await SessionReplay.instance.closeScreenVideo(screenVisitedFinished);
+    await _sessionReplay.closeScreenVideo(screenVisitedFinished);
 
     await waitForEndScreenTasksCompleter();
     logger.d(
       ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId}',
     );
-    endScreenToComplete.complete();
     await _apiInstance.endScreen(endScreenMessage);
+    endScreenToComplete.complete();
   }
 
   Future<void> wentToBackground() async {
@@ -205,8 +204,10 @@ class Tracking with TrackingCompleter {
     //No unfinished screens, so there's no possibility of ending any screen
     if (visitedUnfinishedScreen == null) return;
     screenVisitedWhenAppWentToBackground = visitedUnfinishedScreen;
-    await endScreen(screenVisitedWhenAppWentToBackground!.id,
-        isBackground: true);
+    await endScreen(
+      screenVisitedWhenAppWentToBackground!.id,
+      isBackground: true,
+    );
   }
 
   Future<void> returnFromBackground() async {
@@ -251,7 +252,7 @@ class Tracking with TrackingCompleter {
     //Temporary patch for issue https://github.com/flutter/flutter/issues/113020
     //Jira ticket DCBLMOB-1725
     if (!tabController.indexIsChanging) {
-      await Future.delayed(Duration(milliseconds: 200));
+      await Future.delayed(const Duration(milliseconds: 200));
       if (tabController.indexIsChanging) {
         //needed because of multiple calls to this will mess up the number of
         //pages transitioning count
@@ -274,8 +275,7 @@ class Tracking with TrackingCompleter {
       final bool isTabBarAndUnfinished =
           visitedUnfinishedScreen?.isTabBarWithId(screenId) ?? false;
       if (isTabBarAndUnfinished) {
-        await Tracking.instance
-            .endScreen(visitedUnfinishedScreen!.id, isTabBar: true);
+        await endScreen(visitedUnfinishedScreen!.id, isTabBar: true);
       }
 
       final ScreenVisited screenVisited = createScreenVisited(
@@ -305,8 +305,7 @@ class Tracking with TrackingCompleter {
     final bool isTabBarAndUnfinished =
         visitedUnfinishedScreen?.isTabBarWithId(screenId) ?? false;
     if (isTabBarAndUnfinished) {
-      await Tracking.instance
-          .endScreen(visitedUnfinishedScreen!.id, isTabBar: true);
+      await endScreen(visitedUnfinishedScreen!.id, isTabBar: true);
     }
     final ScreenVisited screenVisited = createScreenVisited(
       id: screenId,
@@ -340,6 +339,10 @@ class ScreenVisited {
   BuildContext? get getCurrentContext {
     if (!isDialog) return captureKey.currentContext;
     return dialogContext!;
+  }
+
+  bool get widgetInTheTree {
+    return getCurrentContext != null;
   }
 
   final bool finished;
@@ -464,7 +467,9 @@ class ScreenVisited {
   }
 
   ScreenVisited getAutomaticPopupScreenVisited(
-      String routeId, BuildContext dialogContext) {
+    String routeId,
+    BuildContext dialogContext,
+  ) {
     final int timestamp = DateTime.now().millisecondsSinceEpoch;
     return ScreenVisited.automaticPopup(
       id: routeId,
@@ -548,28 +553,30 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required List<GlobalKey<State<StatefulWidget>>> listOfMasks,
     required bool enableAutomaticMasking,
   }) : super.tabBarChild(
-            id: id,
-            name: name,
-            timestamp: timestamp,
-            captureKey: captureKey,
-            enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-            listOfMasks: listOfMasks,
-            enableAutomaticMasking: enableAutomaticMasking);
+          id: id,
+          name: name,
+          timestamp: timestamp,
+          captureKey: captureKey,
+          enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+          listOfMasks: listOfMasks,
+          enableAutomaticMasking: enableAutomaticMasking,
+        );
 
   @override
   ScreenVisited getScreenVisitedWithNewStartTimeStamp(int startTimeStamp) {
     return ScreenVisitedTabBar.internal(
-        id: id,
-        name: name,
-        timestamp: startTimeStamp,
-        captureKey: captureKey,
-        tabBarScreens: tabBarScreens,
-        tabIndex: tabIndex,
-        tabBarId: tabBarId,
-        tabBarname: tabBarname,
-        listOfMasks: listOfMasks,
-        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-        enableAutomaticMasking: enableAutomaticMasking);
+      id: id,
+      name: name,
+      timestamp: startTimeStamp,
+      captureKey: captureKey,
+      tabBarScreens: tabBarScreens,
+      tabIndex: tabIndex,
+      tabBarId: tabBarId,
+      tabBarname: tabBarname,
+      listOfMasks: listOfMasks,
+      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+      enableAutomaticMasking: enableAutomaticMasking,
+    );
   }
 
   @override

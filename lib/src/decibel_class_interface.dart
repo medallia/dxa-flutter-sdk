@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_positional_boolean_parameters
+
 import 'package:decibel_sdk/decibel_sdk.dart';
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
