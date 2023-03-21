@@ -1,21 +1,40 @@
 package com.decibel.decibel_sdk
 
+import android.app.Activity
 import com.decibel.common.enums.CustomerConsentType
 import com.decibel.builder.prod.Decibel
 import com.decibel.common.enums.PlatformType
+import com.decibel.common.internal.logic.providers.ActivityProvider
+import com.decibel.common.internal.logic.providers.ActivityResumedListener
 import com.decibel.common.internal.models.Customer
 import com.decibel.common.internal.models.Multiplatform
+import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import java.lang.ref.WeakReference
 
 /** DecibelSdkPlugin */
 class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
+    private var latestFlutterActivity: WeakReference<Activity> = WeakReference(null)
+
+    private val onFlutterActivityResumedListener = object : ActivityResumedListener {
+        override fun onActivityResumed(activity: Activity) {
+            if (activity is FlutterActivity || activity is FlutterFragmentActivity) {
+                latestFlutterActivity = WeakReference(activity)
+            }
+        }
+    }
+
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         Messages.MedalliaDxaNativeApi.setup(flutterPluginBinding.binaryMessenger, this)
+        ActivityProvider.addListen(onFlutterActivityResumedListener)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         Messages.MedalliaDxaNativeApi.setup(binding.binaryMessenger, null)
+        ActivityProvider.removeListener(onFlutterActivityResumedListener)
+        latestFlutterActivity.clear()
     }
 
     override fun initialize(arg: Messages.SessionMessage) {
@@ -30,15 +49,13 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
     }
 
     override fun startScreen(msg: Messages.StartScreenMessage) {
-        msg.let {
-            Decibel.sdk.startScreen(it.screenId, it.screenName, it.startTime)
-        }
+        val currentActivity = latestFlutterActivity.get() ?: ActivityProvider.currentActivity ?: return
+        Decibel.sdk.startScreen(msg.screenId, msg.screenName, msg.startTime, currentActivity)
     }
 
     override fun endScreen(msg: Messages.EndScreenMessage) {
-        msg.let {
-            Decibel.sdk.endScreen(it.screenId, it.screenName, it.endTime)
-        }
+        val currentActivity = latestFlutterActivity.get() ?: ActivityProvider.currentActivity ?: return
+        Decibel.sdk.endScreen(msg.screenId, msg.screenName, msg.endTime, currentActivity)
     }
 
     override fun setEnableConsents(arg: Messages.ConsentsMessage) {
@@ -81,8 +98,10 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
     }
 
     override fun sendGoal(msg: Messages.GoalMessage) {
-        msg.let {
-            Decibel.sdk.sendGoal(msg.goal, msg.value)
+        if(msg.value == null) {
+            Decibel.sdk.sendGoal(msg.goal)
+        } else {
+            Decibel.sdk.sendGoal(msg.goal, msg.value!!)
         }
     }
 

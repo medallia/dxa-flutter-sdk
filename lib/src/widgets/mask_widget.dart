@@ -2,7 +2,7 @@ part of 'screen_widget/screen_widget.dart';
 
 class MaskWidget extends StatelessWidget {
   const MaskWidget({required this.child});
-  bool get isSdkInitialized => MedalliaDxaConfig().initialized;
+  bool get isSdkInitialized => DependencyInjector.instance.config.initialized;
 
   final Widget child;
   @override
@@ -22,11 +22,11 @@ class _ActiveMaskWidget extends StatefulWidget {
 class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   late GlobalKey globalKey;
   late List<GlobalKey> listOfMasks;
-  final Logger logger = LoggerSDK.instance.maskWidgetLogger;
+  late final Logger logger =
+      DependencyInjector.instance.loggerSdk.maskWidgetLogger;
   @override
   void initState() {
-    logger.d(
-        'initState - child runtimeType: ${widget.child.runtimeType.toString()}');
+    logger.d('initState - child runtimeType: ${widget.child.runtimeType}');
 
     globalKey = GlobalKey();
 
@@ -40,7 +40,7 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
     listOfMasks = _MaskList.of(context)!.listOfMasks;
     CustomRouteObserver.screenWidgetRouteObserver
         .subscribe(this, ModalRoute.of(context)!);
-    logger.d('didChangeDependencies - listsOfMasks ${listOfMasks.toString()}');
+    logger.d('didChangeDependencies - listsOfMasks $listOfMasks');
   }
 
   @override
@@ -83,7 +83,7 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   }
 
   void addMask(GlobalKey globalKey) {
-    logger.d('addMask ${globalKey.toString()}');
+    logger.d('addMask $globalKey');
 
     // if (listOfMasks == null)
     //   throw (StateError("MaskWidget must have an ancestor ScreenWidget"));
@@ -97,7 +97,7 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   }
 
   void removeMask(GlobalKey globalKey) {
-    logger.d('removeMask ${globalKey.toString()}');
+    logger.d('removeMask $globalKey');
 
     //   final List<GlobalKey>? listOfMasks = _MaskList.of(context)?.listOfMasks;
     //   if (listOfMasks == null) return;

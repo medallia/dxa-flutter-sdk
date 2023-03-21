@@ -1,7 +1,6 @@
-import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -21,12 +20,16 @@ class ScreenWidget extends StatelessWidget {
   })  : isPopup = false,
         builder = null,
         initialIndex = null,
-        assert(tabController != null ? tabNames != null : tabNames == null,
-            'You either have to provide both tab related arguments, or none'),
+        assert(
+          tabController != null ? tabNames != null : tabNames == null,
+          'You either have to provide both tab related arguments, or none',
+        ),
         assert(tabNames == null || tabNames.length > 0),
-        assert(tabController != null
-            ? tabController.length == tabNames?.length
-            : true);
+        assert(
+          tabController != null
+              ? tabController.length == tabNames?.length
+              : true,
+        );
 
   const ScreenWidget.popup({
     required this.child,
@@ -77,7 +80,8 @@ class ScreenWidget extends StatelessWidget {
   static _ScreenWidgetManualTabBar? of(BuildContext context) =>
       _ScreenWidgetManualTabBar.of(context);
 
-  bool get isSdkInitialized => MedalliaDxaConfig().initialized;
+  bool get isSdkInitialized => DependencyInjector.instance.config.initialized;
+
   @override
   Widget build(BuildContext context) {
     if (!isSdkInitialized) {
@@ -146,7 +150,9 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     with WidgetsBindingObserver, RouteAware {
   final GlobalKey _globalKey = GlobalKey();
   final List<GlobalKey> listOfMasks = [];
-  final Logger logger = LoggerSDK.instance.screenWidgetLogger;
+  late final Logger logger =
+      DependencyInjector.instance.loggerSdk.screenWidgetLogger;
+  late final Tracking tracking = DependencyInjector.instance.tracking;
   int get screenId => _globalKey.hashCode;
   bool get isTabBar => widget.tabNames != null && widget.tabController != null;
   ModalRoute<Object?>? route;
@@ -156,7 +162,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     logger.d('New Screen Handler index: $index');
     currentIndex = index;
     if (route?.isCurrent ?? false) {
-      await Tracking.instance.manualTabBarIndexHandler(
+      await tracking.manualTabBarIndexHandler(
         screenId: screenId.toString(),
         name: widget.screenName,
         listOfMasks: listOfMasks,
@@ -186,7 +192,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   // Defining an internal function to be able to remove the listener
   Future<void> _tabControllerListener() async {
-    await Tracking.instance.tabControllerListener(
+    await tracking.tabControllerListener(
       screenId: screenId.toString(),
       name: widget.screenName,
       listOfMasks: listOfMasks,
@@ -212,7 +218,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     logger.d('initState');
 
     super.initState();
-    Tracking.instance.physicalSize =
+    tracking.physicalSize =
         WidgetsBindingNullSafe.instance!.window.physicalSize;
     WidgetsBindingNullSafe.instance!
       ..addObserver(this)
@@ -249,19 +255,19 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    logger.d('didChangeAppLifecycleState ${state.toString()}');
+    logger.d('didChangeAppLifecycleState $state');
 
     super.didChangeAppLifecycleState(state);
 
     switch (state) {
       case AppLifecycleState.resumed:
-        Tracking.instance.returnFromBackground();
+        tracking.returnFromBackground();
         break;
 
       default:
         if (state == AppLifecycleState.paused ||
             state == AppLifecycleState.inactive) {
-          Tracking.instance.wentToBackground();
+          tracking.wentToBackground();
         }
     }
   }
@@ -270,7 +276,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
   void didChangeMetrics() {
     logger.d('didChangeMetrics');
 
-    Tracking.instance.physicalSize =
+    tracking.physicalSize =
         WidgetsBindingNullSafe.instance!.window.physicalSize;
     super.didChangeMetrics();
   }
@@ -318,10 +324,10 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   Future<void> callWhenIsNotCurrentRoute() async {
     logger.d(
-      'callWhenIsNotCurrentRoute - screenId: ${screenId.toString()} - isTabBar: $isTabBar',
+      'callWhenIsNotCurrentRoute - screenId: $screenId - isTabBar: $isTabBar',
     );
 
-    await Tracking.instance.endScreen(screenId.toString(), isTabBar: isTabBar);
+    await tracking.endScreen(screenId.toString(), isTabBar: isTabBar);
   }
 
   Future<void> callWhenIsCurrentRoute() async {
@@ -331,20 +337,22 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     } else {
       tabIndex = currentIndex;
     }
-    final ScreenVisited screenVisited = Tracking.instance.createScreenVisited(
-        id: screenId.toString(),
-        name: widget.screenName,
-        listOfMasks: listOfMasks,
-        captureKey: _globalKey,
-        tabBarNames: widget.tabNames,
-        tabBarIndex: tabIndex,
-        enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
-        enableAutomaticMasking: widget.enableAutomaticMasking);
+    final ScreenVisited screenVisited = tracking.createScreenVisited(
+      id: screenId.toString(),
+      name: widget.screenName,
+      listOfMasks: listOfMasks,
+      captureKey: _globalKey,
+      tabBarNames: widget.tabNames,
+      tabBarIndex: tabIndex,
+      enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
+      enableAutomaticMasking: widget.enableAutomaticMasking,
+    );
 
     logger.d(
-        'callWhenIsCurrentRoute - screenVisited ${screenVisited.toString()}');
+      'callWhenIsCurrentRoute - screenVisited $screenVisited',
+    );
 
-    await Tracking.instance.startScreen(
+    await tracking.startScreen(
       screenVisited,
     );
   }

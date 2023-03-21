@@ -21,6 +21,9 @@ void main() {
   late MockAutoMasking mockAutoMasking;
   late MockHttpErrors mockHttpErrors;
   late MockLoggerSDK mockLoggerSDK;
+  late MockFrameTracking mockFrameTracking;
+  late MockPlaceholderImageConfig mockPlaceholderImageConfig;
+  late MockTracking mockTracking;
   late dynamic Function(
     String yaml,
   ) loadYaml;
@@ -40,6 +43,10 @@ void main() {
     mockLoggerSDK = MockLoggerSDK();
     loadYaml = (yaml) => YamlMap.wrap({'version': version});
     assetBundleMock = MockAssetBundle();
+    mockFrameTracking = MockFrameTracking();
+    mockPlaceholderImageConfig = MockPlaceholderImageConfig();
+    mockTracking = MockTracking();
+
     medalliaDxaConfig = MedalliaDxaConfig.testing(
       mockApi,
       loadYaml,
@@ -48,6 +55,10 @@ void main() {
       mockSessionReplay,
       mockHttpErrors,
       mockLoggerSDK,
+      mockAutoMasking,
+      mockFrameTracking,
+      mockPlaceholderImageConfig,
+      mockTracking,
     );
     when(mockSessionReplay.autoMasking).thenReturn(mockAutoMasking);
   });
@@ -102,7 +113,7 @@ THEN the method throws an assertion error
         expect(sessionMessage.property, 0);
         expect(sessionMessage.version, '1');
         expect(sessionMessage.consents, consents.toIndexList());
-        verify(mockSessionReplay.start());
+        verify(mockSessionReplay.startPeriodicTimer());
       },
     );
     test('''
@@ -137,8 +148,8 @@ AND the method stop from sessionReplay is called''', () async {
         MedalliaDxaCustomerConsentType.none
       ];
       await medalliaDxaConfig.setEnableConsents(consents);
-      verifyNever(mockSessionReplay.start());
-      verify(mockSessionReplay.stop());
+      verifyNever(mockSessionReplay.startPeriodicTimer());
+      verify(mockSessionReplay.stopPeriodicTimer());
     });
     test('''
 WHEN set enable consents is called
@@ -151,7 +162,7 @@ AND the method start from sessionReplay is called''', () async {
         MedalliaDxaCustomerConsentType.tracking
       ];
       await medalliaDxaConfig.setEnableConsents(consents);
-      verify(mockSessionReplay.start());
+      verify(mockSessionReplay.startPeriodicTimer());
     });
     test('''
 WHEN set enable consents is called
@@ -162,7 +173,7 @@ AND the method start from sessionReplay is called''', () async {
         MedalliaDxaCustomerConsentType.recordingAndTracking,
       ];
       await medalliaDxaConfig.setEnableConsents(consents);
-      verify(mockSessionReplay.start());
+      verify(mockSessionReplay.startPeriodicTimer());
     });
   });
   group('disable consents', () {
@@ -174,7 +185,7 @@ THEN the MedalliaDxaNativeApi method setDisableConsents is called
 AND the method stop from sessionReplay is not called''', () async {
       final consents = [MedalliaDxaCustomerConsentType.none];
       await medalliaDxaConfig.setDisableConsents(consents);
-      verifyNever(mockSessionReplay.stop());
+      verifyNever(mockSessionReplay.stopPeriodicTimer());
     });
     test('''
 WHEN set disable consents is called
@@ -186,7 +197,7 @@ AND the method stop from sessionReplay is called''', () async {
         MedalliaDxaCustomerConsentType.all
       ];
       await medalliaDxaConfig.setDisableConsents(consents);
-      verify(mockSessionReplay.stop());
+      verify(mockSessionReplay.stopPeriodicTimer());
     });
     test('''
 WHEN set disable consents is called
@@ -197,7 +208,7 @@ AND the method stop from sessionReplay is called''', () async {
         MedalliaDxaCustomerConsentType.recordingAndTracking,
       ];
       await medalliaDxaConfig.setDisableConsents(consents);
-      verify(mockSessionReplay.stop());
+      verify(mockSessionReplay.stopPeriodicTimer());
     });
   });
 
