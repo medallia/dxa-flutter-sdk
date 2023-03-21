@@ -16,7 +16,6 @@ class ScreenWidget extends StatelessWidget {
     this.tabController,
     this.tabNames,
     this.recordingAllowed = true,
-    this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -38,7 +37,6 @@ class ScreenWidget extends StatelessWidget {
     required this.child,
     required this.screenName,
     this.recordingAllowed = true,
-    this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -54,7 +52,6 @@ class ScreenWidget extends StatelessWidget {
     required this.tabNames,
     required this.tabController,
     this.recordingAllowed = true,
-    this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -68,7 +65,6 @@ class ScreenWidget extends StatelessWidget {
     required this.tabNames,
     required this.initialIndex,
     this.recordingAllowed = true,
-    this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -80,7 +76,6 @@ class ScreenWidget extends StatelessWidget {
   final ScreenWidgetBuilder? builder;
   final String screenName;
   final bool recordingAllowed;
-  final bool trackingAllowed;
   final TabController? tabController;
   final List<String>? tabNames;
   final int? initialIndex;
@@ -120,7 +115,6 @@ class ScreenWidget extends StatelessWidget {
         tabController: tabController,
         tabNames: tabNames,
         recordingAllowed: recordingAllowed,
-        trackingAllowed: trackingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticPopupTracking: enableAutomaticPopupTracking,
         enableAutomaticMasking: enableAutomaticMasking,
@@ -145,7 +139,6 @@ class _ActiveScreenWidget extends StatefulWidget {
     required this.builder,
     required this.screenName,
     required this.recordingAllowed,
-    required this.trackingAllowed,
     required this.enableAutomaticPopupRecording,
     required this.enableAutomaticPopupTracking,
     required this.enableAutomaticMasking,
@@ -161,7 +154,6 @@ class _ActiveScreenWidget extends StatefulWidget {
   final TabController? tabController;
   final List<String>? tabNames;
   final bool recordingAllowed;
-  final bool trackingAllowed;
   final bool enableAutomaticPopupRecording;
   final bool enableAutomaticPopupTracking;
   final bool enableAutomaticMasking;
@@ -196,7 +188,6 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
         manualIndex: index,
         tabNames: widget.tabNames!,
         recordingAllowed: widget.recordingAllowed,
-        trackingAllowed: widget.trackingAllowed,
         enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
         enableAutomaticPopupTracking: widget.enableAutomaticPopupTracking,
         enableAutomaticMasking: widget.enableAutomaticMasking,
@@ -229,7 +220,6 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       tabController: widget.tabController!,
       tabNames: widget.tabNames!,
       recordingAllowed: widget.recordingAllowed,
-      trackingAllowed: widget.trackingAllowed,
       enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
       enableAutomaticPopupTracking: widget.enableAutomaticPopupTracking,
       enableAutomaticMasking: widget.enableAutomaticMasking,
@@ -377,7 +367,6 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       tabBarNames: widget.tabNames,
       tabBarIndex: tabIndex,
       recordingAllowed: widget.recordingAllowed,
-      trackingAllowed: widget.trackingAllowed,
       enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
       enableAutomaticPopupTracking: widget.enableAutomaticPopupTracking,
       enableAutomaticMasking: widget.enableAutomaticMasking,
