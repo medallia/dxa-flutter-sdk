@@ -15,6 +15,7 @@ class ScreenWidget extends StatelessWidget {
     required this.screenName,
     this.tabController,
     this.tabNames,
+    this.recordingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = false,
@@ -34,6 +35,7 @@ class ScreenWidget extends StatelessWidget {
   const ScreenWidget.popup({
     required this.child,
     required this.screenName,
+    this.recordingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = true,
@@ -47,6 +49,7 @@ class ScreenWidget extends StatelessWidget {
     required this.screenName,
     required this.tabNames,
     required this.tabController,
+    this.recordingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = false,
@@ -58,6 +61,7 @@ class ScreenWidget extends StatelessWidget {
     required this.screenName,
     required this.tabNames,
     required this.initialIndex,
+    this.recordingAllowed = true,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = false,
@@ -67,6 +71,7 @@ class ScreenWidget extends StatelessWidget {
   final Widget? child;
   final ScreenWidgetBuilder? builder;
   final String screenName;
+  final bool recordingAllowed;
   final TabController? tabController;
   final List<String>? tabNames;
   final int? initialIndex;
@@ -102,6 +107,7 @@ class ScreenWidget extends StatelessWidget {
         screenName: screenName,
         tabController: tabController,
         tabNames: tabNames,
+        recordingAllowed: recordingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticMasking: enableAutomaticMasking,
         isPopup: isPopup,
@@ -124,6 +130,7 @@ class _ActiveScreenWidget extends StatefulWidget {
     required this.child,
     required this.builder,
     required this.screenName,
+    required this.recordingAllowed,
     required this.enableAutomaticPopupRecording,
     required this.enableAutomaticMasking,
     required this.isPopup,
@@ -137,6 +144,7 @@ class _ActiveScreenWidget extends StatefulWidget {
   final String screenName;
   final TabController? tabController;
   final List<String>? tabNames;
+  final bool recordingAllowed;
   final bool enableAutomaticPopupRecording;
   final bool enableAutomaticMasking;
   final bool isPopup;
@@ -169,6 +177,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
         captureKey: _globalKey,
         manualIndex: index,
         tabNames: widget.tabNames!,
+        recordingAllowed: widget.recordingAllowed,
         enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
         enableAutomaticMasking: widget.enableAutomaticMasking,
       );
@@ -199,6 +208,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       captureKey: _globalKey,
       tabController: widget.tabController!,
       tabNames: widget.tabNames!,
+      recordingAllowed: widget.recordingAllowed,
       enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
       enableAutomaticMasking: widget.enableAutomaticMasking,
     );
@@ -344,6 +354,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       captureKey: _globalKey,
       tabBarNames: widget.tabNames,
       tabBarIndex: tabIndex,
+      recordingAllowed: widget.recordingAllowed,
       enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
       enableAutomaticMasking: widget.enableAutomaticMasking,
     );
