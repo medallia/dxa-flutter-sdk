@@ -1,49 +1,50 @@
 import 'dart:async';
 
 import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:flutter/material.dart';
 
 class TrackingCompleter {
+  late final Tracking tracking = DependencyInjector.instance.tracking;
+
   ///Wrapper for tasks that need completion before sending the endScreen to
   ///native
-  Future<void> endScreenTasksCompleterWrapper(
-      Future<void> Function() function) async {
+  Future<T> endScreenTasksCompleterWrapper<T>(
+    Future<T> Function() function,
+  ) async {
     final Completer completer = Completer();
-    Tracking.instance.tasksBeforeEndScreenCompleterList.add(completer);
-    await function.call();
+    tracking.tasksBeforeEndScreenCompleterList.add(completer);
+    final T returnValue = await function.call();
     completer.complete();
+    return returnValue;
   }
 
   ///Waits until every task is completed.
   Future<void> waitForEndScreenTasksCompleter() async {
     await Future.wait(
-      Tracking.instance.tasksBeforeEndScreenCompleterList.map((e) {
+      tracking.tasksBeforeEndScreenCompleterList.map((e) {
         return e.future;
       }),
     );
 
-    Tracking.instance.tasksBeforeEndScreenCompleterList.clear();
+    tracking.tasksBeforeEndScreenCompleterList.clear();
   }
 
   FutureOr<void> waitForNewScreenIfThereNoneActive() async {
-    if (Tracking.instance.visitedUnfinishedScreen == null) {
+    if (tracking.visitedUnfinishedScreen == null) {
       //Edge case: called before the first screen has started
       //(unfinishedScreens is empty and no endScreen has ever been called).
-      if (Tracking.instance.endScreenCompleter == null) {
-        await Tracking.instance.newScreenSentToNativeStreamController.stream
+      if (tracking.endScreenCompleter == null) {
+        await tracking.newScreenSentToNativeStreamController.stream
             .asBroadcastStream()
             .first;
         return;
       }
-      //It's possible that no screen is active and endScreen has still not being
-      //sent to native (isCompleted would be false). So if this is the case,
-      //we don't want to wait until next screen
-      if (Tracking.instance.endScreenCompleter!.isCompleted) {
-        await Tracking.instance.newScreenSentToNativeStreamController.stream
-            .asBroadcastStream()
-            .first;
-        return;
-      }
+
+      await tracking.newScreenSentToNativeStreamController.stream
+          .asBroadcastStream()
+          .first;
+      return;
     } else {
       return;
     }

@@ -1,11 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/utility/dependency_injector.dart';
+import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-
-import 'package:decibel_sdk/src/features/session_replay.dart';
-import 'package:decibel_sdk/src/features/tracking.dart';
-import 'package:decibel_sdk/src/utility/extensions.dart';
 
 class CustomRouteObserver {
   static final RouteObserver<ModalRoute<void>> screenWidgetRouteObserver =
@@ -18,6 +17,8 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   MyRouteObserver(
     this._logger,
   );
+  late final Tracking tracking = DependencyInjector.instance.tracking;
+
   final LoggerSDK _logger;
   Logger get logger => _logger.routeObserverLogger;
 
@@ -48,17 +49,15 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
                 if (previousElement.containsScreenWidget()) {
                   logger.d('previousElement containsScreenWidget');
 
-                  // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
                   final BuildContext dialogContext = route.subtreeContext!;
-                  final ScreenVisited screenVisited = Tracking
-                      .instance.visitedScreensList.last
+                  final ScreenVisited screenVisited = tracking
+                      .visitedScreensList.last
                       .getAutomaticPopupScreenVisited(
                     route.hashCode.toString(),
                     dialogContext,
                   );
 
-                  Tracking.instance.startScreen(screenVisited);
-                  // });
+                  tracking.startScreen(screenVisited);
                 }
               });
             }
@@ -110,12 +109,12 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
     if (route.offstage) return;
     if (status == AnimationStatus.completed ||
         status == AnimationStatus.dismissed) {
-      Tracking.instance.isPageTransitioning = false;
+      tracking.isPageTransitioning = false;
       route.animation?.removeStatusListener((status) {
         _animationListener(status, route);
       });
     } else {
-      Tracking.instance.isPageTransitioning = true;
+      tracking.isPageTransitioning = true;
     }
   }
 
@@ -127,7 +126,7 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
         if (element.containsScreenWidget()) {
           return;
         } else {
-          Tracking.instance.endScreen(dialogRoute.hashCode.toString());
+          tracking.endScreen(dialogRoute.hashCode.toString());
         }
       });
     }

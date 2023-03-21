@@ -1,15 +1,23 @@
+// ignore_for_file: avoid_positional_boolean_parameters
+
 import 'dart:async';
 
+import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
+import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
+import 'package:decibel_sdk/src/features/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
+import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
+import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:decibel_sdk/src/utility/route_observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart' as services;
 import 'package:yaml/yaml.dart' as yaml_parser;
 
@@ -20,26 +28,72 @@ class MedalliaDxaConfig {
     return _singleton;
   }
   MedalliaDxaConfig._internal()
-      : _api = MedalliaDxaNativeApi(),
+      : _nativeApi = MedalliaDxaNativeApi(),
         _loadYaml = yaml_parser.loadYaml,
         _rootBundle = services.rootBundle,
         _loggerSDK = LoggerSDK.instance {
-    _sessionReplay = SessionReplay.instance..medalliaDxaConfig = this;
-    _goalsAndDimensions = GoalsAndDimensions(_api);
-    _httpErrors = HttpErrors(_api);
+    final frameTracking = FrameTracking(
+      postFrameCallback: WidgetsBindingNullSafe.instance!.addPostFrameCallback,
+    );
+    final autoMasking = AutoMasking();
+    final placeholderImageConfig = PlaceholderImageConfig.instance;
+    final WidgetsBinding widgetsBinding = WidgetsBindingNullSafe.instance!;
+    final SchedulerBinding schedulerBinding =
+        SchedulerBindingNullSafe.instance!;
+    final ScreenshotTaker screenshotTaker =
+        ScreenshotTaker(autoMasking: autoMasking);
+    _sessionReplay = SessionReplay(
+      this,
+      _loggerSDK,
+      frameTracking,
+      autoMasking,
+      placeholderImageConfig,
+      widgetsBinding,
+      schedulerBinding,
+      screenshotTaker,
+      _nativeApi,
+    );
+    final tracking = Tracking(this, _loggerSDK, _sessionReplay);
+    _goalsAndDimensions = GoalsAndDimensions(_nativeApi);
+    _httpErrors = HttpErrors(_nativeApi);
+    DependencyInjector(
+      config: this,
+      autoMasking: autoMasking,
+      frameTracking: frameTracking,
+      loggerSdk: _loggerSDK,
+      nativeApi: _nativeApi,
+      placeholderImageConfig: placeholderImageConfig,
+      tracking: tracking,
+      sessionReplay: _sessionReplay,
+    );
   }
   @visibleForTesting
   MedalliaDxaConfig.testing(
-    this._api,
+    this._nativeApi,
     this._loadYaml,
     this._goalsAndDimensions,
     this._rootBundle,
     this._sessionReplay,
     this._httpErrors,
     this._loggerSDK,
-  );
+    AutoMasking autoMasking,
+    FrameTracking frameTracking,
+    PlaceholderImageConfig placeholderImageConfig,
+    Tracking tracking,
+  ) {
+    DependencyInjector(
+      config: this,
+      autoMasking: autoMasking,
+      frameTracking: frameTracking,
+      loggerSdk: _loggerSDK,
+      nativeApi: _nativeApi,
+      placeholderImageConfig: placeholderImageConfig,
+      tracking: tracking,
+      sessionReplay: _sessionReplay,
+    );
+  }
 
-  final MedalliaDxaNativeApi _api;
+  final MedalliaDxaNativeApi _nativeApi;
   final AssetBundle _rootBundle;
   final dynamic Function(
     String yaml,
@@ -48,7 +102,7 @@ class MedalliaDxaConfig {
   final LoggerSDK _loggerSDK;
   late final GoalsAndDimensions _goalsAndDimensions;
   late final HttpErrors _httpErrors;
-  final List<NavigatorObserver> _routeObserversToUse = [
+  late final List<NavigatorObserver> _routeObserversToUse = [
     CustomRouteObserver.screenWidgetRouteObserver,
     CustomRouteObserver.generalRouteObserver
   ];
@@ -58,9 +112,9 @@ class MedalliaDxaConfig {
   bool _recordingAllowed = false;
   void setRecordingAllowed(bool value) {
     if (value) {
-      _sessionReplay.start();
+      _sessionReplay.startPeriodicTimer();
     } else {
-      _sessionReplay.stop();
+      _sessionReplay.stopPeriodicTimer();
     }
     _recordingAllowed = value;
   }
@@ -85,7 +139,7 @@ class MedalliaDxaConfig {
       version: version,
     );
 
-    await _api.initialize(sessionMessage);
+    await _nativeApi.initialize(sessionMessage);
     initialized = true;
   }
 
@@ -108,7 +162,7 @@ class MedalliaDxaConfig {
     List<enums.MedalliaDxaCustomerConsentType> consents,
   ) async {
     _setEnableConsentsForFlutter(consents);
-    await _api.setEnableConsents(
+    await _nativeApi.setEnableConsents(
       ConsentsMessage(consents: consents.toIndexList()),
     );
   }
@@ -125,12 +179,13 @@ class MedalliaDxaConfig {
         _trackingAllowed = false;
       }
       if (consents.contains(
-          enums.MedalliaDxaCustomerConsentType.recordingAndTracking)) {
+        enums.MedalliaDxaCustomerConsentType.recordingAndTracking,
+      )) {
         setRecordingAllowed(false);
         _trackingAllowed = false;
       }
     }
-    await _api.setDisableConsents(
+    await _nativeApi.setDisableConsents(
       ConsentsMessage(consents: consents.toIndexList()),
     );
   }
@@ -169,7 +224,7 @@ class MedalliaDxaConfig {
 
   Future<String?> getWebViewProperties() async {
     assert(initialized);
-    return _api.getWebViewProperties();
+    return _nativeApi.getWebViewProperties();
   }
 
   //Set the automasking configuration
@@ -195,7 +250,7 @@ class MedalliaDxaConfig {
   ///Only for debug purposes
   Future<String> getSessionId() async {
     assert(initialized);
-    return _api.getSessionId();
+    return _nativeApi.getSessionId();
   }
 
   ///Enable Logs for every SDK module.
@@ -224,7 +279,7 @@ class MedalliaDxaConfig {
         maskWidget: maskWidget,
       );
   void sendDataOverWifiOnly() {
-    _api.sendDataOverWifiOnly();
+    _nativeApi.sendDataOverWifiOnly();
   }
 
   Future<void> sendHttpError(
@@ -234,19 +289,19 @@ class MedalliaDxaConfig {
   }
 
   Future<void> enableSessionForExperience(bool value) async {
-    return _api.enableSessionForExperience(value);
+    return _nativeApi.enableSessionForExperience(value);
   }
 
   Future<void> enableSessionForAnalysis(bool value) async {
-    return _api.enableSessionForAnalysis(value);
+    return _nativeApi.enableSessionForAnalysis(value);
   }
 
   Future<void> enableSessionForReplay(bool value) async {
-    return _api.enableSessionForReplay(value);
+    return _nativeApi.enableSessionForReplay(value);
   }
 
   Future<void> enableScreenForAnalysis(bool value) async {
-    return _api.enableScreenForAnalysis(value);
+    return _nativeApi.enableScreenForAnalysis(value);
   }
 
   void _setEnableConsentsForFlutter(
@@ -258,7 +313,8 @@ class MedalliaDxaConfig {
       return;
     }
     if (consents.contains(
-            enums.MedalliaDxaCustomerConsentType.recordingAndTracking) ||
+          enums.MedalliaDxaCustomerConsentType.recordingAndTracking,
+        ) ||
         consents.contains(enums.MedalliaDxaCustomerConsentType.all)) {
       setRecordingAllowed(true);
       _trackingAllowed = true;

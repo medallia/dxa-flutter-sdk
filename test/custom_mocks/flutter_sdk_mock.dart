@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class FlutterSdkMock {
   final List<void Function(Duration)> postFrameCallbacks = [];
 
