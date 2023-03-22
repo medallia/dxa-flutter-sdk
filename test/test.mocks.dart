@@ -1679,6 +1679,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
     required List<_i4.GlobalKey<_i4.State<_i4.StatefulWidget>>>? listOfMasks,
     required _i4.GlobalKey<_i4.State<_i4.StatefulWidget>>? captureKey,
     required bool? recordingAllowed,
+    required bool? trackingAllowed,
     required bool? enableAutomaticPopupRecording,
     required bool? enableAutomaticPopupTracking,
     required bool? enableAutomaticMasking,
@@ -1695,6 +1696,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
             #listOfMasks: listOfMasks,
             #captureKey: captureKey,
             #recordingAllowed: recordingAllowed,
+            #trackingAllowed: trackingAllowed,
             #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
             #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
             #enableAutomaticMasking: enableAutomaticMasking,
@@ -1713,6 +1715,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
               #listOfMasks: listOfMasks,
               #captureKey: captureKey,
               #recordingAllowed: recordingAllowed,
+              #trackingAllowed: trackingAllowed,
               #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
               #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
               #enableAutomaticMasking: enableAutomaticMasking,
@@ -1732,6 +1735,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
               #listOfMasks: listOfMasks,
               #captureKey: captureKey,
               #recordingAllowed: recordingAllowed,
+              #trackingAllowed: trackingAllowed,
               #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
               #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
               #enableAutomaticMasking: enableAutomaticMasking,
@@ -1809,6 +1813,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
     required _i4.TabController? tabController,
     required List<String>? tabNames,
     required bool? recordingAllowed,
+    required bool? trackingAllowed,
     required bool? enableAutomaticPopupRecording,
     required bool? enableAutomaticPopupTracking,
     required bool? enableAutomaticMasking,
@@ -1825,6 +1830,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
             #tabController: tabController,
             #tabNames: tabNames,
             #recordingAllowed: recordingAllowed,
+            #trackingAllowed: trackingAllowed,
             #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
             #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
             #enableAutomaticMasking: enableAutomaticMasking,
@@ -1842,6 +1848,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
     required int? manualIndex,
     required List<String>? tabNames,
     required bool? recordingAllowed,
+    required bool? trackingAllowed,
     required bool? enableAutomaticPopupRecording,
     required bool? enableAutomaticPopupTracking,
     required bool? enableAutomaticMasking,
@@ -1858,6 +1865,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
             #manualIndex: manualIndex,
             #tabNames: tabNames,
             #recordingAllowed: recordingAllowed,
+            #trackingAllowed: trackingAllowed,
             #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
             #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
             #enableAutomaticMasking: enableAutomaticMasking,
@@ -1977,6 +1985,12 @@ class MockScreenVisited extends _i1.Mock implements _i8.ScreenVisited {
   @override
   bool get recordingAllowed => (super.noSuchMethod(
         Invocation.getter(#recordingAllowed),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  bool get trackingAllowed => (super.noSuchMethod(
+        Invocation.getter(#trackingAllowed),
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
