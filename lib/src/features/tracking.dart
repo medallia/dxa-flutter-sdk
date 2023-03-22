@@ -518,7 +518,8 @@ class ScreenVisited {
       dialogContext: dialogContext,
       recordingAllowed:
           recordingAllowed ? enableAutomaticPopupRecording : recordingAllowed,
-      trackingAllowed: trackingAllowed,
+      trackingAllowed:
+          trackingAllowed ? enableAutomaticPopupTracking : trackingAllowed,
       enableAutomaticMasking: enableAutomaticMasking,
     );
   }
