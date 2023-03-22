@@ -18,6 +18,7 @@ class ScreenWidget extends StatelessWidget {
     this.recordingAllowed = true,
     this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = false,
         builder = null,
@@ -39,6 +40,7 @@ class ScreenWidget extends StatelessWidget {
     this.recordingAllowed = true,
     this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = true,
         tabController = null,
@@ -54,6 +56,7 @@ class ScreenWidget extends StatelessWidget {
     this.recordingAllowed = true,
     this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = false,
         builder = null,
@@ -67,6 +70,7 @@ class ScreenWidget extends StatelessWidget {
     this.recordingAllowed = true,
     this.trackingAllowed = true,
     this.enableAutomaticPopupRecording = true,
+    this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
   })  : isPopup = false,
         tabController = null,
@@ -83,6 +87,9 @@ class ScreenWidget extends StatelessWidget {
 
   ///Enables automatic screen replay for PopupRoutes without ScreenWidget
   final bool enableAutomaticPopupRecording;
+
+  ///Enables automatic tracking for PopupRoutes without ScreenWidget
+  final bool enableAutomaticPopupTracking;
   //Enables automatic masking for this screen
   final bool enableAutomaticMasking;
   final bool isPopup;
@@ -115,6 +122,7 @@ class ScreenWidget extends StatelessWidget {
         recordingAllowed: recordingAllowed,
         trackingAllowed: trackingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+        enableAutomaticPopupTracking: enableAutomaticPopupTracking,
         enableAutomaticMasking: enableAutomaticMasking,
         isPopup: isPopup,
         manualTabBarInitialIndex: initialIndex,
@@ -139,6 +147,7 @@ class _ActiveScreenWidget extends StatefulWidget {
     required this.recordingAllowed,
     required this.trackingAllowed,
     required this.enableAutomaticPopupRecording,
+    required this.enableAutomaticPopupTracking,
     required this.enableAutomaticMasking,
     required this.isPopup,
     required this.manualTabBarInitialIndex,
@@ -154,6 +163,7 @@ class _ActiveScreenWidget extends StatefulWidget {
   final bool recordingAllowed;
   final bool trackingAllowed;
   final bool enableAutomaticPopupRecording;
+  final bool enableAutomaticPopupTracking;
   final bool enableAutomaticMasking;
   final bool isPopup;
   final int? manualTabBarInitialIndex;
@@ -188,6 +198,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
         recordingAllowed: widget.recordingAllowed,
         trackingAllowed: widget.trackingAllowed,
         enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
+        enableAutomaticPopupTracking: widget.enableAutomaticPopupTracking,
         enableAutomaticMasking: widget.enableAutomaticMasking,
       );
     }
@@ -220,6 +231,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       recordingAllowed: widget.recordingAllowed,
       trackingAllowed: widget.trackingAllowed,
       enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
+      enableAutomaticPopupTracking: widget.enableAutomaticPopupTracking,
       enableAutomaticMasking: widget.enableAutomaticMasking,
     );
   }
@@ -367,6 +379,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
       recordingAllowed: widget.recordingAllowed,
       trackingAllowed: widget.trackingAllowed,
       enableAutomaticPopupRecording: widget.enableAutomaticPopupRecording,
+      enableAutomaticPopupTracking: widget.enableAutomaticPopupTracking,
       enableAutomaticMasking: widget.enableAutomaticMasking,
     );
 
