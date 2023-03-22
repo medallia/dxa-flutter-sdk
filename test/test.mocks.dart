@@ -1681,6 +1681,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
     required bool? recordingAllowed,
     required bool? trackingAllowed,
     required bool? enableAutomaticPopupRecording,
+    required bool? enableAutomaticPopupTracking,
     required bool? enableAutomaticMasking,
     List<String>? tabBarNames,
     int? tabBarIndex,
@@ -1697,6 +1698,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
             #recordingAllowed: recordingAllowed,
             #trackingAllowed: trackingAllowed,
             #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+            #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
             #enableAutomaticMasking: enableAutomaticMasking,
             #tabBarNames: tabBarNames,
             #tabBarIndex: tabBarIndex,
@@ -1715,6 +1717,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
               #recordingAllowed: recordingAllowed,
               #trackingAllowed: trackingAllowed,
               #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+              #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
               #enableAutomaticMasking: enableAutomaticMasking,
               #tabBarNames: tabBarNames,
               #tabBarIndex: tabBarIndex,
@@ -1734,6 +1737,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
               #recordingAllowed: recordingAllowed,
               #trackingAllowed: trackingAllowed,
               #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+              #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
               #enableAutomaticMasking: enableAutomaticMasking,
               #tabBarNames: tabBarNames,
               #tabBarIndex: tabBarIndex,
@@ -1811,6 +1815,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
     required bool? recordingAllowed,
     required bool? trackingAllowed,
     required bool? enableAutomaticPopupRecording,
+    required bool? enableAutomaticPopupTracking,
     required bool? enableAutomaticMasking,
   }) =>
       (super.noSuchMethod(
@@ -1827,6 +1832,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
             #recordingAllowed: recordingAllowed,
             #trackingAllowed: trackingAllowed,
             #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+            #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
             #enableAutomaticMasking: enableAutomaticMasking,
           },
         ),
@@ -1844,6 +1850,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
     required bool? recordingAllowed,
     required bool? trackingAllowed,
     required bool? enableAutomaticPopupRecording,
+    required bool? enableAutomaticPopupTracking,
     required bool? enableAutomaticMasking,
   }) =>
       (super.noSuchMethod(
@@ -1860,6 +1867,7 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
             #recordingAllowed: recordingAllowed,
             #trackingAllowed: trackingAllowed,
             #enableAutomaticPopupRecording: enableAutomaticPopupRecording,
+            #enableAutomaticPopupTracking: enableAutomaticPopupTracking,
             #enableAutomaticMasking: enableAutomaticMasking,
           },
         ),
@@ -1965,6 +1973,12 @@ class MockScreenVisited extends _i1.Mock implements _i8.ScreenVisited {
   @override
   bool get enableAutomaticPopupRecording => (super.noSuchMethod(
         Invocation.getter(#enableAutomaticPopupRecording),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  bool get enableAutomaticPopupTracking => (super.noSuchMethod(
+        Invocation.getter(#enableAutomaticPopupTracking),
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
