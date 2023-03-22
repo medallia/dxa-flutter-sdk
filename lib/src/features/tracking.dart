@@ -68,6 +68,7 @@ class Tracking with TrackingCompleter {
     required List<GlobalKey> listOfMasks,
     required GlobalKey captureKey,
     required bool recordingAllowed,
+    required bool trackingAllowed,
     required bool enableAutomaticPopupRecording,
     required bool enableAutomaticMasking,
     List<String>? tabBarNames,
@@ -91,6 +92,7 @@ class Tracking with TrackingCompleter {
         tabIndex: tabBarIndex,
         listOfMasks: listOfMasks,
         recordingAllowed: recordingAllowed,
+        trackingAllowed: trackingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticMasking: enableAutomaticMasking,
       );
@@ -102,6 +104,7 @@ class Tracking with TrackingCompleter {
         timestamp: timestamp,
         name: name,
         recordingAllowed: recordingAllowed,
+        trackingAllowed: trackingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticMasking: enableAutomaticMasking,
       );
@@ -114,6 +117,7 @@ class Tracking with TrackingCompleter {
     bool isBackground = false,
   }) async {
     if (!medalliaDxaConfig.trackingAllowed) return;
+    if (!screenVisited.trackingAllowed) return;
     late bool backgroundFlag;
     //When returning from background there's the possibility that the screen
     //which went to background isn't the same as the one at the top of the
@@ -250,6 +254,7 @@ class Tracking with TrackingCompleter {
     required TabController tabController,
     required List<String> tabNames,
     required bool recordingAllowed,
+    required bool trackingAllowed,
     required bool enableAutomaticPopupRecording,
     required bool enableAutomaticMasking,
   }) async {
@@ -290,6 +295,7 @@ class Tracking with TrackingCompleter {
         tabBarNames: tabNames,
         tabBarIndex: tabController.index,
         recordingAllowed: recordingAllowed,
+        trackingAllowed: trackingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticMasking: enableAutomaticMasking,
       );
@@ -305,6 +311,7 @@ class Tracking with TrackingCompleter {
     required int manualIndex,
     required List<String> tabNames,
     required bool recordingAllowed,
+    required bool trackingAllowed,
     required bool enableAutomaticPopupRecording,
     required bool enableAutomaticMasking,
   }) async {
@@ -321,6 +328,7 @@ class Tracking with TrackingCompleter {
       tabBarNames: tabNames,
       tabBarIndex: manualIndex,
       recordingAllowed: recordingAllowed,
+      trackingAllowed: trackingAllowed,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       enableAutomaticMasking: enableAutomaticMasking,
     );
@@ -341,6 +349,7 @@ class ScreenVisited {
   final BuildContext? dialogContext;
   final bool enableAutomaticPopupRecording;
   final bool recordingAllowed;
+  final bool trackingAllowed;
   final List<ScreenShotTaken> screenshotTakenList;
   final bool enableAutomaticMasking;
   BuildContext? get getCurrentContext {
@@ -369,6 +378,7 @@ class ScreenVisited {
     required this.enableAutomaticPopupRecording,
     required this.enableAutomaticMasking,
     required this.recordingAllowed,
+    required this.trackingAllowed,
   }) : screenshotTakenList = [];
 
   ScreenVisited.standard({
@@ -380,6 +390,7 @@ class ScreenVisited {
     required this.enableAutomaticPopupRecording,
     required this.enableAutomaticMasking,
     required this.recordingAllowed,
+    required this.trackingAllowed,
     this.endTimestamp,
   })  : finished = false,
         isDialog = false,
@@ -401,6 +412,7 @@ class ScreenVisited {
     required this.dialogContext,
     required this.enableAutomaticPopupRecording,
     required this.recordingAllowed,
+    required this.trackingAllowed,
     required this.screenshotTakenList,
     required this.enableAutomaticMasking,
   }) : finished = true;
@@ -412,6 +424,7 @@ class ScreenVisited {
     required this.enableAutomaticPopupRecording,
     required this.enableAutomaticMasking,
     required this.recordingAllowed,
+    required this.trackingAllowed,
     this.listOfMasks = const [],
     this.endTimestamp,
   })  : finished = false,
@@ -427,6 +440,7 @@ class ScreenVisited {
     required this.captureKey,
     required this.dialogContext,
     required this.recordingAllowed,
+    required this.trackingAllowed,
     required this.enableAutomaticMasking,
     this.endTimestamp,
   })  : finished = false,
@@ -448,6 +462,7 @@ class ScreenVisited {
       dialogContext: dialogContext,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       recordingAllowed: recordingAllowed,
+      trackingAllowed: trackingAllowed,
       screenshotTakenList: screenshotTakenList,
       enableAutomaticMasking: enableAutomaticMasking,
     );
@@ -469,6 +484,7 @@ class ScreenVisited {
       dialogContext: dialogContext,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       recordingAllowed: recordingAllowed,
+      trackingAllowed: trackingAllowed,
       enableAutomaticMasking: enableAutomaticMasking,
     );
   }
@@ -487,6 +503,7 @@ class ScreenVisited {
       dialogContext: dialogContext,
       recordingAllowed:
           recordingAllowed ? enableAutomaticPopupRecording : recordingAllowed,
+      trackingAllowed: trackingAllowed,
       enableAutomaticMasking: enableAutomaticMasking,
     );
   }
@@ -518,6 +535,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required List<String> tabBarNames,
     required int tabIndex,
     required bool recordingAllowed,
+    required bool trackingAllowed,
     required bool enableAutomaticPopupRecording,
     required bool enableAutomaticMasking,
   }) {
@@ -531,6 +549,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
         name: name,
         captureKey: captureKey,
         recordingAllowed: recordingAllowed,
+        trackingAllowed: trackingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticMasking: enableAutomaticMasking,
       );
@@ -547,6 +566,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
       tabBarname: name,
       listOfMasks: listOfMasks,
       recordingAllowed: recordingAllowed,
+      trackingAllowed: trackingAllowed,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       enableAutomaticMasking: enableAutomaticMasking,
     );
@@ -561,6 +581,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required this.tabBarId,
     required this.tabBarname,
     required bool recordingAllowed,
+    required bool trackingAllowed,
     required bool enableAutomaticPopupRecording,
     required List<GlobalKey<State<StatefulWidget>>> listOfMasks,
     required bool enableAutomaticMasking,
@@ -570,6 +591,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
           timestamp: timestamp,
           captureKey: captureKey,
           recordingAllowed: recordingAllowed,
+          trackingAllowed: trackingAllowed,
           enableAutomaticPopupRecording: enableAutomaticPopupRecording,
           listOfMasks: listOfMasks,
           enableAutomaticMasking: enableAutomaticMasking,
@@ -588,6 +610,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
       tabBarname: tabBarname,
       listOfMasks: listOfMasks,
       recordingAllowed: recordingAllowed,
+      trackingAllowed: trackingAllowed,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       enableAutomaticMasking: enableAutomaticMasking,
     );
