@@ -21,7 +21,7 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
     private val logTag = "DXA-FLUTTER"
 
-    private val enableLogs = true
+    private val enableLogs = false
 
     private var latestFlutterActivity: WeakReference<Activity> = WeakReference(null)
 
