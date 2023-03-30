@@ -107,10 +107,13 @@ class GoalMessage {
 @HostApi()
 abstract class MedalliaDxaNativeApi {
   void initialize(SessionMessage msg);
+  @async
   void startScreen(StartScreenMessage msg);
+  @async
   void endScreen(EndScreenMessage msg);
   void setEnableConsents(ConsentsMessage msg);
   void setDisableConsents(ConsentsMessage msg);
+  @async
   void saveScreenshot(ScreenshotMessage msg);
   void sendDimensionWithString(DimensionStringMessage msg);
   void sendDimensionWithNumber(DimensionNumberMessage msg);
