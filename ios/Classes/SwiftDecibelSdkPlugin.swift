@@ -25,15 +25,17 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
 
     }
 
-    public func startScreenMsg(_ msg: FLTStartScreenMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+    public func startScreenMsg(_ msg: FLTStartScreenMessage, completion: @escaping (FlutterError?) -> Void) {
         if let screenId = msg.screenId as? Int, let isBackground = msg.isBackground as? Bool{
             DecibelSDK.multiPlatform.set(screen: msg.screenName, id: screenId, fromBackground: isBackground)
+            completion(nil)
         }
     }
     
-    public func endScreenMsg(_ msg: FLTEndScreenMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+    public func endScreenMsg(_ msg: FLTEndScreenMessage, completion: @escaping (FlutterError?) -> Void) {
        if let screenId = msg.screenId as? Int, let isBackground = msg.isBackground as? Bool{
            DecibelSDK.multiPlatform.endScreen(goesToBackground: isBackground)
+           completion(nil)
        }
     }
 
@@ -49,10 +51,11 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
         }
     }
 
-    public func saveScreenshotMsg(_ msg: FLTScreenshotMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+    public func saveScreenshotMsg(_ msg: FLTScreenshotMessage, completion: @escaping (FlutterError?) -> Void) {
         if let screenId = msg.screenId as? Int,
            let startFocusTime = msg.startFocusTime as? TimeInterval {
             DecibelSDK.multiPlatform.saveScreenShot(screenshot: msg.screenshotData.data, id: screenId, screenName: msg.screenName, startFocusTime: startFocusTime)
+            completion(nil)
         }
     }
     
