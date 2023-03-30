@@ -22,7 +22,11 @@ class Tracking with TrackingCompleter {
   final List<ScreenVisited> _visitedScreensList = [];
   final StreamController<ScreenVisited> newScreenSentToNativeStreamController =
       StreamController.broadcast();
-
+  final List<Completer> tasksBeforeEndScreenCompleterList = [];
+  final List<Completer> startScreenEnquedCompleterList =
+      List.empty(growable: true);
+  final List<Completer> endScreenEnquedCompleterList =
+      List.empty(growable: true);
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   ScreenVisited? screenVisitedWhenAppWentToBackground;
   int _transitioningPages = 0;
