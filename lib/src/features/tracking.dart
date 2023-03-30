@@ -24,6 +24,7 @@ class Tracking with TrackingCompleter {
       StreamController.broadcast();
   final List<Completer> tasksBeforeEndScreenCompleterList = [];
   Completer? endScreenCompleter;
+  ScreenVisited? latestStartScreenCalled;
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   ScreenVisited? screenVisitedWhenAppWentToBackground;
   int _transitioningPages = 0;
@@ -134,8 +135,12 @@ class Tracking with TrackingCompleter {
     } else {
       backgroundFlag = isBackground;
     }
+    latestStartScreenCalled = screenVisited;
     if (visitedUnfinishedScreen != null) {
       await endScreen(visitedUnfinishedScreen!.id);
+      if (latestStartScreenCalled != screenVisited) {
+        return;
+      }
     }
     _addVisitedScreenList(
       screenVisited,
@@ -152,6 +157,7 @@ class Tracking with TrackingCompleter {
         isBackground: backgroundFlag,
       ),
     );
+    print('⚪️ newScreenSentToNativeStreamController.add');
     newScreenSentToNativeStreamController.add(screenVisited);
     await _sessionReplay.newScreen();
   }
@@ -195,10 +201,10 @@ class Tracking with TrackingCompleter {
       endTime: screenVisitedFinished.endTimestamp!,
       isBackground: isBackground,
     );
-
+    print('⚪️waitForEndScreenTasksCompleter');
+    await waitForEndScreenTasksCompleter();
     await _sessionReplay.closeScreenVideo(screenVisitedFinished);
 
-    await waitForEndScreenTasksCompleter();
     logger.d(
       ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId}',
     );
