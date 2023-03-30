@@ -6,6 +6,39 @@ import 'package:flutter/material.dart';
 
 class TrackingCompleter {
   late final Tracking tracking = DependencyInjector.instance.tracking;
+  List<Completer> startScreenEnquedCompleterList = List.empty(growable: true);
+  List<Completer> endScreenEnquedCompleterList = List.empty(growable: true);
+  final List<Completer> tasksBeforeEndScreenCompleterList = [];
+
+  Future<void> startScreenTasksCompleterWrapper(
+    Future<void> Function() function,
+  ) async {
+    await Future.wait(
+      startScreenEnquedCompleterList.map((e) {
+        return e.future;
+      }),
+    );
+    startScreenEnquedCompleterList.clear();
+    final Completer completer = Completer();
+    startScreenEnquedCompleterList.add(completer);
+    await function.call();
+    completer.complete();
+  }
+
+  Completer createEndScreenCompleter() {
+    final Completer endScreenToComplete = Completer();
+    endScreenEnquedCompleterList.add(endScreenToComplete);
+    return endScreenToComplete;
+  }
+
+  Future<void> waitForEndScreenEnquedCompleter() async {
+    await Future.wait(
+      endScreenEnquedCompleterList.map((e) {
+        return e.future;
+      }),
+    );
+    endScreenEnquedCompleterList.clear();
+  }
 
   ///Wrapper for tasks that need completion before sending the endScreen to
   ///native
@@ -34,7 +67,7 @@ class TrackingCompleter {
     if (tracking.visitedUnfinishedScreen == null) {
       //Edge case: called before the first screen has started
       //(unfinishedScreens is empty and no endScreen has ever been called).
-      if (tracking.endScreenCompleter == null) {
+      if (tracking.endScreenEnquedCompleterList.isEmpty) {
         await tracking.newScreenSentToNativeStreamController.stream
             .asBroadcastStream()
             .first;

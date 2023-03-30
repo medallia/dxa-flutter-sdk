@@ -22,9 +22,7 @@ class Tracking with TrackingCompleter {
   final List<ScreenVisited> _visitedScreensList = [];
   final StreamController<ScreenVisited> newScreenSentToNativeStreamController =
       StreamController.broadcast();
-  final List<Completer> tasksBeforeEndScreenCompleterList = [];
-  Completer? endScreenCompleter;
-  ScreenVisited? latestStartScreenCalled;
+
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   ScreenVisited? screenVisitedWhenAppWentToBackground;
   int _transitioningPages = 0;
@@ -120,6 +118,15 @@ class Tracking with TrackingCompleter {
     ScreenVisited screenVisited, {
     bool isBackground = false,
   }) async {
+    await startScreenTasksCompleterWrapper(
+      () => startScreenQueued(screenVisited, isBackground: isBackground),
+    );
+  }
+
+  Future<void> startScreenQueued(
+    ScreenVisited screenVisited, {
+    bool isBackground = false,
+  }) async {
     if (!medalliaDxaConfig.trackingAllowed) return;
     if (!screenVisited.trackingAllowed) return;
     late bool backgroundFlag;
@@ -135,17 +142,14 @@ class Tracking with TrackingCompleter {
     } else {
       backgroundFlag = isBackground;
     }
-    latestStartScreenCalled = screenVisited;
     if (visitedUnfinishedScreen != null) {
       await endScreen(visitedUnfinishedScreen!.id);
-      if (latestStartScreenCalled != screenVisited) {
-        return;
-      }
     }
+    await waitForEndScreenEnquedCompleter();
     _addVisitedScreenList(
       screenVisited,
     );
-    await endScreenCompleter?.future;
+
     logger.d(
       ' 🔵 Start Screen - name: ${screenVisited.name} - id: ${screenVisited.uniqueId}',
     );
@@ -157,7 +161,6 @@ class Tracking with TrackingCompleter {
         isBackground: backgroundFlag,
       ),
     );
-    print('⚪️ newScreenSentToNativeStreamController.add');
     newScreenSentToNativeStreamController.add(screenVisited);
     await _sessionReplay.newScreen();
   }
@@ -184,8 +187,7 @@ class Tracking with TrackingCompleter {
     //If not, we can start with the logic related to ending the screen
     if (potentialScreenVisited == null) return;
     _sessionReplay.clearMasks();
-    final Completer endScreenToComplete = Completer();
-    endScreenCompleter = endScreenToComplete;
+    final Completer endScreenToComplete = createEndScreenCompleter();
     screenVisited = potentialScreenVisited;
     //find the visitedScreen which is not finished, to then get its finished
     //version and replace the original in the visitedScreensList
@@ -201,7 +203,6 @@ class Tracking with TrackingCompleter {
       endTime: screenVisitedFinished.endTimestamp!,
       isBackground: isBackground,
     );
-    print('⚪️waitForEndScreenTasksCompleter');
     await waitForEndScreenTasksCompleter();
     await _sessionReplay.closeScreenVideo(screenVisitedFinished);
 
