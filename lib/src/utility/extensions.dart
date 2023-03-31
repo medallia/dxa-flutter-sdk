@@ -1,4 +1,5 @@
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
+import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/utility/constants.dart';
 import 'package:decibel_sdk/src/utility/enums.dart';
 import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
@@ -57,7 +58,7 @@ extension RenderObjectPaintBounds on RenderObject {
 }
 
 extension ListMedalliaDxaCustomerConsentTypeExt
-    on List<MedalliaDxaCustomerConsentType> {
+    on List<DecibelCustomerConsentType> {
   List<int> toIndexList() {
     return map((consent) => consent.index).toList();
   }

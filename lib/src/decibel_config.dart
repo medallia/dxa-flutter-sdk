@@ -8,7 +8,7 @@ import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
@@ -53,7 +53,11 @@ class MedalliaDxaConfig {
       screenshotTaker,
       _nativeApi,
     );
-    final tracking = Tracking(this, _loggerSDK, _sessionReplay);
+    final tracking = Tracking(
+      this,
+      _loggerSDK,
+      _sessionReplay,
+    );
     _goalsAndDimensions = GoalsAndDimensions(_nativeApi);
     _httpErrors = HttpErrors(_nativeApi);
     DependencyInjector(
@@ -127,7 +131,7 @@ class MedalliaDxaConfig {
   Future<void> initialize(
     int account,
     int property,
-    List<enums.MedalliaDxaCustomerConsentType> consents,
+    List<enums.DecibelCustomerConsentType> consents,
   ) async {
     final String version = await _getVersion();
     _setObservers();
@@ -159,7 +163,7 @@ class MedalliaDxaConfig {
 
   /// Enable the Customer Consents list passed as parameter
   Future<void> setEnableConsents(
-    List<enums.MedalliaDxaCustomerConsentType> consents,
+    List<enums.DecibelCustomerConsentType> consents,
   ) async {
     _setEnableConsentsForFlutter(consents);
     await _nativeApi.setEnableConsents(
@@ -169,17 +173,17 @@ class MedalliaDxaConfig {
 
   /// Disable the Customer Consents list passed as parameter
   Future<void> setDisableConsents(
-    List<enums.MedalliaDxaCustomerConsentType> consents,
+    List<enums.DecibelCustomerConsentType> consents,
   ) async {
-    if (consents.contains(enums.MedalliaDxaCustomerConsentType.all)) {
+    if (consents.contains(enums.DecibelCustomerConsentType.all)) {
       setRecordingAllowed(false);
       _trackingAllowed = false;
     } else {
-      if (consents.contains(enums.MedalliaDxaCustomerConsentType.tracking)) {
+      if (consents.contains(enums.DecibelCustomerConsentType.tracking)) {
         _trackingAllowed = false;
       }
       if (consents.contains(
-        enums.MedalliaDxaCustomerConsentType.recordingAndTracking,
+        enums.DecibelCustomerConsentType.recordingAndTracking,
       )) {
         setRecordingAllowed(false);
         _trackingAllowed = false;
@@ -305,22 +309,22 @@ class MedalliaDxaConfig {
   }
 
   void _setEnableConsentsForFlutter(
-    List<enums.MedalliaDxaCustomerConsentType> consents,
+    List<enums.DecibelCustomerConsentType> consents,
   ) {
-    if (consents.contains(enums.MedalliaDxaCustomerConsentType.none)) {
+    if (consents.contains(enums.DecibelCustomerConsentType.none)) {
       _trackingAllowed = false;
       setRecordingAllowed(false);
       return;
     }
     if (consents.contains(
-          enums.MedalliaDxaCustomerConsentType.recordingAndTracking,
+          enums.DecibelCustomerConsentType.recordingAndTracking,
         ) ||
-        consents.contains(enums.MedalliaDxaCustomerConsentType.all)) {
+        consents.contains(enums.DecibelCustomerConsentType.all)) {
       setRecordingAllowed(true);
       _trackingAllowed = true;
       return;
     }
-    if (consents.contains(enums.MedalliaDxaCustomerConsentType.tracking)) {
+    if (consents.contains(enums.DecibelCustomerConsentType.tracking)) {
       setRecordingAllowed(false);
       _trackingAllowed = true;
     }
