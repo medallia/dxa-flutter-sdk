@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:flutter/material.dart';
 

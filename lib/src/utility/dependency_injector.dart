@@ -2,7 +2,7 @@ import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
