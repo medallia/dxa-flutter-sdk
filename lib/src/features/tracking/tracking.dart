@@ -226,7 +226,7 @@ class Tracking with TrackingCompleter {
     await _sessionReplay.closeScreenVideo(screenVisitedFinished);
 
     logger.d(
-      ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId}',
+      ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId} - endTime ${endScreenMessage.endTime}',
     );
     await _apiInstance.endScreen(endScreenMessage);
     endScreenToComplete.complete();
