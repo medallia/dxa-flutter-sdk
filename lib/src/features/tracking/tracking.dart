@@ -3,30 +3,44 @@ import 'dart:async';
 
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
+import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
+import 'package:decibel_sdk/src/features/tracking/untracked_screens.dart';
 import 'package:decibel_sdk/src/messages.dart';
+
 import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
-import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 class Tracking with TrackingCompleter {
-  Tracking(this.medalliaDxaConfig, this._logger, this._sessionReplay);
+  Tracking(
+    this.medalliaDxaConfig,
+    this._logger,
+    this._sessionReplay,
+  ) {
+    _untrackedScreens = UntrackedScreens(this);
+  }
 
   final MedalliaDxaConfig medalliaDxaConfig;
   final LoggerSDK _logger;
   final SessionReplay _sessionReplay;
+  late final UntrackedScreens _untrackedScreens;
   Logger get logger => _logger.trackingLogger;
   final MedalliaDxaNativeApi _apiInstance = MedalliaDxaNativeApi();
   final List<ScreenVisited> _visitedScreensList = [];
   final StreamController<ScreenVisited> newScreenSentToNativeStreamController =
       StreamController.broadcast();
   final List<Completer> tasksBeforeEndScreenCompleterList = [];
-  Completer? endScreenCompleter;
+  final List<Completer> startScreenEnquedCompleterList =
+      List.empty(growable: true);
+  final List<Completer> endScreenEnquedCompleterList =
+      List.empty(growable: true);
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   ScreenVisited? screenVisitedWhenAppWentToBackground;
   int _transitioningPages = 0;
+  ScreenVisited? get lastUntrackedOrTrackedScreenVisited =>
+      _untrackedScreens.lastUntrackedOrTrackedScreenVisited;
   bool get isPageTransitioning => _transitioningPages > 0;
   set isPageTransitioning(bool transitioning) {
     if (transitioning) {
@@ -119,8 +133,21 @@ class Tracking with TrackingCompleter {
     ScreenVisited screenVisited, {
     bool isBackground = false,
   }) async {
+    await startScreenTasksCompleterWrapper(
+      () => startScreenQueued(screenVisited, isBackground: isBackground),
+    );
+  }
+
+  Future<void> startScreenQueued(
+    ScreenVisited screenVisited, {
+    bool isBackground = false,
+  }) async {
     if (!medalliaDxaConfig.trackingAllowed) return;
-    if (!screenVisited.trackingAllowed) return;
+    if (!screenVisited.trackingAllowed) {
+      _untrackedScreens.untrackedScreensList.add(screenVisited);
+      return;
+    }
+
     late bool backgroundFlag;
     //When returning from background there's the possibility that the screen
     //which went to background isn't the same as the one at the top of the
@@ -137,10 +164,11 @@ class Tracking with TrackingCompleter {
     if (visitedUnfinishedScreen != null) {
       await endScreen(visitedUnfinishedScreen!.id);
     }
+    await waitForEndScreenEnquedCompleter();
     _addVisitedScreenList(
       screenVisited,
     );
-    await endScreenCompleter?.future;
+
     logger.d(
       ' 🔵 Start Screen - name: ${screenVisited.name} - id: ${screenVisited.uniqueId}',
     );
@@ -178,8 +206,7 @@ class Tracking with TrackingCompleter {
     //If not, we can start with the logic related to ending the screen
     if (potentialScreenVisited == null) return;
     _sessionReplay.clearMasks();
-    final Completer endScreenToComplete = Completer();
-    endScreenCompleter = endScreenToComplete;
+    final Completer endScreenToComplete = createEndScreenCompleter();
     screenVisited = potentialScreenVisited;
     //find the visitedScreen which is not finished, to then get its finished
     //version and replace the original in the visitedScreensList
@@ -195,12 +222,11 @@ class Tracking with TrackingCompleter {
       endTime: screenVisitedFinished.endTimestamp!,
       isBackground: isBackground,
     );
-
+    await waitForEndScreenTasksCompleter();
     await _sessionReplay.closeScreenVideo(screenVisitedFinished);
 
-    await waitForEndScreenTasksCompleter();
     logger.d(
-      ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId}',
+      ' 🟡 End Screen - name: ${endScreenMessage.screenName} - id: ${endScreenMessage.screenId} - endTime ${endScreenMessage.endTime}',
     );
     await _apiInstance.endScreen(endScreenMessage);
     endScreenToComplete.complete();
@@ -341,311 +367,4 @@ class Tracking with TrackingCompleter {
     );
     await startScreen(screenVisited);
   }
-}
-
-@immutable
-class ScreenVisited {
-  final String id;
-  final String name;
-  final int timestamp;
-  final int? endTimestamp;
-  final bool isTabBar;
-  final GlobalKey captureKey;
-  final List<GlobalKey> listOfMasks;
-  final bool isDialog;
-  final BuildContext? dialogContext;
-  final bool enableAutomaticPopupRecording;
-  final bool enableAutomaticPopupTracking;
-  final bool recordingAllowed;
-  final bool trackingAllowed;
-  final List<ScreenShotTaken> screenshotTakenList;
-  final bool enableAutomaticMasking;
-  BuildContext? get getCurrentContext {
-    if (!isDialog) return captureKey.currentContext;
-    return dialogContext!;
-  }
-
-  bool get widgetInTheTree {
-    return getCurrentContext != null;
-  }
-
-  final bool finished;
-  int get uniqueId => id.hashCode ^ timestamp.hashCode;
-
-  ScreenVisited({
-    required this.id,
-    required this.name,
-    required this.timestamp,
-    required this.listOfMasks,
-    required this.captureKey,
-    required this.endTimestamp,
-    required this.finished,
-    required this.isDialog,
-    required this.isTabBar,
-    required this.dialogContext,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
-    required this.enableAutomaticMasking,
-    required this.recordingAllowed,
-    required this.trackingAllowed,
-  }) : screenshotTakenList = [];
-
-  ScreenVisited.standard({
-    required this.id,
-    required this.name,
-    required this.timestamp,
-    required this.listOfMasks,
-    required this.captureKey,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
-    required this.enableAutomaticMasking,
-    required this.recordingAllowed,
-    required this.trackingAllowed,
-    this.endTimestamp,
-  })  : finished = false,
-        isDialog = false,
-        isTabBar = false,
-        dialogContext = null,
-        screenshotTakenList = [];
-
-  ///Used by [getScreenVisitedAsFinished] to get a finished version
-  ///of a ScreenVisited object
-  const ScreenVisited.finished({
-    required this.id,
-    required this.timestamp,
-    required this.name,
-    required this.endTimestamp,
-    required this.listOfMasks,
-    required this.captureKey,
-    required this.isDialog,
-    required this.isTabBar,
-    required this.dialogContext,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
-    required this.recordingAllowed,
-    required this.trackingAllowed,
-    required this.screenshotTakenList,
-    required this.enableAutomaticMasking,
-  }) : finished = true;
-  ScreenVisited.tabBarChild({
-    required this.id,
-    required this.name,
-    required this.timestamp,
-    required this.captureKey,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
-    required this.enableAutomaticMasking,
-    required this.recordingAllowed,
-    required this.trackingAllowed,
-    this.listOfMasks = const [],
-    this.endTimestamp,
-  })  : finished = false,
-        isDialog = false,
-        isTabBar = true,
-        dialogContext = null,
-        screenshotTakenList = [];
-  ScreenVisited.automaticPopup({
-    required this.id,
-    required this.timestamp,
-    required this.name,
-    required this.listOfMasks,
-    required this.captureKey,
-    required this.dialogContext,
-    required this.recordingAllowed,
-    required this.trackingAllowed,
-    required this.enableAutomaticMasking,
-    this.endTimestamp,
-  })  : finished = false,
-        isDialog = true,
-        isTabBar = false,
-        enableAutomaticPopupRecording = false,
-        enableAutomaticPopupTracking = false,
-        screenshotTakenList = [];
-
-  ScreenVisited getScreenVisitedAsFinished(int endTimestamp) {
-    return ScreenVisited.finished(
-      id: id,
-      name: name,
-      listOfMasks: listOfMasks,
-      captureKey: captureKey,
-      timestamp: timestamp,
-      endTimestamp: endTimestamp,
-      isDialog: isDialog,
-      isTabBar: isTabBar,
-      dialogContext: dialogContext,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-      recordingAllowed: recordingAllowed,
-      trackingAllowed: trackingAllowed,
-      screenshotTakenList: screenshotTakenList,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-
-  //Facilitates the reopening of a screen where everything is the same except
-  //for the start timestamp, and therefore the uniqueId will also change
-  ScreenVisited getScreenVisitedWithNewStartTimeStamp(int startTimeStamp) {
-    return ScreenVisited(
-      id: id,
-      name: name,
-      timestamp: startTimeStamp,
-      listOfMasks: listOfMasks,
-      captureKey: captureKey,
-      endTimestamp: endTimestamp,
-      finished: finished,
-      isDialog: isDialog,
-      isTabBar: isTabBar,
-      dialogContext: dialogContext,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-      recordingAllowed: recordingAllowed,
-      trackingAllowed: trackingAllowed,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-
-  ScreenVisited getAutomaticPopupScreenVisited(
-    String routeId,
-    BuildContext dialogContext,
-  ) {
-    final int timestamp = DateTime.now().millisecondsSinceEpoch;
-    return ScreenVisited.automaticPopup(
-      id: routeId,
-      name: '$name-dialog',
-      timestamp: timestamp,
-      listOfMasks: listOfMasks,
-      captureKey: captureKey,
-      dialogContext: dialogContext,
-      recordingAllowed:
-          recordingAllowed ? enableAutomaticPopupRecording : recordingAllowed,
-      trackingAllowed:
-          trackingAllowed ? enableAutomaticPopupTracking : trackingAllowed,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'ScreenVisited(id: $id, uniqueid $uniqueId, name: $name, timestamp: $timestamp, endTimestamp: $endTimestamp, isTabBar: $isTabBar, finished: $finished)';
-  }
-}
-
-///ScreenVisited version for screens that are tabBars.
-///Used only when the TabBar Screen is still unfinished, when the finished version
-///is used by calling [getScreenVisitedAsFinished] or [ScreenVisited.finished]
-///it's then converted back to a ScreenVisited object.
-@immutable
-class ScreenVisitedTabBar extends ScreenVisited {
-  final List<ScreenVisited> tabBarScreens;
-  final String tabBarId;
-  final String tabBarname;
-  final int tabIndex;
-  @override
-  bool get isTabBar => true;
-  factory ScreenVisitedTabBar({
-    required String id,
-    required int timestamp,
-    required String name,
-    required List<GlobalKey> listOfMasks,
-    required GlobalKey captureKey,
-    required List<String> tabBarNames,
-    required int tabIndex,
-    required bool recordingAllowed,
-    required bool trackingAllowed,
-    required bool enableAutomaticPopupRecording,
-    required bool enableAutomaticPopupTracking,
-    required bool enableAutomaticMasking,
-  }) {
-    final String tabName = tabBarNames[tabIndex];
-    final String idWithTabName = '$id-$tabName';
-    final List<ScreenVisited> tabBarScreens =
-        tabBarNames.map<ScreenVisited>((name) {
-      return ScreenVisited.tabBarChild(
-        id: '$id-$name',
-        timestamp: timestamp,
-        name: name,
-        captureKey: captureKey,
-        recordingAllowed: recordingAllowed,
-        trackingAllowed: trackingAllowed,
-        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-        enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-        enableAutomaticMasking: enableAutomaticMasking,
-      );
-    }).toList();
-
-    return ScreenVisitedTabBar.internal(
-      id: idWithTabName,
-      tabBarId: id,
-      timestamp: timestamp,
-      captureKey: captureKey,
-      name: tabName,
-      tabBarScreens: tabBarScreens,
-      tabIndex: tabIndex,
-      tabBarname: name,
-      listOfMasks: listOfMasks,
-      recordingAllowed: recordingAllowed,
-      trackingAllowed: trackingAllowed,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-  ScreenVisitedTabBar.internal({
-    required String id,
-    required String name,
-    required int timestamp,
-    required GlobalKey<State<StatefulWidget>> captureKey,
-    required this.tabBarScreens,
-    required this.tabIndex,
-    required this.tabBarId,
-    required this.tabBarname,
-    required bool recordingAllowed,
-    required bool trackingAllowed,
-    required bool enableAutomaticPopupRecording,
-    required bool enableAutomaticPopupTracking,
-    required List<GlobalKey<State<StatefulWidget>>> listOfMasks,
-    required bool enableAutomaticMasking,
-  }) : super.tabBarChild(
-          id: id,
-          name: name,
-          timestamp: timestamp,
-          captureKey: captureKey,
-          recordingAllowed: recordingAllowed,
-          trackingAllowed: trackingAllowed,
-          enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-          enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-          listOfMasks: listOfMasks,
-          enableAutomaticMasking: enableAutomaticMasking,
-        );
-
-  @override
-  ScreenVisited getScreenVisitedWithNewStartTimeStamp(int startTimeStamp) {
-    return ScreenVisitedTabBar.internal(
-      id: id,
-      name: name,
-      timestamp: startTimeStamp,
-      captureKey: captureKey,
-      tabBarScreens: tabBarScreens,
-      tabIndex: tabIndex,
-      tabBarId: tabBarId,
-      tabBarname: tabBarname,
-      listOfMasks: listOfMasks,
-      recordingAllowed: recordingAllowed,
-      trackingAllowed: trackingAllowed,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'ScreenVisitedTabBar(id: $id, uniqueid $uniqueId, name: $name, tabBarId: $tabBarId, tabBarname: $tabBarname, tabIndex: $tabIndex)';
-  }
-}
-
-@immutable
-class ScreenShotTaken {
-  final int startFocusTime;
-  const ScreenShotTaken({required this.startFocusTime});
 }

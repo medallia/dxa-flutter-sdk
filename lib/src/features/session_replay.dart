@@ -6,7 +6,8 @@ import 'dart:ui' as ui;
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
+import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
@@ -173,7 +174,9 @@ class SessionReplay {
     screenVisited.screenshotTakenList.add(
       ScreenShotTaken(startFocusTime: startFocusTime),
     );
-    logger.d('Save screenshot - screenName: $screenName - screenId: $screenId');
+    logger.d(
+      'Save screenshot - screenName: $screenName - screenId: $screenId - startFocusTime: $startFocusTime',
+    );
     await _nativeApiInstance.saveScreenshot(screenshotMessage);
   }
 
@@ -188,7 +191,7 @@ class SessionReplay {
       if (screenVisited.isCurrentScreenOverMaxDuration) {
         startFocusTime = screenVisited.maximumDurationForLastScreenshot;
       } else {
-        startFocusTime = DateTime.now().millisecondsSinceEpoch;
+        startFocusTime = screenVisited.endTimestamp! - 500;
       }
 
       final ScreenshotMessage screenShotMessage = lastScreenshotSent!;

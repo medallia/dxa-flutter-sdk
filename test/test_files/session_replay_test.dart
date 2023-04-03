@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:decibel_sdk/src/features/session_replay.dart';
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/constants.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
@@ -376,6 +376,8 @@ AND a screenshot will be sent to native
         //(not exceeding isCurrentScreenOverMaxDuration)
         when(mockScreenVisited.timestamp)
             .thenReturn(DateTime.now().millisecondsSinceEpoch - 10000);
+        when(mockScreenVisited.endTimestamp)
+            .thenReturn(DateTime.now().millisecondsSinceEpoch);
         await sessionReplay.closeScreenVideo(mockScreenVisited);
         //THEN last screenshot will be null
         await Future.value(() {

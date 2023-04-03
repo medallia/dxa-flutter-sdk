@@ -466,13 +466,13 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
         binaryMessenger:binaryMessenger
         codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(startScreenMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(startScreenMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(startScreenMsg:completion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(startScreenMsg:completion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTStartScreenMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
-        FlutterError *error;
-        [api startScreenMsg:arg_msg error:&error];
-        callback(wrapResult(nil, error));
+        [api startScreenMsg:arg_msg completion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
       }];
     } else {
       [channel setMessageHandler:nil];
@@ -485,13 +485,13 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
         binaryMessenger:binaryMessenger
         codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(endScreenMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(endScreenMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(endScreenMsg:completion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(endScreenMsg:completion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTEndScreenMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
-        FlutterError *error;
-        [api endScreenMsg:arg_msg error:&error];
-        callback(wrapResult(nil, error));
+        [api endScreenMsg:arg_msg completion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
       }];
     } else {
       [channel setMessageHandler:nil];
@@ -542,13 +542,13 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
         binaryMessenger:binaryMessenger
         codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(saveScreenshotMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(saveScreenshotMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(saveScreenshotMsg:completion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(saveScreenshotMsg:completion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTScreenshotMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
-        FlutterError *error;
-        [api saveScreenshotMsg:arg_msg error:&error];
-        callback(wrapResult(nil, error));
+        [api saveScreenshotMsg:arg_msg completion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
       }];
     } else {
       [channel setMessageHandler:nil];
