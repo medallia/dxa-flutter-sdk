@@ -101,7 +101,7 @@ THEN the method throws an assertion error
       the sessionMessage
       AND the method start() should be called''',
       () async {
-        final consents = [MedalliaDxaCustomerConsentType.all];
+        final consents = [DecibelCustomerConsentType.all];
         await medalliaDxaConfig.initialize(account, property, consents);
 
         //get SessionMessage sent to the Api
@@ -144,8 +144,8 @@ THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is NOT called
 AND the method stop from sessionReplay is called''', () async {
       final consents = [
-        MedalliaDxaCustomerConsentType.all,
-        MedalliaDxaCustomerConsentType.none
+        DecibelCustomerConsentType.all,
+        DecibelCustomerConsentType.none
       ];
       await medalliaDxaConfig.setEnableConsents(consents);
       verifyNever(mockSessionReplay.startPeriodicTimer());
@@ -158,8 +158,8 @@ AND it doens't include .none
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is called''', () async {
       final consents = [
-        MedalliaDxaCustomerConsentType.all,
-        MedalliaDxaCustomerConsentType.tracking
+        DecibelCustomerConsentType.all,
+        DecibelCustomerConsentType.tracking
       ];
       await medalliaDxaConfig.setEnableConsents(consents);
       verify(mockSessionReplay.startPeriodicTimer());
@@ -170,7 +170,7 @@ AND the consent parameters list includes .recordAndTracking
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is called''', () async {
       final consents = [
-        MedalliaDxaCustomerConsentType.recordingAndTracking,
+        DecibelCustomerConsentType.recordingAndTracking,
       ];
       await medalliaDxaConfig.setEnableConsents(consents);
       verify(mockSessionReplay.startPeriodicTimer());
@@ -183,7 +183,7 @@ AND the consent parameters list includes .none
 AND it doens't include .all
 THEN the MedalliaDxaNativeApi method setDisableConsents is called
 AND the method stop from sessionReplay is not called''', () async {
-      final consents = [MedalliaDxaCustomerConsentType.none];
+      final consents = [DecibelCustomerConsentType.none];
       await medalliaDxaConfig.setDisableConsents(consents);
       verifyNever(mockSessionReplay.stopPeriodicTimer());
     });
@@ -193,8 +193,8 @@ AND the consent parameters list includes .all
 THEN the MedalliaDxaNativeApi method setDisableConsents is called
 AND the method stop from sessionReplay is called''', () async {
       final consents = [
-        MedalliaDxaCustomerConsentType.none,
-        MedalliaDxaCustomerConsentType.all
+        DecibelCustomerConsentType.none,
+        DecibelCustomerConsentType.all
       ];
       await medalliaDxaConfig.setDisableConsents(consents);
       verify(mockSessionReplay.stopPeriodicTimer());
@@ -205,7 +205,7 @@ AND the consent parameters list includes .recordAndTracking
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method stop from sessionReplay is called''', () async {
       final consents = [
-        MedalliaDxaCustomerConsentType.recordingAndTracking,
+        DecibelCustomerConsentType.recordingAndTracking,
       ];
       await medalliaDxaConfig.setDisableConsents(consents);
       verify(mockSessionReplay.stopPeriodicTimer());

@@ -120,11 +120,11 @@ NSObject<FlutterMessageCodec> *FLTMedalliaDxaNativeApiGetCodec(void);
 
 @protocol FLTMedalliaDxaNativeApi
 - (void)initializeMsg:(FLTSessionMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
-- (void)startScreenMsg:(FLTStartScreenMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
-- (void)endScreenMsg:(FLTEndScreenMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)startScreenMsg:(FLTStartScreenMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
+- (void)endScreenMsg:(FLTEndScreenMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
 - (void)setEnableConsentsMsg:(FLTConsentsMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setDisableConsentsMsg:(FLTConsentsMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
-- (void)saveScreenshotMsg:(FLTScreenshotMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)saveScreenshotMsg:(FLTScreenshotMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
 - (void)sendDimensionWithStringMsg:(FLTDimensionStringMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendDimensionWithNumberMsg:(FLTDimensionNumberMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendDimensionWithBoolMsg:(FLTDimensionBoolMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;

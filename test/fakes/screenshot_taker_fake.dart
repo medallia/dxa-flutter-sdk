@@ -1,5 +1,5 @@
 import 'package:decibel_sdk/src/features/session_replay.dart';
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mockito/mockito.dart';
 

@@ -5,7 +5,7 @@ import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/utility/enums.dart' as enums;
 import 'package:flutter/material.dart';
 
-class MedalliaDxa {
+class DecibelSdk {
   static void disableAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
     return MedalliaDxaConfig().disableAutoMasking(widgetsToMask);
   }
@@ -45,8 +45,8 @@ class MedalliaDxa {
   static Future<void> initialize(
     int account,
     int property, [
-    List<enums.MedalliaDxaCustomerConsentType> consents = const [
-      enums.MedalliaDxaCustomerConsentType.all
+    List<enums.DecibelCustomerConsentType> consents = const [
+      enums.DecibelCustomerConsentType.all
     ],
   ]) async {
     await MedalliaDxaConfig().initialize(account, property, consents);
@@ -94,13 +94,13 @@ class MedalliaDxa {
   }
 
   static Future<void> setDisableConsents(
-    List<enums.MedalliaDxaCustomerConsentType> consents,
+    List<enums.DecibelCustomerConsentType> consents,
   ) {
     return MedalliaDxaConfig().setDisableConsents(consents);
   }
 
   static Future<void> setEnableConsents(
-    List<enums.MedalliaDxaCustomerConsentType> consents,
+    List<enums.DecibelCustomerConsentType> consents,
   ) {
     return MedalliaDxaConfig().setEnableConsents(consents);
   }

@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:decibel_sdk/src/features/tracking.dart';
+import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
+import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
@@ -48,16 +49,17 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
               previousContext.visitChildElements((previousElement) {
                 if (previousElement.containsScreenWidget()) {
                   logger.d('previousElement containsScreenWidget');
-
+                  ;
                   final BuildContext dialogContext = route.subtreeContext!;
-                  final ScreenVisited screenVisited = tracking
-                      .visitedScreensList.last
-                      .getAutomaticPopupScreenVisited(
+                  final ScreenVisited? screenVisited = tracking
+                      .lastUntrackedOrTrackedScreenVisited
+                      ?.getAutomaticPopupScreenVisited(
                     route.hashCode.toString(),
                     dialogContext,
                   );
-
-                  tracking.startScreen(screenVisited);
+                  if (screenVisited != null) {
+                    tracking.startScreen(screenVisited);
+                  }
                 }
               });
             }

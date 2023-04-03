@@ -931,15 +931,15 @@ public class Messages {
 
     void initialize(@NonNull SessionMessage msg);
 
-    void startScreen(@NonNull StartScreenMessage msg);
+    void startScreen(@NonNull StartScreenMessage msg, Result<Void> result);
 
-    void endScreen(@NonNull EndScreenMessage msg);
+    void endScreen(@NonNull EndScreenMessage msg, Result<Void> result);
 
     void setEnableConsents(@NonNull ConsentsMessage msg);
 
     void setDisableConsents(@NonNull ConsentsMessage msg);
 
-    void saveScreenshot(@NonNull ScreenshotMessage msg);
+    void saveScreenshot(@NonNull ScreenshotMessage msg, Result<Void> result);
 
     void sendDimensionWithString(@NonNull DimensionStringMessage msg);
 
@@ -1013,13 +1013,24 @@ public class Messages {
                   if (msgArg == null) {
                     throw new NullPointerException("msgArg unexpectedly null.");
                   }
-                  api.startScreen(msgArg);
-                  wrapped.add(0, null);
+                  Result<Void> resultCallback = 
+                      new Result<Void>() {
+                        public void success(Void result) {
+                          wrapped.add(0, null);
+                          reply.reply(wrapped);
+                        }
+
+                        public void error(Throwable error) {
+                          ArrayList<Object> wrappedError = wrapError(error);
+                          reply.reply(wrappedError);
+                        }
+                      };
+
+                  api.startScreen(msgArg, resultCallback);
                 } catch (Error | RuntimeException exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
-                  wrapped = wrappedError;
+                  reply.reply(wrappedError);
                 }
-                reply.reply(wrapped);
               });
         } else {
           channel.setMessageHandler(null);
@@ -1040,13 +1051,24 @@ public class Messages {
                   if (msgArg == null) {
                     throw new NullPointerException("msgArg unexpectedly null.");
                   }
-                  api.endScreen(msgArg);
-                  wrapped.add(0, null);
+                  Result<Void> resultCallback = 
+                      new Result<Void>() {
+                        public void success(Void result) {
+                          wrapped.add(0, null);
+                          reply.reply(wrapped);
+                        }
+
+                        public void error(Throwable error) {
+                          ArrayList<Object> wrappedError = wrapError(error);
+                          reply.reply(wrappedError);
+                        }
+                      };
+
+                  api.endScreen(msgArg, resultCallback);
                 } catch (Error | RuntimeException exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
-                  wrapped = wrappedError;
+                  reply.reply(wrappedError);
                 }
-                reply.reply(wrapped);
               });
         } else {
           channel.setMessageHandler(null);
@@ -1121,13 +1143,24 @@ public class Messages {
                   if (msgArg == null) {
                     throw new NullPointerException("msgArg unexpectedly null.");
                   }
-                  api.saveScreenshot(msgArg);
-                  wrapped.add(0, null);
+                  Result<Void> resultCallback = 
+                      new Result<Void>() {
+                        public void success(Void result) {
+                          wrapped.add(0, null);
+                          reply.reply(wrapped);
+                        }
+
+                        public void error(Throwable error) {
+                          ArrayList<Object> wrappedError = wrapError(error);
+                          reply.reply(wrappedError);
+                        }
+                      };
+
+                  api.saveScreenshot(msgArg, resultCallback);
                 } catch (Error | RuntimeException exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
-                  wrapped = wrappedError;
+                  reply.reply(wrappedError);
                 }
-                reply.reply(wrapped);
               });
         } else {
           channel.setMessageHandler(null);
