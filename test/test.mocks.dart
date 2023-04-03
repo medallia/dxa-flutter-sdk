@@ -2133,8 +2133,8 @@ class MockScreenVisited extends _i1.Mock implements _i12.ScreenVisited {
       (super.noSuchMethod(
         Invocation.getter(#listOfMasks),
         returnValue: <_i4.GlobalKey<_i4.State<_i4.StatefulWidget>>>[],
-        returnValueForMissingStub: <_i4
-            .GlobalKey<_i4.State<_i4.StatefulWidget>>>[],
+        returnValueForMissingStub: <
+            _i4.GlobalKey<_i4.State<_i4.StatefulWidget>>>[],
       ) as List<_i4.GlobalKey<_i4.State<_i4.StatefulWidget>>>);
   @override
   bool get isDialog => (super.noSuchMethod(
