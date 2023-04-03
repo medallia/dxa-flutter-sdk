@@ -376,6 +376,8 @@ AND a screenshot will be sent to native
         //(not exceeding isCurrentScreenOverMaxDuration)
         when(mockScreenVisited.timestamp)
             .thenReturn(DateTime.now().millisecondsSinceEpoch - 10000);
+        when(mockScreenVisited.endTimestamp)
+            .thenReturn(DateTime.now().millisecondsSinceEpoch);
         await sessionReplay.closeScreenVideo(mockScreenVisited);
         //THEN last screenshot will be null
         await Future.value(() {
