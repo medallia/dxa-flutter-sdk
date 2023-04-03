@@ -174,7 +174,9 @@ class SessionReplay {
     screenVisited.screenshotTakenList.add(
       ScreenShotTaken(startFocusTime: startFocusTime),
     );
-    logger.d('Save screenshot - screenName: $screenName - screenId: $screenId');
+    logger.d(
+      'Save screenshot - screenName: $screenName - screenId: $screenId - startFocusTime: $startFocusTime',
+    );
     await _nativeApiInstance.saveScreenshot(screenshotMessage);
   }
 
@@ -189,7 +191,7 @@ class SessionReplay {
       if (screenVisited.isCurrentScreenOverMaxDuration) {
         startFocusTime = screenVisited.maximumDurationForLastScreenshot;
       } else {
-        startFocusTime = DateTime.now().millisecondsSinceEpoch;
+        startFocusTime = screenVisited.endTimestamp! - 500;
       }
 
       final ScreenshotMessage screenShotMessage = lastScreenshotSent!;
