@@ -22,14 +22,14 @@ class _ScreenWidgetInheritedWidget extends InheritedWidget {
   }
 }
 
-class _MaskList extends InheritedWidget {
-  const _MaskList({required this.listOfMasks, required Widget child})
+class MaskList extends InheritedWidget {
+  const MaskList({required this.listOfMasks, required Widget child})
       : super(child: child);
   final List<GlobalKey> listOfMasks;
 
-  static _MaskList? of(BuildContext context) {
-    final _MaskList? result =
-        context.dependOnInheritedWidgetOfExactType<_MaskList>();
+  static MaskList? of(BuildContext context) {
+    final MaskList? result =
+        context.dependOnInheritedWidgetOfExactType<MaskList>();
     assert(
       result != null,
       "Couldn't find an ancestor of type ScreenWidget.",
@@ -38,7 +38,7 @@ class _MaskList extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(covariant _MaskList oldWidget) {
+  bool updateShouldNotify(covariant MaskList oldWidget) {
     return listOfMasks != oldWidget.listOfMasks;
   }
 }

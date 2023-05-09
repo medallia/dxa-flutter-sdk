@@ -39,12 +39,6 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 - (NSArray *)toList;
 @end
 
-@interface FLTConsentsMessage ()
-+ (FLTConsentsMessage *)fromList:(NSArray *)list;
-+ (nullable FLTConsentsMessage *)nullableFromList:(NSArray *)list;
-- (NSArray *)toList;
-@end
-
 @interface FLTScreenshotMessage ()
 + (FLTScreenshotMessage *)fromList:(NSArray *)list;
 + (nullable FLTScreenshotMessage *)nullableFromList:(NSArray *)list;
@@ -152,7 +146,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 @implementation FLTSessionMessage
 + (instancetype)makeWithAccount:(NSNumber *)account
     property:(NSNumber *)property
-    consents:(NSArray<NSNumber *> *)consents
+    consents:(NSNumber *)consents
     version:(NSString *)version {
   FLTSessionMessage* pigeonResult = [[FLTSessionMessage alloc] init];
   pigeonResult.account = account;
@@ -182,28 +176,6 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     (self.property ?: [NSNull null]),
     (self.consents ?: [NSNull null]),
     (self.version ?: [NSNull null]),
-  ];
-}
-@end
-
-@implementation FLTConsentsMessage
-+ (instancetype)makeWithConsents:(NSArray<NSNumber *> *)consents {
-  FLTConsentsMessage* pigeonResult = [[FLTConsentsMessage alloc] init];
-  pigeonResult.consents = consents;
-  return pigeonResult;
-}
-+ (FLTConsentsMessage *)fromList:(NSArray *)list {
-  FLTConsentsMessage *pigeonResult = [[FLTConsentsMessage alloc] init];
-  pigeonResult.consents = GetNullableObjectAtIndex(list, 0);
-  NSAssert(pigeonResult.consents != nil, @"");
-  return pigeonResult;
-}
-+ (nullable FLTConsentsMessage *)nullableFromList:(NSArray *)list {
-  return (list) ? [FLTConsentsMessage fromList:list] : nil;
-}
-- (NSArray *)toList {
-  return @[
-    (self.consents ?: [NSNull null]),
   ];
 }
 @end
@@ -358,22 +330,20 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 - (nullable id)readValueOfType:(UInt8)type {
   switch (type) {
     case 128: 
-      return [FLTConsentsMessage fromList:[self readValue]];
-    case 129: 
       return [FLTDimensionBoolMessage fromList:[self readValue]];
-    case 130: 
+    case 129: 
       return [FLTDimensionNumberMessage fromList:[self readValue]];
-    case 131: 
+    case 130: 
       return [FLTDimensionStringMessage fromList:[self readValue]];
-    case 132: 
+    case 131: 
       return [FLTEndScreenMessage fromList:[self readValue]];
-    case 133: 
+    case 132: 
       return [FLTGoalMessage fromList:[self readValue]];
-    case 134: 
+    case 133: 
       return [FLTScreenshotMessage fromList:[self readValue]];
-    case 135: 
+    case 134: 
       return [FLTSessionMessage fromList:[self readValue]];
-    case 136: 
+    case 135: 
       return [FLTStartScreenMessage fromList:[self readValue]];
     default:
       return [super readValueOfType:type];
@@ -385,32 +355,29 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 @end
 @implementation FLTMedalliaDxaNativeApiCodecWriter
 - (void)writeValue:(id)value {
-  if ([value isKindOfClass:[FLTConsentsMessage class]]) {
+  if ([value isKindOfClass:[FLTDimensionBoolMessage class]]) {
     [self writeByte:128];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTDimensionBoolMessage class]]) {
+  } else if ([value isKindOfClass:[FLTDimensionNumberMessage class]]) {
     [self writeByte:129];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTDimensionNumberMessage class]]) {
+  } else if ([value isKindOfClass:[FLTDimensionStringMessage class]]) {
     [self writeByte:130];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTDimensionStringMessage class]]) {
+  } else if ([value isKindOfClass:[FLTEndScreenMessage class]]) {
     [self writeByte:131];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTEndScreenMessage class]]) {
+  } else if ([value isKindOfClass:[FLTGoalMessage class]]) {
     [self writeByte:132];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTGoalMessage class]]) {
+  } else if ([value isKindOfClass:[FLTScreenshotMessage class]]) {
     [self writeByte:133];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTScreenshotMessage class]]) {
+  } else if ([value isKindOfClass:[FLTSessionMessage class]]) {
     [self writeByte:134];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTSessionMessage class]]) {
-    [self writeByte:135];
-    [self writeValue:[value toList]];
   } else if ([value isKindOfClass:[FLTStartScreenMessage class]]) {
-    [self writeByte:136];
+    [self writeByte:135];
     [self writeValue:[value toList]];
   } else {
     [super writeValue:value];
@@ -447,13 +414,13 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
         binaryMessenger:binaryMessenger
         codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(initializeMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(initializeMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(initializeMsg:completion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(initializeMsg:completion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTSessionMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
-        FlutterError *error;
-        [api initializeMsg:arg_msg error:&error];
-        callback(wrapResult(nil, error));
+        [api initializeMsg:arg_msg completion:^(FlutterError *_Nullable error) {
+          callback(wrapResult(nil, error));
+        }];
       }];
     } else {
       [channel setMessageHandler:nil];
@@ -500,35 +467,16 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.setEnableConsents"
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.setConsents"
         binaryMessenger:binaryMessenger
         codec:FLTMedalliaDxaNativeApiGetCodec()];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(setEnableConsentsMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(setEnableConsentsMsg:error:)", api);
+      NSCAssert([api respondsToSelector:@selector(setConsentsValue:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(setConsentsValue:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
-        FLTConsentsMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
+        NSNumber *arg_value = GetNullableObjectAtIndex(args, 0);
         FlutterError *error;
-        [api setEnableConsentsMsg:arg_msg error:&error];
-        callback(wrapResult(nil, error));
-      }];
-    } else {
-      [channel setMessageHandler:nil];
-    }
-  }
-  {
-    FlutterBasicMessageChannel *channel =
-      [[FlutterBasicMessageChannel alloc]
-        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.setDisableConsents"
-        binaryMessenger:binaryMessenger
-        codec:FLTMedalliaDxaNativeApiGetCodec()];
-    if (api) {
-      NSCAssert([api respondsToSelector:@selector(setDisableConsentsMsg:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(setDisableConsentsMsg:error:)", api);
-      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
-        NSArray *args = message;
-        FLTConsentsMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
-        FlutterError *error;
-        [api setDisableConsentsMsg:arg_msg error:&error];
+        [api setConsentsValue:arg_value error:&error];
         callback(wrapResult(nil, error));
       }];
     } else {
@@ -769,6 +717,23 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
       NSCAssert([api respondsToSelector:@selector(getSessionIdWithCompletion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(getSessionIdWithCompletion:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         [api getSessionIdWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
+        }];
+      }];
+    } else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [[FlutterBasicMessageChannel alloc]
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionUrl"
+        binaryMessenger:binaryMessenger
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(getSessionUrlWithCompletion:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(getSessionUrlWithCompletion:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        [api getSessionUrlWithCompletion:^(NSString *_Nullable output, FlutterError *_Nullable error) {
           callback(wrapResult(output, error));
         }];
       }];

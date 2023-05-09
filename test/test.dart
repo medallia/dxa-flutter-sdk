@@ -3,6 +3,7 @@ import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart';
+import 'package:decibel_sdk/src/features/manual_tracking/manual_tracking.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
@@ -22,6 +23,7 @@ import 'test_files/session_replay_test.dart' as session_replay_test;
   MockSpec<MedalliaDxaNativeApi>(),
   MockSpec<MedalliaDxaConfig>(),
   MockSpec<SessionReplay>(),
+  MockSpec<ScreenshotTaker>(),
   MockSpec<GoalsAndDimensions>(),
   MockSpec<AutoMasking>(),
   MockSpec<HttpErrors>(),
@@ -30,6 +32,7 @@ import 'test_files/session_replay_test.dart' as session_replay_test;
   MockSpec<FrameTracking>(),
   MockSpec<PlaceholderImageConfig>(),
   MockSpec<Tracking>(),
+  MockSpec<ManualTracking>(),
 
   MockSpec<ScreenVisited>(),
   //Third parties

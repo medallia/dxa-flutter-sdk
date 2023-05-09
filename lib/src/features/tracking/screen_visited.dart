@@ -1,3 +1,4 @@
+import 'package:decibel_sdk/src/messages.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -25,6 +26,8 @@ class ScreenVisited {
   bool get widgetInTheTree {
     return getCurrentContext != null;
   }
+
+  Element get rootElementForAutomasking => getCurrentContext! as Element;
 
   final bool finished;
   int get uniqueId => id.hashCode ^ timestamp.hashCode;
@@ -181,6 +184,10 @@ class ScreenVisited {
     );
   }
 
+  Size getSize(RenderObject renderObject) {
+    return MediaQuery.of(getCurrentContext!).size;
+  }
+
   @override
   String toString() {
     return 'ScreenVisited(id: $id, uniqueid $uniqueId, name: $name, timestamp: $timestamp, endTimestamp: $endTimestamp, isTabBar: $isTabBar, finished: $finished)';
@@ -303,6 +310,10 @@ class ScreenVisitedTabBar extends ScreenVisited {
 
 @immutable
 class ScreenShotTaken {
-  final int startFocusTime;
-  const ScreenShotTaken({required this.startFocusTime});
+  final bool isPlaceholder;
+  final ScreenshotMessage screenshotMessage;
+  const ScreenShotTaken({
+    required this.isPlaceholder,
+    required this.screenshotMessage,
+  });
 }

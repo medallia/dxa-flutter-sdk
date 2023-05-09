@@ -7,7 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 
-enum PlaceholderTypeEnum { replayDisabled, noPreviewAvailable }
+enum PlaceholderTypeEnum {
+  replayDisabled,
+  noPreviewAvailable,
+  performanceStress
+}
 
 class PlaceholderType {
   final PlaceholderTypeEnum placeholderTypeEnum;
@@ -22,6 +26,9 @@ class PlaceholderType {
       case PlaceholderTypeEnum.noPreviewAvailable:
         return 'No preview available';
 
+      case PlaceholderTypeEnum.performanceStress:
+        return 'The device is stressed';
+
       default:
         return 'No preview available';
     }
@@ -32,28 +39,45 @@ class PlaceholderImageConfig {
   PlaceholderImageConfig._internal();
   static final _instance = PlaceholderImageConfig._internal();
   static PlaceholderImageConfig get instance => _instance;
-  final HashMap<Size, ByteData> placeholderImageByteDataMap = HashMap();
+  final HashMap<PlaceholderImageId, ByteData> placeholderImageByteDataMap =
+      HashMap();
+
   ByteData? placeHolderIcon;
+  static const Size _fallbackSize = Size(200, 500);
+  Size lastSize = _fallbackSize;
 
   FutureOr<ByteData> getPlaceholderImage(
-    BuildContext context,
+    BuildContext? context,
     PlaceholderType placeholderType,
   ) async {
-    final Size size = MediaQuery.of(context).size;
-    if (placeholderImageByteDataMap.containsKey(size)) {
-      return placeholderImageByteDataMap[size]!;
+    late Size size;
+    if (context == null) {
+      size = lastSize;
+    } else {
+      size = MediaQuery.of(context).size;
+      if (size.width <= 0 || size.height <= 0) {
+        size = _fallbackSize;
+      }
+    }
+    lastSize = size;
+    final placeholderImageId = PlaceholderImageId(
+      size: size,
+      type: placeholderType.placeholderTypeEnum,
+    );
+
+    if (placeholderImageByteDataMap.containsKey(placeholderImageId)) {
+      return placeholderImageByteDataMap[placeholderImageId]!;
     }
     final ByteData placeholderImage =
-        await _createPlaceHolderImage(context, placeholderType);
-    placeholderImageByteDataMap[size] = placeholderImage;
+        await _createPlaceHolderImage(size, placeholderType);
+    placeholderImageByteDataMap[placeholderImageId] = placeholderImage;
     return placeholderImage;
   }
 
   Future<ByteData> _createPlaceHolderImage(
-    BuildContext context,
+    Size size,
     PlaceholderType placeholderType,
   ) async {
-    final Size size = MediaQuery.of(context).size;
     final double screenWidth = size.width;
     final double screenHeight = size.height;
     final recorder = ui.PictureRecorder();
@@ -73,6 +97,7 @@ class PlaceholderImageConfig {
     final textPainter = TextPainter(
       text: textSpan,
       textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
     );
     textPainter.layout(
       maxWidth: size.width,
@@ -117,4 +142,25 @@ class PlaceholderImageConfig {
   FutureOr<ByteData> _getPlaceholderIcon() async =>
       placeHolderIcon ??= await rootBundle
           .load('packages/decibel_sdk/assets/placeholder_image.svg');
+}
+
+///used to cache placeholder images by size and text, so they can be reused
+///instead of creating a new one each time
+class PlaceholderImageId {
+  final Size size;
+  final PlaceholderTypeEnum type;
+  PlaceholderImageId({
+    required this.size,
+    required this.type,
+  });
+
+  @override
+  bool operator ==(covariant PlaceholderImageId other) {
+    if (identical(this, other)) return true;
+
+    return other.size == size && other.type == type;
+  }
+
+  @override
+  int get hashCode => size.hashCode ^ type.hashCode;
 }

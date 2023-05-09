@@ -1,6 +1,7 @@
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
+import 'package:decibel_sdk/src/features/manual_tracking/manual_tracking.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
@@ -11,6 +12,7 @@ class DependencyInjector {
   factory DependencyInjector({
     required MedalliaDxaConfig config,
     required Tracking tracking,
+    required ManualTracking manualTracking,
     required SessionReplay sessionReplay,
     required LoggerSDK loggerSdk,
     required AutoMasking autoMasking,
@@ -21,6 +23,7 @@ class DependencyInjector {
     return _instance = DependencyInjector._(
       config: config,
       tracking: tracking,
+      manualTracking: manualTracking,
       sessionReplay: sessionReplay,
       loggerSdk: loggerSdk,
       autoMasking: autoMasking,
@@ -32,6 +35,7 @@ class DependencyInjector {
   DependencyInjector._({
     required this.config,
     required this.tracking,
+    required this.manualTracking,
     required this.sessionReplay,
     required this.loggerSdk,
     required this.autoMasking,
@@ -45,6 +49,7 @@ class DependencyInjector {
 
   final MedalliaDxaConfig config;
   final Tracking tracking;
+  final ManualTracking manualTracking;
   final SessionReplay sessionReplay;
   final LoggerSDK loggerSdk;
   final AutoMasking autoMasking;

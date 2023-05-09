@@ -302,13 +302,13 @@ public class Messages {
       this.property = setterArg;
     }
 
-    private @NonNull List<Long> consents;
+    private @NonNull Long consents;
 
-    public @NonNull List<Long> getConsents() {
+    public @NonNull Long getConsents() {
       return consents;
     }
 
-    public void setConsents(@NonNull List<Long> setterArg) {
+    public void setConsents(@NonNull Long setterArg) {
       if (setterArg == null) {
         throw new IllegalStateException("Nonnull field \"consents\" is null.");
       }
@@ -347,9 +347,9 @@ public class Messages {
         return this;
       }
 
-      private @Nullable List<Long> consents;
+      private @Nullable Long consents;
 
-      public @NonNull Builder setConsents(@NonNull List<Long> setterArg) {
+      public @NonNull Builder setConsents(@NonNull Long setterArg) {
         this.consents = setterArg;
         return this;
       }
@@ -388,58 +388,9 @@ public class Messages {
       Object property = list.get(1);
       pigeonResult.setProperty((property == null) ? null : ((property instanceof Integer) ? (Integer) property : (Long) property));
       Object consents = list.get(2);
-      pigeonResult.setConsents((List<Long>) consents);
+      pigeonResult.setConsents((consents == null) ? null : ((consents instanceof Integer) ? (Integer) consents : (Long) consents));
       Object version = list.get(3);
       pigeonResult.setVersion((String) version);
-      return pigeonResult;
-    }
-  }
-
-  /** Generated class from Pigeon that represents data sent in messages. */
-  public static final class ConsentsMessage {
-    private @NonNull List<Long> consents;
-
-    public @NonNull List<Long> getConsents() {
-      return consents;
-    }
-
-    public void setConsents(@NonNull List<Long> setterArg) {
-      if (setterArg == null) {
-        throw new IllegalStateException("Nonnull field \"consents\" is null.");
-      }
-      this.consents = setterArg;
-    }
-
-    /** Constructor is private to enforce null safety; use Builder. */
-    private ConsentsMessage() {}
-
-    public static final class Builder {
-
-      private @Nullable List<Long> consents;
-
-      public @NonNull Builder setConsents(@NonNull List<Long> setterArg) {
-        this.consents = setterArg;
-        return this;
-      }
-
-      public @NonNull ConsentsMessage build() {
-        ConsentsMessage pigeonReturn = new ConsentsMessage();
-        pigeonReturn.setConsents(consents);
-        return pigeonReturn;
-      }
-    }
-
-    @NonNull
-    ArrayList<Object> toList() {
-      ArrayList<Object> toListResult = new ArrayList<Object>(1);
-      toListResult.add(consents);
-      return toListResult;
-    }
-
-    static @NonNull ConsentsMessage fromList(@NonNull ArrayList<Object> list) {
-      ConsentsMessage pigeonResult = new ConsentsMessage();
-      Object consents = list.get(0);
-      pigeonResult.setConsents((List<Long>) consents);
       return pigeonResult;
     }
   }
@@ -869,22 +820,20 @@ public class Messages {
     protected Object readValueOfType(byte type, @NonNull ByteBuffer buffer) {
       switch (type) {
         case (byte) 128:
-          return ConsentsMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 129:
           return DimensionBoolMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 130:
+        case (byte) 129:
           return DimensionNumberMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 131:
+        case (byte) 130:
           return DimensionStringMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 132:
+        case (byte) 131:
           return EndScreenMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 133:
+        case (byte) 132:
           return GoalMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 134:
+        case (byte) 133:
           return ScreenshotMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 135:
+        case (byte) 134:
           return SessionMessage.fromList((ArrayList<Object>) readValue(buffer));
-        case (byte) 136:
+        case (byte) 135:
           return StartScreenMessage.fromList((ArrayList<Object>) readValue(buffer));
         default:
           return super.readValueOfType(type, buffer);
@@ -893,32 +842,29 @@ public class Messages {
 
     @Override
     protected void writeValue(@NonNull ByteArrayOutputStream stream, Object value) {
-      if (value instanceof ConsentsMessage) {
+      if (value instanceof DimensionBoolMessage) {
         stream.write(128);
-        writeValue(stream, ((ConsentsMessage) value).toList());
-      } else if (value instanceof DimensionBoolMessage) {
-        stream.write(129);
         writeValue(stream, ((DimensionBoolMessage) value).toList());
       } else if (value instanceof DimensionNumberMessage) {
-        stream.write(130);
+        stream.write(129);
         writeValue(stream, ((DimensionNumberMessage) value).toList());
       } else if (value instanceof DimensionStringMessage) {
-        stream.write(131);
+        stream.write(130);
         writeValue(stream, ((DimensionStringMessage) value).toList());
       } else if (value instanceof EndScreenMessage) {
-        stream.write(132);
+        stream.write(131);
         writeValue(stream, ((EndScreenMessage) value).toList());
       } else if (value instanceof GoalMessage) {
-        stream.write(133);
+        stream.write(132);
         writeValue(stream, ((GoalMessage) value).toList());
       } else if (value instanceof ScreenshotMessage) {
-        stream.write(134);
+        stream.write(133);
         writeValue(stream, ((ScreenshotMessage) value).toList());
       } else if (value instanceof SessionMessage) {
-        stream.write(135);
+        stream.write(134);
         writeValue(stream, ((SessionMessage) value).toList());
       } else if (value instanceof StartScreenMessage) {
-        stream.write(136);
+        stream.write(135);
         writeValue(stream, ((StartScreenMessage) value).toList());
       } else {
         super.writeValue(stream, value);
@@ -929,15 +875,13 @@ public class Messages {
   /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
   public interface MedalliaDxaNativeApi {
 
-    void initialize(@NonNull SessionMessage msg);
+    void initialize(@NonNull SessionMessage msg, Result<Void> result);
 
     void startScreen(@NonNull StartScreenMessage msg, Result<Void> result);
 
     void endScreen(@NonNull EndScreenMessage msg, Result<Void> result);
 
-    void setEnableConsents(@NonNull ConsentsMessage msg);
-
-    void setDisableConsents(@NonNull ConsentsMessage msg);
+    void setConsents(@NonNull Long value);
 
     void saveScreenshot(@NonNull ScreenshotMessage msg, Result<Void> result);
 
@@ -965,6 +909,8 @@ public class Messages {
 
     void getSessionId(Result<String> result);
 
+    void getSessionUrl(Result<String> result);
+
     /** The codec used by MedalliaDxaNativeApi. */
     static MessageCodec<Object> getCodec() {
       return MedalliaDxaNativeApiCodec.INSTANCE;
@@ -986,13 +932,24 @@ public class Messages {
                   if (msgArg == null) {
                     throw new NullPointerException("msgArg unexpectedly null.");
                   }
-                  api.initialize(msgArg);
-                  wrapped.add(0, null);
+                  Result<Void> resultCallback = 
+                      new Result<Void>() {
+                        public void success(Void result) {
+                          wrapped.add(0, null);
+                          reply.reply(wrapped);
+                        }
+
+                        public void error(Throwable error) {
+                          ArrayList<Object> wrappedError = wrapError(error);
+                          reply.reply(wrappedError);
+                        }
+                      };
+
+                  api.initialize(msgArg, resultCallback);
                 } catch (Error | RuntimeException exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
-                  wrapped = wrappedError;
+                  reply.reply(wrappedError);
                 }
-                reply.reply(wrapped);
               });
         } else {
           channel.setMessageHandler(null);
@@ -1077,7 +1034,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.setEnableConsents", getCodec());
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.setConsents", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -1085,38 +1042,11 @@ public class Messages {
                 try {
                   ArrayList<Object> args = (ArrayList<Object>) message;
                   assert args != null;
-                  ConsentsMessage msgArg = (ConsentsMessage) args.get(0);
-                  if (msgArg == null) {
-                    throw new NullPointerException("msgArg unexpectedly null.");
+                  Number valueArg = (Number) args.get(0);
+                  if (valueArg == null) {
+                    throw new NullPointerException("valueArg unexpectedly null.");
                   }
-                  api.setEnableConsents(msgArg);
-                  wrapped.add(0, null);
-                } catch (Error | RuntimeException exception) {
-                  ArrayList<Object> wrappedError = wrapError(exception);
-                  wrapped = wrappedError;
-                }
-                reply.reply(wrapped);
-              });
-        } else {
-          channel.setMessageHandler(null);
-        }
-      }
-      {
-        BasicMessageChannel<Object> channel =
-            new BasicMessageChannel<>(
-                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.setDisableConsents", getCodec());
-        if (api != null) {
-          channel.setMessageHandler(
-              (message, reply) -> {
-                ArrayList<Object> wrapped = new ArrayList<Object>();
-                try {
-                  ArrayList<Object> args = (ArrayList<Object>) message;
-                  assert args != null;
-                  ConsentsMessage msgArg = (ConsentsMessage) args.get(0);
-                  if (msgArg == null) {
-                    throw new NullPointerException("msgArg unexpectedly null.");
-                  }
-                  api.setDisableConsents(msgArg);
+                  api.setConsents((valueArg == null) ? null : valueArg.longValue());
                   wrapped.add(0, null);
                 } catch (Error | RuntimeException exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
@@ -1485,6 +1415,38 @@ public class Messages {
                       };
 
                   api.getSessionId(resultCallback);
+                } catch (Error | RuntimeException exception) {
+                  ArrayList<Object> wrappedError = wrapError(exception);
+                  reply.reply(wrappedError);
+                }
+              });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionUrl", getCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+              (message, reply) -> {
+                ArrayList<Object> wrapped = new ArrayList<Object>();
+                try {
+                  Result<String> resultCallback = 
+                      new Result<String>() {
+                        public void success(String result) {
+                          wrapped.add(0, result);
+                          reply.reply(wrapped);
+                        }
+
+                        public void error(Throwable error) {
+                          ArrayList<Object> wrappedError = wrapError(error);
+                          reply.reply(wrappedError);
+                        }
+                      };
+
+                  api.getSessionUrl(resultCallback);
                 } catch (Error | RuntimeException exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   reply.reply(wrappedError);

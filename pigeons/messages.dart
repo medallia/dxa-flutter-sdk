@@ -38,20 +38,13 @@ class EndScreenMessage {
 class SessionMessage {
   final int account;
   final int property;
-  final List<int?> consents;
+  final int consents;
   final String version;
   const SessionMessage({
     required this.account,
     required this.property,
     required this.consents,
     required this.version,
-  });
-}
-
-class ConsentsMessage {
-  final List<int?> consents;
-  const ConsentsMessage({
-    required this.consents,
   });
 }
 
@@ -106,13 +99,13 @@ class GoalMessage {
 
 @HostApi()
 abstract class MedalliaDxaNativeApi {
+  @async
   void initialize(SessionMessage msg);
   @async
   void startScreen(StartScreenMessage msg);
   @async
   void endScreen(EndScreenMessage msg);
-  void setEnableConsents(ConsentsMessage msg);
-  void setDisableConsents(ConsentsMessage msg);
+  void setConsents(int value);
   @async
   void saveScreenshot(ScreenshotMessage msg);
   void sendDimensionWithString(DimensionStringMessage msg);
@@ -129,4 +122,6 @@ abstract class MedalliaDxaNativeApi {
   String getWebViewProperties();
   @async
   String getSessionId();
+  @async
+  String getSessionUrl();
 }

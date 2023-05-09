@@ -13,7 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class FLTStartScreenMessage;
 @class FLTEndScreenMessage;
 @class FLTSessionMessage;
-@class FLTConsentsMessage;
 @class FLTScreenshotMessage;
 @class FLTDimensionStringMessage;
 @class FLTDimensionNumberMessage;
@@ -51,19 +50,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)makeWithAccount:(NSNumber *)account
     property:(NSNumber *)property
-    consents:(NSArray<NSNumber *> *)consents
+    consents:(NSNumber *)consents
     version:(NSString *)version;
 @property(nonatomic, strong) NSNumber * account;
 @property(nonatomic, strong) NSNumber * property;
-@property(nonatomic, strong) NSArray<NSNumber *> * consents;
+@property(nonatomic, strong) NSNumber * consents;
 @property(nonatomic, copy) NSString * version;
-@end
-
-@interface FLTConsentsMessage : NSObject
-/// `init` unavailable to enforce nonnull fields, see the `make` class method.
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)makeWithConsents:(NSArray<NSNumber *> *)consents;
-@property(nonatomic, strong) NSArray<NSNumber *> * consents;
 @end
 
 @interface FLTScreenshotMessage : NSObject
@@ -119,11 +111,10 @@ NS_ASSUME_NONNULL_BEGIN
 NSObject<FlutterMessageCodec> *FLTMedalliaDxaNativeApiGetCodec(void);
 
 @protocol FLTMedalliaDxaNativeApi
-- (void)initializeMsg:(FLTSessionMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)initializeMsg:(FLTSessionMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
 - (void)startScreenMsg:(FLTStartScreenMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
 - (void)endScreenMsg:(FLTEndScreenMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
-- (void)setEnableConsentsMsg:(FLTConsentsMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
-- (void)setDisableConsentsMsg:(FLTConsentsMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)setConsentsValue:(NSNumber *)value error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)saveScreenshotMsg:(FLTScreenshotMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
 - (void)sendDimensionWithStringMsg:(FLTDimensionStringMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendDimensionWithNumberMsg:(FLTDimensionNumberMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
@@ -137,6 +128,7 @@ NSObject<FlutterMessageCodec> *FLTMedalliaDxaNativeApiGetCodec(void);
 - (void)enableScreenForAnalysisValue:(NSNumber *)value error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)getWebViewPropertiesWithCompletion:(void (^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 - (void)getSessionIdWithCompletion:(void (^)(NSString *_Nullable, FlutterError *_Nullable))completion;
+- (void)getSessionUrlWithCompletion:(void (^)(NSString *_Nullable, FlutterError *_Nullable))completion;
 @end
 
 extern void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NSObject<FLTMedalliaDxaNativeApi> *_Nullable api);

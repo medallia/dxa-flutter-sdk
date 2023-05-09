@@ -10,14 +10,18 @@ class TrackingCompleter {
   Future<void> startScreenTasksCompleterWrapper(
     Future<void> Function() function,
   ) async {
+    final List<Completer<dynamic>> startScreenEnqued =
+        List.from(tracking.startScreenEnquedCompleterList);
+
+    final Completer completer = Completer();
+    tracking.startScreenEnquedCompleterList.add(completer);
     await Future.wait(
-      tracking.startScreenEnquedCompleterList.map((e) {
+      startScreenEnqued.map((e) {
         return e.future;
       }),
     );
-    tracking.startScreenEnquedCompleterList.clear();
-    final Completer completer = Completer();
-    tracking.startScreenEnquedCompleterList.add(completer);
+    tracking.startScreenEnquedCompleterList
+        .removeWhere((completer) => completer.isCompleted);
     await function.call();
     completer.complete();
   }
@@ -93,5 +97,29 @@ class TrackingCompleter {
       return context.state.mounted;
     }
     return true;
+  }
+}
+
+class TaskCompleter {
+  final Map<int, Future> completerMap = {};
+
+  ///Stores this async function future so other functions can wait
+  ///for it to finish
+  Future<T> functionCompleterWrapper<T>(
+    int hashCode,
+    Future<T> Function() function,
+  ) async {
+    final Future<T> returnValue = function.call();
+    completerMap.addAll(<int, Future>{hashCode: returnValue});
+
+    return returnValue;
+  }
+
+  ///Waits for the async function of this hashcode
+  Future<void> waitForFunctionCompleter(int hashCode) async {
+    final Future? future = completerMap[hashCode];
+    await future;
+    // ignore: unawaited_futures
+    completerMap.remove(hashCode);
   }
 }

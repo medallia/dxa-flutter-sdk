@@ -3,12 +3,14 @@ package com.decibel.decibel_sdk
 import android.app.Activity
 import android.util.Log
 import com.decibel.common.enums.CustomerConsentType
-import com.decibel.builder.prod.Decibel
+import com.decibel.builder.dev.Decibel
 import com.decibel.common.enums.PlatformType
 import com.decibel.common.internal.logic.providers.ActivityProvider
 import com.decibel.common.internal.logic.providers.ActivityResumedListener
 import com.decibel.common.internal.models.Customer
 import com.decibel.common.internal.models.Multiplatform
+import com.decibel.common.internal.models.SdkConfig
+import com.decibel.common.internal.models.Session
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -29,6 +31,11 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         log("Attaching to engine...")
+        startCollectSdkConfig()
+        startCollectSessionsInfo()
+        startCollectCpuUsageMetric()
+        startCollectBatteryLevelMetric()
+        startCollectAllocatedMemoryMetric()
         Messages.MedalliaDxaNativeApi.setup(flutterPluginBinding.binaryMessenger, this)
         ActivityProvider.addListen(onFlutterActivityResumedListener)
     }
@@ -41,41 +48,40 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         binderScope.cancel()
     }
 
-
-    override fun initialize(arg: Messages.SessionMessage) {
+    override fun initialize(msg: Messages.SessionMessage, result: Messages.Result<Void>?) {
+        val initTime = Date().time
         log(
-                message = "calling initialize: account=${arg.account} - property${arg.property} - " +
-                        "version=${arg.version} - consents=${arg.consents}"
+            message = "calling initialize: account=${msg.account} - property${msg.property} - " +
+                    "version=${msg.version} - consents=${msg.consents}"
         )
-        arg.consents.let {
-            val consents = translateConsentsFlutterToAndroid(it.map(Long::toInt))
-            Decibel.sdk.initialize(
-                    customer = Customer(arg.account, arg.property),
-                    customerConsent = consents,
-                    platform = Multiplatform(type = PlatformType.FLUTTER)
+        val consents = translateConsentsFlutterToAndroid(msg.consents)
+        binderScope.launch {
+            val config = Decibel.sdk.standaloneInitialize(
+                customer = Customer(msg.account, msg.property),
+                customerConsent = consents,
+                platform = Multiplatform(type = PlatformType.FLUTTER)
             )
+            log(message = "Initial config: $config")
+            val endTime = Date().time
+            log(message = "initialize SDK took: ${endTime - initTime}")
+            result?.success(null)
         }
     }
 
     override fun startScreen(
-            msg: Messages.StartScreenMessage,
-            result: Messages.Result<Void>?
+        msg: Messages.StartScreenMessage,
+        result: Messages.Result<Void>?
     ) {
         msg.run {
-
-
             val initTime = Date().time
             log(
-                    message = "calling startScreen: screenID=${screenId} - screenName${screenName} - " +
-                            "startTime=${startTime} - isBackground=${isBackground}"
+                message = "calling startScreen: screenID=${screenId} - screenName${screenName} - " +
+                        "startTime=${startTime} - isBackground=${isBackground}"
             )
-
-
             val currentActivity = latestFlutterActivity.get() ?: ActivityProvider.currentActivity
             ?: let {
                 return@run result?.success(null)
             }
-
             val job = Decibel.sdk.startScreen(msg.screenId, msg.screenName, msg.startTime, currentActivity)
             binderScope.launch {
                 job.join()
@@ -87,23 +93,20 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
     }
 
     override fun endScreen(
-            msg: Messages.EndScreenMessage,
-            result: Messages.Result<Void>?
+        msg: Messages.EndScreenMessage,
+        result: Messages.Result<Void>?
     ) {
         msg.run {
-
-
             val initTime = Date().time
             log(
-                    message = "calling endScreen: screenID=${screenId} - screenName${screenName} - " +
-                            "endTime=${endTime} - isBackground=${isBackground}"
+                message = "calling endScreen: screenID=${screenId} - screenName${screenName} - " +
+                        "endTime=${endTime} - isBackground=${isBackground}"
             )
             val currentActivity = latestFlutterActivity.get() ?: ActivityProvider.currentActivity
             if (currentActivity == null) {
                 result?.success(null)
                 return
             }
-
             val job = Decibel.sdk.endScreen(msg.screenId, msg.screenName, msg.endTime, currentActivity)
             binderScope.launch {
                 job.join()
@@ -111,33 +114,24 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
                 log(message = "endScreen took: ${endTime - initTime}")
                 result?.success(null)
             }
-
         }
     }
 
-    override fun setEnableConsents(arg: Messages.ConsentsMessage) {
-        arg.consents.let {
-            val consents = translateConsentsFlutterToAndroid(it.map(Long::toInt))
-            Decibel.sdk.enableUserConsent(consents)
-        }
-    }
-
-    override fun setDisableConsents(arg: Messages.ConsentsMessage) {
-        arg.consents.let {
-            val consents = translateConsentsFlutterToAndroid(it.map(Long::toInt))
-            Decibel.sdk.disableUserConsent(consents)
-        }
+    override fun setConsents(consentLevel: Long) {
+        Decibel.sdk.setConsent(
+            translateConsentsFlutterToAndroid(consentLevel)
+        )
     }
 
     override fun saveScreenshot(
-            msg: Messages.ScreenshotMessage,
-            result: Messages.Result<Void>?
+        msg: Messages.ScreenshotMessage,
+        result: Messages.Result<Void>?
     ) {
         msg.run {
             val initTime = Date().time
             log(
-                    message = "calling saveScreenshot: screenID=${screenId} - screenName${screenName} - " +
-                            "startFocusTime=${startFocusTime} - screenshotDataSize=${screenshotData?.size}"
+                message = "calling saveScreenshot: screenID=${screenId} - screenName${screenName} - " +
+                        "startFocusTime=${startFocusTime} - screenshotDataSize=${screenshotData.size}"
             )
 
             val job = Decibel.sdk.saveScreenShot(screenshotData, screenId, screenName, startFocusTime)
@@ -147,8 +141,6 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
                 log(message = "saveScreenshot took: ${endTime - initTime}")
                 result?.success(null)
             }
-
-
         }
     }
 
@@ -197,6 +189,11 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         result.success(Decibel.sdk.getSessionId())
     }
 
+    override fun getSessionUrl(result: Messages.Result<String>) {
+        log(message = "calling getSessionUrl")
+        result.success(Decibel.sdk.getSessionUrl())
+    }
+
     override fun enableSessionForExperience(msg: Boolean) {
         msg.let {
             Decibel.sdk.enableSessionForExperience(it)
@@ -221,34 +218,93 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         }
     }
 
+    private fun startCollectSessionsInfo() {
+        binderScope.launch {
+            Decibel.sdk.getSessionsInfoFlow().collect { newSessionInfo: Session ->
+                log(
+                    message = "new session data info from native: $newSessionInfo",
+                    level = Log.VERBOSE
+                )
+                //TODO: logic to propagate to flutter engine...
+            }
+        }
+    }
+
+    private fun startCollectCpuUsageMetric() {
+        binderScope.launch {
+            Decibel.sdk.getCpuUsageFlow().collect { cpuUsage: Float ->
+                log(
+                    message = "new cpu usage metric from native: $cpuUsage",
+                    level = Log.VERBOSE
+                )
+                //TODO: logic to propagate to flutter engine...
+            }
+        }
+    }
+
+    private fun startCollectBatteryLevelMetric() {
+        binderScope.launch {
+            Decibel.sdk.getBatteryLevelFlow().collect { batteryLevel: Float ->
+                log(
+                    message = "new battery metric from native: $batteryLevel",
+                    level = Log.VERBOSE
+                )
+                //TODO: logic to propagate to flutter engine...
+            }
+        }
+    }
+
+    private fun startCollectAllocatedMemoryMetric() {
+
+        binderScope.launch {
+            Decibel.sdk.getMemoryUsageFlow().collect { memoryUsage: Float ->
+                val totalMemory = Runtime.getRuntime().totalMemory()
+                log(
+                    message = "new memory metric from native: $memoryUsage",
+                    level = Log.VERBOSE
+                )
+                //TODO: logic to propagate to flutter engine...
+            }
+        }
+    }
+
+    private fun startCollectSdkConfig() {
+        binderScope.launch {
+            Decibel.sdk.getConfigFlow().collect { newConfig: SdkConfig? ->
+                log(
+                    message = "new SDK config from native. $newConfig",
+                    level = Log.VERBOSE
+                )
+                //TODO: logic to propagate to flutter engine...
+            }
+        }
+    }
+
     private val onFlutterActivityResumedListener = object : ActivityResumedListener {
         override fun onActivityResumed(activity: Activity) {
             if (activity is FlutterActivity || activity is FlutterFragmentActivity) {
-                log("Detected flutter activity: $activity")
+                log("Detected flutter activity: $activity", level = Log.INFO)
                 latestFlutterActivity = WeakReference(activity)
             }
         }
     }
 
-    private fun translateConsentsFlutterToAndroid(consents: List<Int>): List<CustomerConsentType> {
-        return consents.map {
-            when (it) {
-                0 -> CustomerConsentType.ALL
-                1 -> CustomerConsentType.RECORD_SCREEN
-                2 -> CustomerConsentType.TRACK_SCREEN
-                3 -> CustomerConsentType.NONE
-                else -> CustomerConsentType.ALL
-            }
+    private fun translateConsentsFlutterToAndroid(consents: Long): CustomerConsentType {
+        return when (consents) {
+            1L -> CustomerConsentType.ANALYTICS
+            2L -> CustomerConsentType.ANALYTICS_AND_RECORDING
+            else -> CustomerConsentType.NONE
         }
     }
 
-    private fun log(message: String, error: Boolean = false) {
+    private fun log(message: String, level: Int = Log.DEBUG) {
         if (!enableLogs) return
-        if (error) {
-            Log.e(logTag, message)
-        } else {
-            Log.i(logTag, message)
+        when (level) {
+            Log.VERBOSE -> Log.v(logTag, message)
+            Log.DEBUG -> Log.d(logTag, message)
+            Log.INFO -> Log.i(logTag, message)
+            Log.ERROR -> Log.e(logTag, message)
+            Log.WARN -> Log.w(logTag, message)
         }
     }
-
 }
