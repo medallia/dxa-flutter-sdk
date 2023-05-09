@@ -15,7 +15,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../fakes/screenshot_taker_fake.dart';
 import '../fakes/widgets_binding_fake.dart';
 import '../test.mocks.dart';
 
@@ -28,8 +27,9 @@ void main() {
   late MockFrameTracking mockFrameTracking;
   late MockPlaceholderImageConfig mockPlaceholderImageConfig;
   late MockTracking mockTracking;
+  late MockManualTracking mockManualTracking;
 
-  late FakeScreenshotTaker fakeScreenshotTaker;
+  late MockScreenshotTaker mockScreenshotTaker;
   late MockScreenVisited mockScreenVisited;
 
   late SessionReplay sessionReplay;
@@ -49,19 +49,18 @@ void main() {
     mockAutoMasking = MockAutoMasking();
     mockLoggerSDK = MockLoggerSDK();
     mockLogger = MockLogger();
-    fakeScreenshotTaker = FakeScreenshotTaker();
+    mockScreenshotTaker = MockScreenshotTaker();
     mockScreenVisited = MockScreenVisited();
     mockFrameTracking = MockFrameTracking();
     mockPlaceholderImageConfig = MockPlaceholderImageConfig();
     mockTracking = MockTracking();
-
-    when(mockFrameTracking.newFrameStreamController)
-        .thenReturn(StreamController());
-
+    mockManualTracking = MockManualTracking();
     fakeWidgetsBinding = FakeWidgetsBinding();
     mockSchedulerBinding = MockSchedulerBinding();
     mockBuildContext = MockBuildContext();
-
+    //this is needed here because the sessionReplay constructor uses it
+    when(mockFrameTracking.newFrameStreamController)
+        .thenReturn(StreamController());
     sessionReplay = SessionReplay(
       mockMedalliaDxaConfig,
       mockLoggerSDK,
@@ -70,7 +69,7 @@ void main() {
       mockPlaceholderImageConfig,
       fakeWidgetsBinding,
       mockSchedulerBinding,
-      fakeScreenshotTaker,
+      mockScreenshotTaker,
       mockNativeApi,
     );
 
@@ -82,10 +81,28 @@ void main() {
       nativeApi: mockNativeApi,
       placeholderImageConfig: mockPlaceholderImageConfig,
       tracking: mockTracking,
+      manualTracking: mockManualTracking,
       sessionReplay: sessionReplay,
     );
     when(mockLoggerSDK.sessionReplayLogger).thenReturn(mockLogger);
 
+    //setUp for capture image.
+    when(
+      mockScreenshotTaker.captureImage(
+        forceScreeshotNextFrame: anyNamed('forceScreeshotNextFrame'),
+        uiChangedReset: anyNamed('uiChangedReset'),
+        screenVisited: anyNamed('screenVisited'),
+        screenSizeCallback: anyNamed('screenSizeCallback'),
+      ),
+    ).thenAnswer((realInvocation) {
+      //Before returning the value of the captueed image, we make sure we call
+      //the method passed as uiChangedReset.
+      realInvocation.namedArguments;
+      final uiChangedReset = realInvocation
+          .namedArguments[const Symbol('uiChangedReset')] as VoidCallback;
+      uiChangedReset.call();
+      return Future.value(ByteData(3));
+    });
     //we stop the Timer so we control the framerate calls (maybeTakeScreenshot)
     sessionReplay.stopPeriodicTimer();
   });
@@ -98,15 +115,21 @@ void main() {
       when(mockScreenVisited.widgetInTheTree).thenReturn(true);
     },
     () {
-      when(mockScreenVisited.recordingAllowed).thenReturn(true);
-    },
-    () {
       when(mockTracking.isPageTransitioning).thenReturn(false);
     },
     () {
       sessionReplay.didUiChangeValue = true;
     },
     () {
+      //This will trigger a placeholder image even when the stub
+      //[mockMedalliaDxaConfig.recordingAllowed).thenReturn(true)] is not called
+      //Keep this stub at the end of the list together with the stub mentioned.
+      when(mockScreenVisited.recordingAllowed).thenReturn(true);
+    },
+    () {
+      //This will trigger a placeholder image even when the stub
+      //[mockScreenVisited.recordingAllowed).thenReturn(true)] is not called
+      //Keep this stub at the end of the list together with the stub mentioned.
       when(mockMedalliaDxaConfig.recordingAllowed).thenReturn(true);
     },
   ];
@@ -124,7 +147,7 @@ void main() {
   }
 
   ///Call to takeScreenshot, and then verify that a screenshot has NOT been sent
-  ///using the nativeApi
+  ///using the nativeApi. Placeholder Images included.
   Future<void> verifyNeverScreenshotIsSent() async {
     await sessionReplay.tryToTakeScreenshotIfUiHasChanged();
     verifyNever(mockNativeApi.saveScreenshot(any));
@@ -135,6 +158,32 @@ void main() {
   Future<void> verifyScreenshotIsSent() async {
     await sessionReplay.tryToTakeScreenshotIfUiHasChanged();
     verify(mockNativeApi.saveScreenshot(any)).called(1);
+  }
+
+  ///Call to takeScreenshot, and then verify that a screenshot has NOT been taken
+  ///Placeholder Images don't count
+  Future<void> verifyNeverScreenshotIsTaken() async {
+    await sessionReplay.tryToTakeScreenshotIfUiHasChanged();
+    verifyNever(
+      mockScreenshotTaker.captureImage(
+        forceScreeshotNextFrame: anyNamed('forceScreeshotNextFrame'),
+        uiChangedReset: anyNamed('uiChangedReset'),
+        screenVisited: anyNamed('screenVisited'),
+        screenSizeCallback: anyNamed('screenSizeCallback'),
+      ),
+    );
+  }
+
+  Future<void> verifyScreenshotIsTaken() async {
+    await sessionReplay.tryToTakeScreenshotIfUiHasChanged();
+    verify(
+      mockScreenshotTaker.captureImage(
+        forceScreeshotNextFrame: anyNamed('forceScreeshotNextFrame'),
+        uiChangedReset: anyNamed('uiChangedReset'),
+        screenVisited: anyNamed('screenVisited'),
+        screenSizeCallback: anyNamed('screenSizeCallback'),
+      ),
+    );
   }
 
   group('UI changes and frame calbbacks', () {
@@ -201,13 +250,18 @@ THEN the screenshot is sent''', () async {
       setupMocksForTakeScreenshot();
 
       await verifyNeverScreenshotIsSent();
+
+      ///we call one at a time every stub needed to pass the checks in order
+      ///to take a screenshot, and every iteration we check that indeed the
+      ///method hasn't been called until all stubs are called.
       for (var i = 0; i < stubsToAllowTakeScreenshot.length; i++) {
         stubsToAllowTakeScreenshot[i].call();
+        //once the last one is called, the screenshot should be taken
         if (i == stubsToAllowTakeScreenshot.length - 1) break;
-        await verifyNeverScreenshotIsSent();
+        await verifyNeverScreenshotIsTaken();
       }
 
-      await verifyScreenshotIsSent();
+      await verifyScreenshotIsTaken();
     });
     test('''
 WHEN a page is transitioning
@@ -332,13 +386,20 @@ AND a screenshot is sent to native''', () async {
 WHEN tryToTakeScreenshotIfUiHasChanged
 AND recording is not allowed in this screen
 AND screenshots are already save for this screens
-THEN getPlaceholderImage is not called''', () async {
+THEN getPlaceholderImage is called''', () async {
       setVariablesToAllowTakeScreenshot();
       setupMocksForTakeScreenshot();
       when(mockPlaceholderImageConfig.getPlaceholderImage(any, any))
           .thenAnswer((realInvocation) => ByteData(3));
       when(mockScreenVisited.screenshotTakenList).thenReturn([
-        ScreenShotTaken(startFocusTime: DateTime.now().millisecondsSinceEpoch)
+        ScreenShotTaken(
+          screenshotMessage: ScreenshotMessage(
+              screenId: 0,
+              screenName: 'screenName',
+              screenshotData: ByteData(3).buffer.asUint8List(),
+              startFocusTime: DateTime.now().millisecondsSinceEpoch),
+          isPlaceholder: false,
+        )
       ]);
       //recording is not allowed in a specific screen
       when(mockScreenVisited.recordingAllowed).thenReturn(false);
@@ -347,69 +408,92 @@ THEN getPlaceholderImage is not called''', () async {
       await sessionReplay.tryToTakeScreenshotIfUiHasChanged();
 
       //THEN getPlaceholderImage is not called
-      verifyNever(mockPlaceholderImageConfig.getPlaceholderImage(any, any));
-      verifyNever(mockNativeApi.saveScreenshot(any));
+      verify(mockPlaceholderImageConfig.getPlaceholderImage(any, any))
+          .called(1);
+      verify(mockNativeApi.saveScreenshot(any)).called(1);
     });
     group('close screen video', () {
       test('''
 WHEN close screen video is called
-AND last screenshot is null
-THEN no screenshot is sent to native.
-WHEN last screenshoot is not null
+AND no screenshot is taken in this screen
+THEN a placeholder image is sent to native.
+WHEN there are screenshots in the screen
 AND has a startFocusTime bigger than 1 second
-THEN last screenshot will be null
-AND a screenshot will be sent to native
+THEN a screenshot will be sent to native
 ''', () async {
+        //setup to create place holder image
+
+        when(mockScreenVisited.getCurrentContext).thenReturn(mockBuildContext);
         //WHEN close screen video is called
         //AND last screenshot is null
         await sessionReplay.closeScreenVideo(mockScreenVisited);
+
         //THEN no screenshot is sent to native
-        verifyNever(mockNativeApi.saveScreenshot(any));
+        verify(mockNativeApi.saveScreenshot(any)).called(1);
+        verify(
+          mockPlaceholderImageConfig.getPlaceholderImage(
+            any,
+            any,
+          ),
+        ).called(1);
+
         //WHEN last screenshoot is not null
-        sessionReplay.lastScreenshotSent = ScreenshotMessage(
-          screenshotData: ByteData(3).buffer.asUint8List(),
-          screenId: 0,
-          screenName: 'screenName',
-          //AND has a startFocusTime bigger than 1 second
-          startFocusTime: DateTime.now().millisecondsSinceEpoch - 2000,
-        );
+        when(mockScreenVisited.screenshotTakenList).thenReturn([
+          ScreenShotTaken(
+            isPlaceholder: false,
+            screenshotMessage: ScreenshotMessage(
+              screenshotData: ByteData(3).buffer.asUint8List(),
+              screenId: 0,
+              screenName: 'screenName',
+              //AND has a startFocusTime bigger than 1 second
+              startFocusTime: DateTime.now().millisecondsSinceEpoch - 2000,
+            ),
+          ),
+        ]);
         //(not exceeding isCurrentScreenOverMaxDuration)
         when(mockScreenVisited.timestamp)
             .thenReturn(DateTime.now().millisecondsSinceEpoch - 10000);
         when(mockScreenVisited.endTimestamp)
             .thenReturn(DateTime.now().millisecondsSinceEpoch);
         await sessionReplay.closeScreenVideo(mockScreenVisited);
-        //THEN last screenshot will be null
-        await Future.value(() {
-          expect(sessionReplay.lastScreenshotSent, null);
-        });
-        //AND a screenshot will be sent to native
+        verifyNever(
+          mockPlaceholderImageConfig.getPlaceholderImage(
+            any,
+            any,
+          ),
+        );
+
+        //THEN a screenshot will be sent to native
         verify(mockNativeApi.saveScreenshot(any)).called(1);
       });
       test('''
 WHEN close screen video is called
 AND last screenshoot is not null
 AND has a startFocusTime smaller than 1 second
-THEN last screenshot is not null
-AND a screenshot will NOT be sent to native
+THEN a screenshot will NOT be sent to native
 ''', () async {
+        //setup to create place holder image
+        when(mockScreenVisited.getCurrentContext).thenReturn(mockBuildContext);
+
         // last screenshoot is not null
-        sessionReplay.lastScreenshotSent = ScreenshotMessage(
-          screenshotData: ByteData(3).buffer.asUint8List(),
-          screenId: 0,
-          screenName: 'screenName',
-          //has a startFocusTime smaller than 1 second
-          startFocusTime: DateTime.now().millisecondsSinceEpoch - 100,
+        when(mockScreenVisited.screenshotTakenList).thenReturn(
+          [
+            ScreenShotTaken(
+              isPlaceholder: false,
+              screenshotMessage: ScreenshotMessage(
+                screenshotData: ByteData(3).buffer.asUint8List(),
+                screenId: 0,
+                screenName: 'screenName',
+                //has a startFocusTime smaller than 1 second
+                startFocusTime: DateTime.now().millisecondsSinceEpoch - 100,
+              ),
+            )
+          ],
         );
 
         when(mockScreenVisited.timestamp)
             .thenReturn(DateTime.now().millisecondsSinceEpoch - 10000);
         await sessionReplay.closeScreenVideo(mockScreenVisited);
-
-        //THEN last screenshot is not null
-        await Future.value(() {
-          expect(sessionReplay.lastScreenshotSent, isNotNull);
-        });
         //AND a screenshot will NOT be sent to native
         verifyNever(mockNativeApi.saveScreenshot(any));
       });
@@ -419,18 +503,25 @@ AND last screenshoot is not null
 AND has a startFocusTime bigger than 1 second
 AND the timemstamp of the screen visited is bigger than the
 constant for maximum replay duration per screen
-THEN last screenhot is null
-AND a screenshot will be sent to native
+THEN a screenshot will be sent to native
 AND the start focus time will have a relative value of the maximum replay duration ''',
           () async {
+        //setup to create place holder image
+        when(mockScreenVisited.getCurrentContext).thenReturn(mockBuildContext);
+
         //last screenshoot is not null
-        sessionReplay.lastScreenshotSent = ScreenshotMessage(
-          screenshotData: ByteData(3).buffer.asUint8List(),
-          screenId: 0,
-          screenName: 'screenName',
-          //AND has a startFocusTime bigger than 1 second
-          startFocusTime: DateTime.now().millisecondsSinceEpoch - 2000,
-        );
+        when(mockScreenVisited.screenshotTakenList).thenReturn([
+          ScreenShotTaken(
+            isPlaceholder: false,
+            screenshotMessage: ScreenshotMessage(
+              screenshotData: ByteData(3).buffer.asUint8List(),
+              screenId: 0,
+              screenName: 'screenName',
+              //AND has a startFocusTime bigger than 1 second
+              startFocusTime: DateTime.now().millisecondsSinceEpoch - 2000,
+            ),
+          ),
+        ]);
         //AND the timemstamp of the screen visited is bigger than the
         //constant for maximum replay duration per screen
         when(mockScreenVisited.timestamp).thenReturn(
@@ -439,11 +530,7 @@ AND the start focus time will have a relative value of the maximum replay durati
               1,
         );
         await sessionReplay.closeScreenVideo(mockScreenVisited);
-        //THEN last screenhot is null
 
-        await Future.value(() {
-          expect(sessionReplay.lastScreenshotSent, null);
-        });
         //AND a screenshot will be sent to native
         //AND the start focus time will have a relative value of the maximum
         //replay duration

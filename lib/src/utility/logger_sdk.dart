@@ -12,6 +12,7 @@ class LoggerSDK {
     bool autoMasking = true,
     bool screenWidget = true,
     bool maskWidget = true,
+    bool manualAnalytics = true,
   }) {
     _instance.enabled = enabled;
     _instance.tracking = tracking;
@@ -21,6 +22,7 @@ class LoggerSDK {
     _instance.autoMasking = autoMasking;
     _instance.screenWidget = screenWidget;
     _instance.maskWidget = maskWidget;
+    _instance.manualAnalytics = manualAnalytics;
     cleanLoggers();
   }
 
@@ -33,6 +35,7 @@ class LoggerSDK {
     required bool autoMasking,
     required bool screenWidget,
     required bool maskWidget,
+    required bool manualAnalytics,
   }) {
     _instance.enabled = enabled;
     _instance.tracking = tracking;
@@ -42,6 +45,7 @@ class LoggerSDK {
     _instance.autoMasking = autoMasking;
     _instance.screenWidget = screenWidget;
     _instance.maskWidget = maskWidget;
+    _instance.manualAnalytics = manualAnalytics;
     cleanLoggers();
   }
 
@@ -55,6 +59,7 @@ class LoggerSDK {
   bool autoMasking = false;
   bool screenWidget = false;
   bool maskWidget = false;
+  bool manualAnalytics = false;
   Logger? _screenWidgetLogger;
   Logger? _maskWidgetLogger;
   Logger? _trackingLogger;
@@ -62,6 +67,7 @@ class LoggerSDK {
   Logger? _frameTrackingLogger;
   Logger? _routeObserverLogger;
   Logger? _autoMaskingLogger;
+  Logger? _manualAnalyticsLogger;
 
   void cleanLoggers() {
     _screenWidgetLogger = null;
@@ -71,6 +77,7 @@ class LoggerSDK {
     _frameTrackingLogger = null;
     _routeObserverLogger = null;
     _autoMaskingLogger = null;
+    _manualAnalyticsLogger = null;
   }
 
   Logger get screenWidgetLogger =>
@@ -94,6 +101,10 @@ class LoggerSDK {
 
   Logger get autoMaskingLogger {
     return _autoMaskingLogger ??= _plainLogger(autoMasking);
+  }
+
+  Logger get manualAnalyticsLogger {
+    return _manualAnalyticsLogger ??= _plainLogger(manualAnalytics);
   }
 
   Logger _plainLogger(bool moduleEnabled) {

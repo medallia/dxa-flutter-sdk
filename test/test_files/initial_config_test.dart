@@ -3,6 +3,7 @@ library initial_config_test;
 import 'package:decibel_sdk/decibel_sdk.dart';
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
+import 'package:decibel_sdk/src/features/consents.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ void main() {
   late MockFrameTracking mockFrameTracking;
   late MockPlaceholderImageConfig mockPlaceholderImageConfig;
   late MockTracking mockTracking;
+  late MockManualTracking mockManualTracking;
   late dynamic Function(
     String yaml,
   ) loadYaml;
@@ -46,7 +48,7 @@ void main() {
     mockFrameTracking = MockFrameTracking();
     mockPlaceholderImageConfig = MockPlaceholderImageConfig();
     mockTracking = MockTracking();
-
+    mockManualTracking = MockManualTracking();
     medalliaDxaConfig = MedalliaDxaConfig.testing(
       mockApi,
       loadYaml,
@@ -55,6 +57,7 @@ void main() {
       mockSessionReplay,
       mockHttpErrors,
       mockLoggerSDK,
+      mockManualTracking,
       mockAutoMasking,
       mockFrameTracking,
       mockPlaceholderImageConfig,
@@ -94,15 +97,21 @@ THEN the method throws an assertion error
     test(
       '''
       WHEN the initalize method is called with the corresponding parameters
-      AND consent is all
+      AND consent is recordingAndTracking
       AND the version in the pubspec is '1'
       THEN the properties in the sessionMessage should match these
       AND the the initialize method from MedalliaDxaNativeApi should be called with
       the sessionMessage
       AND the method start() should be called''',
       () async {
-        final consents = [DecibelCustomerConsentType.all];
-        await medalliaDxaConfig.initialize(account, property, consents);
+        const consents = DecibelCustomerConsentType.recordingAndTracking;
+
+        await medalliaDxaConfig.initialize(
+          account,
+          property,
+          consents: consents,
+          manualTrackingEnabled: false,
+        );
 
         //get SessionMessage sent to the Api
         final SessionMessage sessionMessage =
@@ -112,7 +121,7 @@ THEN the method throws an assertion error
         expect(sessionMessage.account, 0);
         expect(sessionMessage.property, 0);
         expect(sessionMessage.version, '1');
-        expect(sessionMessage.consents, consents.toIndexList());
+        expect(sessionMessage.consents, consents.integerValue());
         verify(mockSessionReplay.startPeriodicTimer());
       },
     );
@@ -139,76 +148,62 @@ AND it returns a Future of type string
   group('enable consents', () {
     test('''
 WHEN set enable consents is called
-AND the consent parameters list includes .none
+AND the consent is .none
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
+AND tracking allowed is false
 AND the method start from sessionReplay is NOT called
-AND the method stop from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.all,
-        DecibelCustomerConsentType.none
-      ];
-      await medalliaDxaConfig.setEnableConsents(consents);
+AND the method stop from sessionReplay is called
+AND tracking allowed is false''', () async {
+      const consents = DecibelCustomerConsentType.none;
+      await medalliaDxaConfig.setConsents(consents);
+      final consentSentToNative = verify(
+        mockApi.setConsents(captureAny),
+      ).captured.single as int;
+      expect(
+        consentSentToNative,
+        consents.integerValue(),
+      );
       verifyNever(mockSessionReplay.startPeriodicTimer());
       verify(mockSessionReplay.stopPeriodicTimer());
+      expect(medalliaDxaConfig.trackingAllowed, false);
     });
     test('''
 WHEN set enable consents is called
-AND the consent parameters list includes .all
-AND it doens't include .none
+AND the consent is .tracking
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
-AND the method start from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.all,
-        DecibelCustomerConsentType.tracking
-      ];
-      await medalliaDxaConfig.setEnableConsents(consents);
-      verify(mockSessionReplay.startPeriodicTimer());
+AND the method start from sessionReplay is NOT called
+AND the method stop from sessionReplay is called
+AND tracking allowed is true''', () async {
+      const consents = DecibelCustomerConsentType.tracking;
+      await medalliaDxaConfig.setConsents(consents);
+      final consentSentToNative = verify(
+        mockApi.setConsents(captureAny),
+      ).captured.single as int;
+      expect(
+        consentSentToNative,
+        consents.integerValue(),
+      );
+      verify(mockSessionReplay.stopPeriodicTimer());
+      expect(medalliaDxaConfig.trackingAllowed, true);
     });
     test('''
 WHEN set enable consents is called
-AND the consent parameters list includes .recordAndTracking
+AND the consent is .recordAndTracking
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
-AND the method start from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.recordingAndTracking,
-      ];
-      await medalliaDxaConfig.setEnableConsents(consents);
-      verify(mockSessionReplay.startPeriodicTimer());
-    });
-  });
-  group('disable consents', () {
-    test('''
-WHEN set disable consents is called
-AND the consent parameters list includes .none
-AND it doens't include .all
-THEN the MedalliaDxaNativeApi method setDisableConsents is called
-AND the method stop from sessionReplay is not called''', () async {
-      final consents = [DecibelCustomerConsentType.none];
-      await medalliaDxaConfig.setDisableConsents(consents);
-      verifyNever(mockSessionReplay.stopPeriodicTimer());
-    });
-    test('''
-WHEN set disable consents is called
-AND the consent parameters list includes .all
-THEN the MedalliaDxaNativeApi method setDisableConsents is called
-AND the method stop from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.none,
-        DecibelCustomerConsentType.all
-      ];
-      await medalliaDxaConfig.setDisableConsents(consents);
-      verify(mockSessionReplay.stopPeriodicTimer());
-    });
-    test('''
-WHEN set disable consents is called
-AND the consent parameters list includes .recordAndTracking
-THEN the MedalliaDxaNativeApi method setEnableConsents is called
-AND the method stop from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.recordingAndTracking,
-      ];
-      await medalliaDxaConfig.setDisableConsents(consents);
-      verify(mockSessionReplay.stopPeriodicTimer());
+AND the method start from sessionReplay is called
+AND tracking allowed is true''', () async {
+      const consents = DecibelCustomerConsentType.recordingAndTracking;
+      await medalliaDxaConfig.setConsents(consents);
+
+      final consentSentToNative = verify(
+        mockApi.setConsents(captureAny),
+      ).captured.single as int;
+      expect(
+        consentSentToNative,
+        consents.integerValue(),
+      );
+      verify(mockSessionReplay.startPeriodicTimer()).called(1);
+      expect(medalliaDxaConfig.trackingAllowed, true);
     });
   });
 
@@ -220,7 +215,9 @@ THEN the _goalsAndDimensions method is called
       const String dimensionName = 'dimensionName';
       const String dimensionValue = 'dimensionValue';
       await medalliaDxaConfig.setDimensionWithString(
-          dimensionName, dimensionValue);
+        dimensionName,
+        dimensionValue,
+      );
       verify(
         mockGoalsAndDimensions.setDimensionWithString(
           dimensionName,
@@ -235,7 +232,9 @@ THEN the _goalsAndDimensions method is called
       const String dimensionName = 'dimensionName';
       const double dimensionValue = 1;
       await medalliaDxaConfig.setDimensionWithNumber(
-          dimensionName, dimensionValue);
+        dimensionName,
+        dimensionValue,
+      );
       verify(
         mockGoalsAndDimensions.setDimensionWithNumber(
           dimensionName,
@@ -249,8 +248,10 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String dimensionName = 'dimensionName';
       const bool dimensionValue = true;
-      await medalliaDxaConfig.setDimensionWithBool(dimensionName,
-          value: dimensionValue);
+      await medalliaDxaConfig.setDimensionWithBool(
+        dimensionName,
+        value: dimensionValue,
+      );
       verify(
         mockGoalsAndDimensions.setDimensionWithBool(
           dimensionName,
@@ -289,32 +290,32 @@ AND has honored every enum passed
       medalliaDxaConfig.setAutoMasking(setOfEnums);
       verify(
         mockAutoMasking.autoMaskingTypeSet = {
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.button,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.button,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.dialog,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.dialog,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.image,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.image,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.inputText,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.inputText,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.text,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.text,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.icons,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.icons,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.webView,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.webView,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.all,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.all,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.none,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.none,
           )
         },
       ).called(1);
@@ -346,6 +347,7 @@ THEN the loggerSDK selected() method is called with the appropiate arguments
           routeObserver: false,
           screenWidget: false,
           maskWidget: false,
+          manualAnalytics: false,
         ),
       );
     });

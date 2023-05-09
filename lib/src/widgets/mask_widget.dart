@@ -37,8 +37,8 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    listOfMasks = _MaskList.of(context)!.listOfMasks;
-    CustomRouteObserver.screenWidgetRouteObserver
+    listOfMasks = MaskList.of(context)!.listOfMasks;
+    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver
         .subscribe(this, ModalRoute.of(context)!);
     logger.d('didChangeDependencies - listsOfMasks $listOfMasks');
   }
@@ -48,7 +48,8 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
     logger.d('dispose');
 
     removeMask(globalKey);
-    CustomRouteObserver.screenWidgetRouteObserver.unsubscribe(this);
+    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver
+        .unsubscribe(this);
     super.dispose();
   }
 

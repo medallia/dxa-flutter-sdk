@@ -1,7 +1,6 @@
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/utility/constants.dart';
-import 'package:decibel_sdk/src/utility/enums.dart';
 import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -54,13 +53,6 @@ extension RenderObjectPaintBounds on RenderObject {
     final translation = getTransformTo(null).getTranslation();
     final Size size = paintBounds.size;
     return Rect.fromLTWH(translation.x, translation.y, size.width, size.height);
-  }
-}
-
-extension ListMedalliaDxaCustomerConsentTypeExt
-    on List<DecibelCustomerConsentType> {
-  List<int> toIndexList() {
-    return map((consent) => consent.index).toList();
   }
 }
 

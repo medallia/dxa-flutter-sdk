@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-import DecibelCoreFlutter
+import MedalliaDXAFlutter
 
 public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativeApi {
         
@@ -11,56 +11,52 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
       }
 
     public func initializeMsg(_ msg: FLTSessionMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        if  let consents = msg.consents as? [Int] {
-            DecibelSDK.multiPlatform.initialize(account: String(describing: msg.account),
-                                                property: String(describing: msg.property),
-                                                consents: consents,
-                                                multiPlatform: SDKMultiPlatform(type: .flutter, version: String(describing: msg.version), language: "Dart"))
+        if  let consents = msg.consents as? Int {
+            let nativeConsents: Consent = translateConsentsFlutterToIos(flutterConsents: consents)
+            let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property),consent: nativeConsents)
+            configuration.endpoint = .production
+            DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
         } else  {
-            DecibelSDK.multiPlatform.initialize(account: String(describing: msg.account),
-                                                property: String(describing: msg.property),
-                                                multiPlatform: SDKMultiPlatform(type: .flutter, version: String(describing: msg.version), language: "Dart"))
+            let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property))
+            configuration.endpoint = .production
+            DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
         }
-        DecibelSDK.multiPlatform.setLogLevel(.info)
-
+       
     }
 
     public func startScreenMsg(_ msg: FLTStartScreenMessage, completion: @escaping (FlutterError?) -> Void) {
-        if let screenId = msg.screenId as? Int, let isBackground = msg.isBackground as? Bool{
-            DecibelSDK.multiPlatform.set(screen: msg.screenName, id: screenId, fromBackground: isBackground)
+        
+        if let screenId = msg.screenId as? Int{
+            DXA.startNewScreen(name: msg.screenName, id: screenId)
             completion(nil)
         }
     }
     
     public func endScreenMsg(_ msg: FLTEndScreenMessage, completion: @escaping (FlutterError?) -> Void) {
-       if let screenId = msg.screenId as? Int, let isBackground = msg.isBackground as? Bool{
-           DecibelSDK.multiPlatform.endScreen(goesToBackground: isBackground)
+           DXA.endScreen()
            completion(nil)
-       }
     }
 
-    public func setEnableConsentsMsg(_ msg: FLTConsentsMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        if let consents = msg.consents as? [Int] {
-            DecibelSDK.multiPlatform.setEnableConsents(consents)
-        }
-    }
-
-    public func setDisableConsentsMsg(_ msg: FLTConsentsMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        if let consents = msg.consents as? [Int] {
-            DecibelSDK.multiPlatform.setDisableConsents(consents)
+    public func setConsentsValue(_ value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+        var nativeConsents: Consent
+        if let consent = value as? Int {
+            nativeConsents = translateConsentsFlutterToIos(flutterConsents: consent)
+            DXA.setConsent(nativeConsents)
         }
     }
 
     public func saveScreenshotMsg(_ msg: FLTScreenshotMessage, completion: @escaping (FlutterError?) -> Void) {
+        print(msg.startFocusTime)
+        print((msg.startFocusTime as? TimeInterval)! / 1000)
         if let screenId = msg.screenId as? Int,
            let startFocusTime = msg.startFocusTime as? TimeInterval {
-            DecibelSDK.multiPlatform.saveScreenShot(screenshot: msg.screenshotData.data, id: screenId, screenName: msg.screenName, startFocusTime: startFocusTime)
+            DXA.saveScreenShot(screenshot: msg.screenshotData.data, id: screenId, screenName: msg.screenName, screenShotTime: startFocusTime/1000)
             completion(nil)
         }
     }
     
     public func sendDimension(withStringMsg msg: FLTDimensionStringMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        DecibelSDK.multiPlatform.send(dimension: msg.dimensionName, withString: msg.value)
+        DXA.send(dimension: msg.dimensionName, value: msg.value)
     }
     
     public func sendDimension(withNumberMsg msg: FLTDimensionNumberMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
@@ -68,8 +64,8 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
         guard let dimensionValue = msg.value as? Double else {
             return
         }
-        
-        DecibelSDK.multiPlatform.send(dimension: msg.dimensionName, withNumber: dimensionValue)
+        DXA.send(dimension: msg.dimensionName, value: dimensionValue)
+
     }
     
     public func sendDimension(withBoolMsg msg: FLTDimensionBoolMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
@@ -77,59 +73,103 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
         guard let dimensionValue = msg.value as? Bool else {
             return
         }
+        DXA.send(dimension: msg.dimensionName, value: dimensionValue)
         
-        DecibelSDK.multiPlatform.send(dimension: msg.dimensionName, withBool: dimensionValue)
     }
     
     public func sendGoalMsg(_ msg: FLTGoalMessage, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
 
         guard let goalValue = msg.value as? Float else {
-            DecibelSDK.multiPlatform.send(goal: msg.goal)
+            DXA.send(goal: msg.goal)
             return
         }
+        DXA.send(goal: msg.goal, with: goalValue)
 
-        DecibelSDK.multiPlatform.send(goal: msg.goal, with: goalValue)
     }
     
     public func sendDataOverWifiOnlyWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        DecibelSDK.settings.mobileDataEnable = false;
+        DXA.mobileDataEnable = false;
     }
 
     public func sendHttpErrorMsg(_ msg: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        DecibelSDK.multiPlatform.sendHTTPError(statusCode: Int(truncating: msg))
+        DXA.sendHTTPError(statusCode: Int(truncating: msg))
     }
 
     public func getWebViewProperties(completion: (String?, FlutterError?)->Void) {
-        completion(DecibelSDK.multiPlatform.getWebViewProperties(), nil);
+        let webViewProperties = DXA.webViewProperties
+        if webViewProperties != nil {
+            completion(webViewProperties, nil);
+            return
+        }
+        
+        completion(nil,FlutterError(code: "getWebViewProperties", message: "Unexpect null value, session has not been initalized", details: nil));     
         
     }
     
     public func getSessionId(completion: (String?, FlutterError?)->Void) {
-        let sessionId = DecibelSDK.multiPlatform.getSessionId()
+        let sessionId = DXA.sessionId
         if sessionId != nil {
             completion(sessionId,nil);
             return
         }
         
         completion(nil,FlutterError(code: "getSessionId", message: "Unexpect null value, session has not been initalized", details: nil));     
+    }
+
+    public func getSessionUrl(completion: (String?, FlutterError?)->Void) {
+        let sessionUrl = DXA.sessionURL
+        if sessionUrl != nil {
+            completion(sessionUrl,nil);
+            return
         }
+        
+        completion(nil,FlutterError(code: "getSessionUrl", message: "Unexpect null value, session has not been initalized", details: nil));     
+    }
 
     public func enableSession(forExperienceValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        DecibelSDK.multiPlatform.enableSessionForExperience(value as! Bool)
-
+        DXA.enableSessionForExperience(value as! Bool)
     }
     
     public func enableSession(forAnalysisValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        DecibelSDK.multiPlatform.enableSessionForAnalysis(value as! Bool)
+        DXA.enableSessionForAnalysis(value as! Bool)
     }
     
     public func enableSession(forReplayValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        DecibelSDK.multiPlatform.enableSessionForReplay(value as! Bool)
+        DXA.enableSessionForReplay(value as! Bool)
     }
     
     public func enableScreen(forAnalysisValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        DecibelSDK.multiPlatform.enableScreenForAnalysis(value as! Bool)
+        DXA.enableScreenForAnalysis(value as! Bool)
+    }
+    
+    private func translateConsentsFlutterToIos(flutterConsents value: Int) -> Consent{
+        var nativeConsent: Consent
+        
+            switch value {
+            case 0:
+                nativeConsent = .noConsent
+            case 1:
+                nativeConsent = .tracking
+            case 2:
+                nativeConsent = .recordingAndTracking
+            default:
+                nativeConsent = .noConsent
+            }
+        return nativeConsent
+
     }
     
     
+}
+
+extension SwiftDecibelSdkPlugin : DXADelegate {
+    public func liveConfig(_ configuration: MedalliaDXAFlutter.LiveConfigurationFlutter) {
+        print("configuration:")
+        print(configuration)
+    }
+    
+    public func performance(_ data: PerformanceFlutter) {
+        print("PerformanceFlutter:")
+        print(data)
+    }
 }

@@ -11,8 +11,8 @@ class AutoMasking with RenderObjectAutoMaskGetter {
   final Set<RenderObject> renderObjectsToMask = Set.of({});
   //Webbview and input text masking by default
   static final Set<AutoMaskingType> _defaultAutoMaskingTypeSet = {
-    const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.webView),
-    const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.inputText)
+    AutoMaskingType(enumType: AutoMaskingTypeEnum.webView),
+    AutoMaskingType(enumType: AutoMaskingTypeEnum.inputText)
   };
   Set<AutoMaskingType> _autoMaskingTypeSet = Set.from(
     _defaultAutoMaskingTypeSet,
@@ -20,7 +20,7 @@ class AutoMasking with RenderObjectAutoMaskGetter {
   Set<AutoMaskingType> get autoMaskingTypeSet => _autoMaskingTypeSet;
   set autoMaskingTypeSet(Set<AutoMaskingType> value) {
     if (value.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.all),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.all),
     )) {
       if (value.length > 1) {
         throw ArgumentError('''
@@ -29,13 +29,13 @@ along with other AutoMaskingType enums
 ''');
       }
       final Set<AutoMaskingType> allEnumsSet =
-          (value.first.getAutoMaskingType as AllAutomaskWidgets).getAllTypes();
+          (value.first.automaskWidgetType as AllAutomaskWidgets).getAllTypes();
       _autoMaskingTypeSet = allEnumsSet;
       return;
     }
 
     if (value.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.none),
     )) {
       if (value.length > 1) {
         throw ArgumentError('''
@@ -44,7 +44,7 @@ along with other AutoMaskingType enums
 ''');
       }
       _autoMaskingTypeSet = {
-        const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none)
+        AutoMaskingType(enumType: AutoMaskingTypeEnum.none)
       };
       return;
     }
@@ -54,12 +54,12 @@ along with other AutoMaskingType enums
 
   void removeUnmaskedTypesFromAutoMaskingTypeSet(Set<AutoMaskingType> set) {
     if (set.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.none),
     )) {
       return;
     }
     if (set.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.all),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.all),
     )) {
       _autoMaskingTypeSet = {};
       return;
@@ -72,7 +72,7 @@ along with other AutoMaskingType enums
   void setAutoMasking(BuildContext context) {
     logger.d('set AutoMasking ${autoMaskingTypeSet.toString()}');
     if (autoMaskingTypeSet.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.none),
     )) {
       return;
     }
@@ -89,22 +89,21 @@ along with other AutoMaskingType enums
 
 mixin RenderObjectAutoMaskGetter {
   Set<RenderObject> getRenderObjectsByAutoMaskingType(
-      BuildContext context, Set<AutoMaskingType> widgetTypes) {
+      BuildContext context, Set<AutoMaskingType> autoMaskingTypeSet) {
     final Set<RenderObject> renderObjectList = Set.of({});
 
     void findChild(Element parentElement) {
       parentElement.visitChildElements((element) {
         //check if the element has a widget of the same type we
         //want to mask
-        final bool typeCheck = widgetTypes.any((type) {
-          if (type.getAutoMaskingType.widgets
-              .contains(element.widget.runtimeType)) {
+        final bool typeCheck = autoMaskingTypeSet.any((type) {
+          if (type.automaskWidgetType.matchesWidgetType(element.widget)) {
             return true;
           }
           //check if the widget that matches a subtype
           //of a family of widgets we want to mask. e.g. a custom
           //button
-          return type.getAutoMaskingType.isSubtype(element.widget);
+          return type.automaskWidgetType.isSubtype(element.widget);
         });
         if (typeCheck) {
           if (element.renderObject != null) {

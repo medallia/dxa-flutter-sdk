@@ -1,10 +1,11 @@
+import 'package:decibel_sdk/src/features/tracking/route_observer.dart';
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:decibel_sdk/src/utility/route_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+
 part '../mask_widget.dart';
 part 'inherited_widgets.dart';
 
@@ -99,9 +100,21 @@ class ScreenWidget extends StatelessWidget {
       _ScreenWidgetManualTabBar.of(context);
 
   bool get isSdkInitialized => DependencyInjector.instance.config.initialized;
+  bool get isManualTrackingEnabled =>
+      DependencyInjector.instance.manualTracking.enabled;
 
   @override
   Widget build(BuildContext context) {
+    assert(() {
+      if (isManualTrackingEnabled) {
+        throw UnsupportedError(
+          '''
+ScreenWidget is not supported when the DXA SDK is working in manual tracking mode''',
+        );
+      }
+      return true;
+    }());
+
     if (!isSdkInitialized) {
       return child ?? builder!(context);
     }
@@ -134,7 +147,15 @@ class ScreenWidget extends StatelessWidget {
     if (child != null) {
       return inheritedScreenWidget;
     } else {
-      if (isInsideAnotherScreenWidget) throw UnimplementedError();
+      assert(() {
+        if (isInsideAnotherScreenWidget) {
+          throw UnsupportedError(
+            '''
+ScreenWidget inside another widget is not supported when the one of them is using the builder parameter''',
+          );
+        }
+        return true;
+      }());
       return inheritedScreenWidget;
     }
   }
@@ -243,7 +264,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
     super.didChangeDependencies();
     route = ModalRoute.of(context);
-    CustomRouteObserver.screenWidgetRouteObserver.subscribe(this, route!);
+    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver
+        .subscribe(this, route!);
   }
 
   @override
@@ -319,7 +341,8 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
     logger.d('dispose');
 
     callWhenIsNotCurrentRoute();
-    CustomRouteObserver.screenWidgetRouteObserver.unsubscribe(this);
+    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver
+        .unsubscribe(this);
     WidgetsBindingNullSafe.instance!.removeObserver(this);
     widget.tabController?.removeListener(_tabControllerListener);
     super.dispose();
@@ -395,7 +418,7 @@ class _ActiveScreenWidgetState extends State<_ActiveScreenWidget>
 
   @override
   Widget build(BuildContext context) {
-    return _MaskList(
+    return MaskList(
       listOfMasks: listOfMasks,
       child: RepaintBoundary(
         key: _globalKey,

@@ -19,7 +19,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
 
-class SessionReplay {
+class SessionReplay with TaskCompleter {
   SessionReplay(
     this._medalliaDxaConfig,
     this._logger,
@@ -52,8 +52,6 @@ class SessionReplay {
   late final Tracking _tracking = DependencyInjector.instance.tracking;
   @visibleForTesting
   late Timer timer;
-  @visibleForTesting
-  ScreenshotMessage? lastScreenshotSent;
   bool _alreadyWaitingForPostFrameCallback = false;
   bool _waitingForEndOfFrame = false;
   bool get _currentlyTracking => _tracking.visitedUnfinishedScreen != null;
@@ -85,11 +83,11 @@ class SessionReplay {
 
   Future<void> newScreen() async {
     didUiChange = true;
-    final bool isNotTabbar = _tracking.visitedScreensList.isEmpty ||
-        !_tracking.visitedScreensList.last.isTabBar;
-    if (isNotTabbar) {
-      await tryToTakeScreenshotIfUiHasChanged();
-    }
+    await tryToTakeScreenshotIfUiHasChanged();
+  }
+
+  Future<void> sendPlaceholderImage() async {
+    await _tryToTakeScreenshot();
   }
 
   void startPeriodicTimer() {
@@ -113,13 +111,15 @@ class SessionReplay {
   }
 
   Future<void> _tryToTakeScreenshot() async {
-    if (!_medalliaDxaConfig.recordingAllowed) return;
     if (!_currentlyTracking) return;
     final ScreenVisited currentTrackedScreen = _currentTrackedScreen;
     if (currentTrackedScreen.isCurrentScreenOverMaxDuration) return;
-    if (!currentTrackedScreen.recordingAllowed) {
+    if (!currentTrackedScreen.recordingAllowed ||
+        !_medalliaDxaConfig.recordingAllowed) {
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: currentTrackedScreen,
+        placeholderType: PlaceholderType(
+            placeholderTypeEnum: PlaceholderTypeEnum.replayDisabled),
       );
     }
 
@@ -145,6 +145,7 @@ class SessionReplay {
       screenVisited: currentTrackedScreen,
       uiChangedReset: () => didUiChange = false,
       forceScreeshotNextFrame: _forceScreenshotNextFrame,
+      screenSizeCallback: (size) => _placeholderImageConfig.lastSize = size,
     );
     if (resultImageData == null) return;
     await _sendScreenshot(
@@ -161,8 +162,9 @@ class SessionReplay {
     int screenId,
     String screenName,
     int startFocusTime,
-    ScreenVisited screenVisited,
-  ) async {
+    ScreenVisited screenVisited, {
+    bool isPlaceholder = false,
+  }) async {
     final ScreenshotMessage screenshotMessage = ScreenshotMessage(
       screenshotData: screenshotData,
       screenId: screenId,
@@ -170,9 +172,11 @@ class SessionReplay {
       startFocusTime: startFocusTime,
     );
 
-    lastScreenshotSent = screenshotMessage;
     screenVisited.screenshotTakenList.add(
-      ScreenShotTaken(startFocusTime: startFocusTime),
+      ScreenShotTaken(
+        screenshotMessage: screenshotMessage,
+        isPlaceholder: isPlaceholder,
+      ),
     );
     logger.d(
       'Save screenshot - screenName: $screenName - screenId: $screenId - startFocusTime: $startFocusTime',
@@ -183,10 +187,19 @@ class SessionReplay {
   ///Resends the last screenshot to native (with a new focusTime) only
   ///if there's been a second or more without any new screenshots
   Future<void> closeScreenVideo(ScreenVisited screenVisited) async {
-    if (lastScreenshotSent != null &&
-        DateTime.now().millisecondsSinceEpoch -
-                lastScreenshotSent!.startFocusTime >
-            1000) {
+    if (screenVisited.screenshotTakenList.isEmpty) {
+      return _sendOnePlaceholderImageForThisScreen(
+        screenVisited: screenVisited,
+        placeholderType: PlaceholderType(
+          placeholderTypeEnum: PlaceholderTypeEnum.noPreviewAvailable,
+        ),
+      );
+    }
+    final ScreenShotTaken lastScreenshotTaken =
+        screenVisited.screenshotTakenList.last;
+    if (DateTime.now().millisecondsSinceEpoch -
+            lastScreenshotTaken.screenshotMessage.startFocusTime >
+        1000) {
       late int startFocusTime;
       if (screenVisited.isCurrentScreenOverMaxDuration) {
         startFocusTime = screenVisited.maximumDurationForLastScreenshot;
@@ -194,9 +207,10 @@ class SessionReplay {
         startFocusTime = screenVisited.endTimestamp! - 500;
       }
 
-      final ScreenshotMessage screenShotMessage = lastScreenshotSent!;
-      lastScreenshotSent = null;
-      await _sendScreenshot(
+      final ScreenshotMessage screenShotMessage =
+          screenVisited.screenshotTakenList.last.screenshotMessage;
+
+      return _sendScreenshot(
         screenShotMessage.screenshotData,
         screenShotMessage.screenId,
         screenShotMessage.screenName,
@@ -208,62 +222,74 @@ class SessionReplay {
 
   Future<void> _sendOnePlaceholderImageForThisScreen({
     required ScreenVisited screenVisited,
+    required PlaceholderType placeholderType,
   }) async {
-    if (screenVisited.screenshotTakenList.isNotEmpty) return;
-    final ByteData byteData = await _placeholderImageConfig.getPlaceholderImage(
-      screenVisited.getCurrentContext!,
-      PlaceholderType(placeholderTypeEnum: PlaceholderTypeEnum.replayDisabled),
+    await waitForFunctionCompleter(
+      _sendOnePlaceholderImageForThisScreen.hashCode,
     );
-    final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
+    return functionCompleterWrapper(
+        _sendOnePlaceholderImageForThisScreen.hashCode, () async {
+      //We don't want to put another placeholder image if the last screenshot
+      //was already a placeholder image
+      if (screenVisited.screenshotTakenList.isNotEmpty &&
+          screenVisited.screenshotTakenList.last.isPlaceholder) return;
+      final ByteData byteData =
+          await _placeholderImageConfig.getPlaceholderImage(
+        screenVisited.getCurrentContext,
+        placeholderType,
+      );
 
-    logger.v(
-      '''
+      final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
+
+      logger.d(
+        '''
       _sendOnePlaceholderImageForThisScreen - 
       screenName: ${screenVisited.name} - 
       screenId: ${screenVisited.uniqueId}
       ''',
-    );
+      );
 
-    await _sendScreenshot(
-      byteData.buffer.asUint8List(),
-      screenVisited.uniqueId,
-      screenVisited.name,
-      startFocusTime,
-      screenVisited,
-    );
+      await _sendScreenshot(
+        byteData.buffer.asUint8List(),
+        screenVisited.uniqueId,
+        screenVisited.name,
+        startFocusTime,
+        screenVisited,
+        isPlaceholder: true,
+      );
+    });
   }
 }
 
 @visibleForTesting
 class ScreenshotTaker with TrackingCompleter {
   final AutoMasking autoMasking;
+  final MedalliaDxaConfig medalliaDxaConfig;
+
   final _maskColor = Paint()..color = Colors.grey;
 
-  ScreenshotTaker({
-    required this.autoMasking,
-  });
+  ScreenshotTaker({required this.autoMasking, required this.medalliaDxaConfig});
 
   Future<ByteData?> captureImage({
     required ScreenVisited screenVisited,
     required VoidCallback uiChangedReset,
     required VoidCallback forceScreeshotNextFrame,
+    required Function(Size) screenSizeCallback,
   }) async {
-    final context = screenVisited.getCurrentContext;
-    if (context == null) {
-      return null;
-    }
-    final Size size = MediaQuery.of(context).size;
-    final double width = size.width;
-    final double height = size.height;
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(
-      recorder,
-      Rect.fromLTWH(0, 0, width, height),
-    );
-    final renderObject = context.findRenderObject();
-
-    late Set<Rect> manualMaskCoordinates;
+    final renderObject = screenVisited.getCurrentContext?.findRenderObject();
     if (renderObject != null) {
+      final Size size = screenVisited.getSize(renderObject);
+      screenSizeCallback(size);
+      final double width = size.width;
+      final double height = size.height;
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(
+        recorder,
+        Rect.fromLTWH(0, 0, width, height),
+      );
+
+      late Set<Rect> manualMaskCoordinates;
+
       final Rect frame = renderObject.globalPaintBounds;
 
       final Offset newPosition = Offset(0, frame.top);
@@ -271,7 +297,7 @@ class ScreenshotTaker with TrackingCompleter {
 
       late ui.Image image;
       if (screenVisited.enableAutomaticMasking) {
-        autoMasking.setAutoMasking(context);
+        autoMasking.setAutoMasking(screenVisited.rootElementForAutomasking);
       }
       manualMaskCoordinates = _saveMaskPosition(screenVisited.listOfMasks);
       return endScreenTasksCompleterWrapper<ByteData?>(() async {
@@ -300,7 +326,6 @@ class ScreenshotTaker with TrackingCompleter {
 
   Set<Rect> _saveMaskPosition(List<GlobalKey> widgetsToMaskList) {
     final Set<Rect> coordinates = {};
-
     for (final globalKey in widgetsToMaskList) {
       final RenderObject? renderObject = globalKey.renderObject;
       //TODO: this is used for tabbars because they share masks references,
