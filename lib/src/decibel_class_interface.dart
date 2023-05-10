@@ -52,10 +52,14 @@ class DecibelSdk {
     int property, {
     enums.DecibelCustomerConsentType consents =
         enums.DecibelCustomerConsentType.recordingAndTracking,
-    bool manualTrackingEnabled = false,
+    bool manualScreenTrackingEnabled = false,
   }) async {
-    await MedalliaDxaConfig().initialize(account, property,
-        consents: consents, manualTrackingEnabled: manualTrackingEnabled);
+    await MedalliaDxaConfig().initialize(
+      account,
+      property,
+      consents: consents,
+      manualScreenTrackingEnabled: manualScreenTrackingEnabled,
+    );
   }
 
   static List<NavigatorObserver> get routeObservers =>

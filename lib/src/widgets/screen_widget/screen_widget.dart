@@ -17,8 +17,8 @@ class ScreenWidget extends StatelessWidget {
     required this.screenName,
     this.tabController,
     this.tabNames,
-    this.recordingAllowed = true,
-    this.trackingAllowed = true,
+    this.disableAnalyticsAndRecording = false,
+    this.disableRecording = false,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -39,8 +39,8 @@ class ScreenWidget extends StatelessWidget {
   const ScreenWidget.popup({
     required this.child,
     required this.screenName,
-    this.recordingAllowed = true,
-    this.trackingAllowed = true,
+    this.disableAnalyticsAndRecording = false,
+    this.disableRecording = false,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -55,8 +55,8 @@ class ScreenWidget extends StatelessWidget {
     required this.screenName,
     required this.tabNames,
     required this.tabController,
-    this.recordingAllowed = true,
-    this.trackingAllowed = true,
+    this.disableAnalyticsAndRecording = false,
+    this.disableRecording = false,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -69,8 +69,8 @@ class ScreenWidget extends StatelessWidget {
     required this.screenName,
     required this.tabNames,
     required this.initialIndex,
-    this.recordingAllowed = true,
-    this.trackingAllowed = true,
+    this.disableAnalyticsAndRecording = false,
+    this.disableRecording = false,
     this.enableAutomaticPopupRecording = true,
     this.enableAutomaticPopupTracking = true,
     this.enableAutomaticMasking = true,
@@ -81,8 +81,8 @@ class ScreenWidget extends StatelessWidget {
   final Widget? child;
   final ScreenWidgetBuilder? builder;
   final String screenName;
-  final bool recordingAllowed;
-  final bool trackingAllowed;
+  final bool disableAnalyticsAndRecording;
+  final bool disableRecording;
   final TabController? tabController;
   final List<String>? tabNames;
   final int? initialIndex;
@@ -102,7 +102,9 @@ class ScreenWidget extends StatelessWidget {
   bool get isSdkInitialized => DependencyInjector.instance.config.initialized;
   bool get isManualTrackingEnabled =>
       DependencyInjector.instance.manualTracking.enabled;
-
+  bool get recordingAllowed =>
+      !(disableAnalyticsAndRecording || disableRecording);
+  bool get trackingAllowed => !disableAnalyticsAndRecording;
   @override
   Widget build(BuildContext context) {
     assert(() {

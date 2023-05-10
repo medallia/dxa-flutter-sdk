@@ -113,7 +113,7 @@ THEN the method throws an assertion error
           account,
           property,
           consents: consents,
-          manualTrackingEnabled: false,
+          manualScreenTrackingEnabled: false,
         );
 
         //get SessionMessage sent to the Api

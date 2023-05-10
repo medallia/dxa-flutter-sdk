@@ -567,7 +567,7 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
     int? account,
     int? property, {
     required _i15.DecibelCustomerConsentType? consents,
-    required bool? manualTrackingEnabled,
+    required bool? manualScreenTrackingEnabled,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -578,7 +578,7 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
           ],
           {
             #consents: consents,
-            #manualTrackingEnabled: manualTrackingEnabled,
+            #manualScreenTrackingEnabled: manualScreenTrackingEnabled,
           },
         ),
         returnValue: _i7.Future<void>.value(),

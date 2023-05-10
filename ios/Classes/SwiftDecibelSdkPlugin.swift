@@ -229,7 +229,7 @@ extension SwiftDecibelSdkPlugin : DXADelegate {
 
             SwiftDecibelSdkPlugin.flutterEventSink?(jsonString)
         } catch {
-            print('Live Config JSON serialization error: $error')
+            print("Live Config JSON serialization error: \(error)")
         }
     }
     
@@ -246,7 +246,7 @@ extension SwiftDecibelSdkPlugin : DXADelegate {
             let jsonString = String(data: jsonData, encoding: .utf8)!
             SwiftDecibelSdkPlugin.flutterEventSink?(jsonString)
         } catch {
-            print('Performance JSON serialization error: $error')
+            print("Performance JSON serialization error: \(error)")
         }
     }
 }
