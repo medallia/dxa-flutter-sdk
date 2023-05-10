@@ -1,5 +1,7 @@
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
+import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart';
+import 'package:decibel_sdk/src/features/event_channel/classes/performance_metrics.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart';
@@ -33,7 +35,8 @@ import 'test_files/session_replay_test.dart' as session_replay_test;
   MockSpec<PlaceholderImageConfig>(),
   MockSpec<Tracking>(),
   MockSpec<ManualTracking>(),
-
+  MockSpec<PerformanceMetrics>(),
+  MockSpec<LiveConfiguration>(),
   MockSpec<ScreenVisited>(),
   //Third parties
   MockSpec<Logger>(),

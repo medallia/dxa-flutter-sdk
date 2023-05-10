@@ -69,6 +69,12 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 - (NSArray *)toList;
 @end
 
+@interface FLTLiveConfigurationPigeon ()
++ (FLTLiveConfigurationPigeon *)fromList:(NSArray *)list;
++ (nullable FLTLiveConfigurationPigeon *)nullableFromList:(NSArray *)list;
+- (NSArray *)toList;
+@end
+
 @implementation FLTStartScreenMessage
 + (instancetype)makeWithScreenName:(NSString *)screenName
     screenId:(NSNumber *)screenId
@@ -324,6 +330,63 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 }
 @end
 
+@implementation FLTLiveConfigurationPigeon
++ (instancetype)makeWithOverrideUserConfig:(nullable NSNumber *)overrideUserConfig
+    blockedFlutterSDKVersions:(nullable NSArray<NSString *> *)blockedFlutterSDKVersions
+    blockedFlutterAppVersions:(nullable NSArray<NSString *> *)blockedFlutterAppVersions
+    maskingColor:(nullable NSString *)maskingColor
+    showLocalLogs:(nullable NSNumber *)showLocalLogs
+    imageQualityType:(nullable NSNumber *)imageQualityType
+    maxScreenshots:(nullable NSNumber *)maxScreenshots
+    maxScreenDuration:(nullable NSNumber *)maxScreenDuration
+    disableScreenTracking:(nullable NSArray<NSString *> *)disableScreenTracking
+    screensMasking:(nullable NSArray<NSString *> *)screensMasking {
+  FLTLiveConfigurationPigeon* pigeonResult = [[FLTLiveConfigurationPigeon alloc] init];
+  pigeonResult.overrideUserConfig = overrideUserConfig;
+  pigeonResult.blockedFlutterSDKVersions = blockedFlutterSDKVersions;
+  pigeonResult.blockedFlutterAppVersions = blockedFlutterAppVersions;
+  pigeonResult.maskingColor = maskingColor;
+  pigeonResult.showLocalLogs = showLocalLogs;
+  pigeonResult.imageQualityType = imageQualityType;
+  pigeonResult.maxScreenshots = maxScreenshots;
+  pigeonResult.maxScreenDuration = maxScreenDuration;
+  pigeonResult.disableScreenTracking = disableScreenTracking;
+  pigeonResult.screensMasking = screensMasking;
+  return pigeonResult;
+}
++ (FLTLiveConfigurationPigeon *)fromList:(NSArray *)list {
+  FLTLiveConfigurationPigeon *pigeonResult = [[FLTLiveConfigurationPigeon alloc] init];
+  pigeonResult.overrideUserConfig = GetNullableObjectAtIndex(list, 0);
+  pigeonResult.blockedFlutterSDKVersions = GetNullableObjectAtIndex(list, 1);
+  pigeonResult.blockedFlutterAppVersions = GetNullableObjectAtIndex(list, 2);
+  pigeonResult.maskingColor = GetNullableObjectAtIndex(list, 3);
+  pigeonResult.showLocalLogs = GetNullableObjectAtIndex(list, 4);
+  pigeonResult.imageQualityType = GetNullableObjectAtIndex(list, 5);
+  pigeonResult.maxScreenshots = GetNullableObjectAtIndex(list, 6);
+  pigeonResult.maxScreenDuration = GetNullableObjectAtIndex(list, 7);
+  pigeonResult.disableScreenTracking = GetNullableObjectAtIndex(list, 8);
+  pigeonResult.screensMasking = GetNullableObjectAtIndex(list, 9);
+  return pigeonResult;
+}
++ (nullable FLTLiveConfigurationPigeon *)nullableFromList:(NSArray *)list {
+  return (list) ? [FLTLiveConfigurationPigeon fromList:list] : nil;
+}
+- (NSArray *)toList {
+  return @[
+    (self.overrideUserConfig ?: [NSNull null]),
+    (self.blockedFlutterSDKVersions ?: [NSNull null]),
+    (self.blockedFlutterAppVersions ?: [NSNull null]),
+    (self.maskingColor ?: [NSNull null]),
+    (self.showLocalLogs ?: [NSNull null]),
+    (self.imageQualityType ?: [NSNull null]),
+    (self.maxScreenshots ?: [NSNull null]),
+    (self.maxScreenDuration ?: [NSNull null]),
+    (self.disableScreenTracking ?: [NSNull null]),
+    (self.screensMasking ?: [NSNull null]),
+  ];
+}
+@end
+
 @interface FLTMedalliaDxaNativeApiCodecReader : FlutterStandardReader
 @end
 @implementation FLTMedalliaDxaNativeApiCodecReader
@@ -340,10 +403,12 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     case 132: 
       return [FLTGoalMessage fromList:[self readValue]];
     case 133: 
-      return [FLTScreenshotMessage fromList:[self readValue]];
+      return [FLTLiveConfigurationPigeon fromList:[self readValue]];
     case 134: 
-      return [FLTSessionMessage fromList:[self readValue]];
+      return [FLTScreenshotMessage fromList:[self readValue]];
     case 135: 
+      return [FLTSessionMessage fromList:[self readValue]];
+    case 136: 
       return [FLTStartScreenMessage fromList:[self readValue]];
     default:
       return [super readValueOfType:type];
@@ -370,14 +435,17 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   } else if ([value isKindOfClass:[FLTGoalMessage class]]) {
     [self writeByte:132];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTScreenshotMessage class]]) {
+  } else if ([value isKindOfClass:[FLTLiveConfigurationPigeon class]]) {
     [self writeByte:133];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTSessionMessage class]]) {
+  } else if ([value isKindOfClass:[FLTScreenshotMessage class]]) {
     [self writeByte:134];
     [self writeValue:[value toList]];
-  } else if ([value isKindOfClass:[FLTStartScreenMessage class]]) {
+  } else if ([value isKindOfClass:[FLTSessionMessage class]]) {
     [self writeByte:135];
+    [self writeValue:[value toList]];
+  } else if ([value isKindOfClass:[FLTStartScreenMessage class]]) {
+    [self writeByte:136];
     [self writeValue:[value toList]];
   } else {
     [super writeValue:value];
@@ -418,8 +486,8 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
         NSArray *args = message;
         FLTSessionMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
-        [api initializeMsg:arg_msg completion:^(FlutterError *_Nullable error) {
-          callback(wrapResult(nil, error));
+        [api initializeMsg:arg_msg completion:^(FLTLiveConfigurationPigeon *_Nullable output, FlutterError *_Nullable error) {
+          callback(wrapResult(output, error));
         }];
       }];
     } else {

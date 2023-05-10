@@ -97,10 +97,35 @@ class GoalMessage {
   });
 }
 
+class LiveConfigurationPigeon {
+  bool? overrideUserConfig;
+  List<String?>? blockedFlutterSDKVersions;
+  List<String?>? blockedFlutterAppVersions;
+  String? maskingColor;
+  bool? showLocalLogs;
+  int? imageQualityType;
+  int? maxScreenshots;
+  int? maxScreenDuration;
+  List<String?>? disableScreenTracking;
+  List<String?>? screensMasking;
+  LiveConfigurationPigeon({
+    this.overrideUserConfig,
+    this.blockedFlutterSDKVersions,
+    this.blockedFlutterAppVersions,
+    this.maskingColor,
+    this.showLocalLogs,
+    this.imageQualityType,
+    this.maxScreenshots,
+    this.maxScreenDuration,
+    this.disableScreenTracking,
+    this.screensMasking,
+  });
+}
+
 @HostApi()
 abstract class MedalliaDxaNativeApi {
   @async
-  void initialize(SessionMessage msg);
+  LiveConfigurationPigeon initialize(SessionMessage msg);
   @async
   void startScreen(StartScreenMessage msg);
   @async

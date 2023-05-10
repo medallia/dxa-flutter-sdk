@@ -256,6 +256,72 @@ class GoalMessage {
   }
 }
 
+class LiveConfigurationPigeon {
+  LiveConfigurationPigeon({
+    this.overrideUserConfig,
+    this.blockedFlutterSDKVersions,
+    this.blockedFlutterAppVersions,
+    this.maskingColor,
+    this.showLocalLogs,
+    this.imageQualityType,
+    this.maxScreenshots,
+    this.maxScreenDuration,
+    this.disableScreenTracking,
+    this.screensMasking,
+  });
+
+  bool? overrideUserConfig;
+
+  List<String?>? blockedFlutterSDKVersions;
+
+  List<String?>? blockedFlutterAppVersions;
+
+  String? maskingColor;
+
+  bool? showLocalLogs;
+
+  int? imageQualityType;
+
+  int? maxScreenshots;
+
+  int? maxScreenDuration;
+
+  List<String?>? disableScreenTracking;
+
+  List<String?>? screensMasking;
+
+  Object encode() {
+    return <Object?>[
+      overrideUserConfig,
+      blockedFlutterSDKVersions,
+      blockedFlutterAppVersions,
+      maskingColor,
+      showLocalLogs,
+      imageQualityType,
+      maxScreenshots,
+      maxScreenDuration,
+      disableScreenTracking,
+      screensMasking,
+    ];
+  }
+
+  static LiveConfigurationPigeon decode(Object result) {
+    result as List<Object?>;
+    return LiveConfigurationPigeon(
+      overrideUserConfig: result[0] as bool?,
+      blockedFlutterSDKVersions: (result[1] as List<Object?>?)?.cast<String?>(),
+      blockedFlutterAppVersions: (result[2] as List<Object?>?)?.cast<String?>(),
+      maskingColor: result[3] as String?,
+      showLocalLogs: result[4] as bool?,
+      imageQualityType: result[5] as int?,
+      maxScreenshots: result[6] as int?,
+      maxScreenDuration: result[7] as int?,
+      disableScreenTracking: (result[8] as List<Object?>?)?.cast<String?>(),
+      screensMasking: (result[9] as List<Object?>?)?.cast<String?>(),
+    );
+  }
+}
+
 class _MedalliaDxaNativeApiCodec extends StandardMessageCodec {
   const _MedalliaDxaNativeApiCodec();
   @override
@@ -275,14 +341,17 @@ class _MedalliaDxaNativeApiCodec extends StandardMessageCodec {
     } else if (value is GoalMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is ScreenshotMessage) {
+    } else if (value is LiveConfigurationPigeon) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else if (value is SessionMessage) {
+    } else if (value is ScreenshotMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is StartScreenMessage) {
+    } else if (value is SessionMessage) {
       buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else if (value is StartScreenMessage) {
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -303,10 +372,12 @@ class _MedalliaDxaNativeApiCodec extends StandardMessageCodec {
       case 132: 
         return GoalMessage.decode(readValue(buffer)!);
       case 133: 
-        return ScreenshotMessage.decode(readValue(buffer)!);
+        return LiveConfigurationPigeon.decode(readValue(buffer)!);
       case 134: 
-        return SessionMessage.decode(readValue(buffer)!);
+        return ScreenshotMessage.decode(readValue(buffer)!);
       case 135: 
+        return SessionMessage.decode(readValue(buffer)!);
+      case 136: 
         return StartScreenMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -324,7 +395,7 @@ class MedalliaDxaNativeApi {
 
   static const MessageCodec<Object?> codec = _MedalliaDxaNativeApiCodec();
 
-  Future<void> initialize(SessionMessage arg_msg) async {
+  Future<LiveConfigurationPigeon> initialize(SessionMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.initialize', codec,
         binaryMessenger: _binaryMessenger);
@@ -341,8 +412,13 @@ class MedalliaDxaNativeApi {
         message: replyList[1] as String?,
         details: replyList[2],
       );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
     } else {
-      return;
+      return (replyList[0] as LiveConfigurationPigeon?)!;
     }
   }
 

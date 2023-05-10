@@ -805,6 +805,238 @@ public class Messages {
     }
   }
 
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static final class LiveConfigurationPigeon {
+    private @Nullable Boolean overrideUserConfig;
+
+    public @Nullable Boolean getOverrideUserConfig() {
+      return overrideUserConfig;
+    }
+
+    public void setOverrideUserConfig(@Nullable Boolean setterArg) {
+      this.overrideUserConfig = setterArg;
+    }
+
+    private @Nullable List<String> blockedFlutterSDKVersions;
+
+    public @Nullable List<String> getBlockedFlutterSDKVersions() {
+      return blockedFlutterSDKVersions;
+    }
+
+    public void setBlockedFlutterSDKVersions(@Nullable List<String> setterArg) {
+      this.blockedFlutterSDKVersions = setterArg;
+    }
+
+    private @Nullable List<String> blockedFlutterAppVersions;
+
+    public @Nullable List<String> getBlockedFlutterAppVersions() {
+      return blockedFlutterAppVersions;
+    }
+
+    public void setBlockedFlutterAppVersions(@Nullable List<String> setterArg) {
+      this.blockedFlutterAppVersions = setterArg;
+    }
+
+    private @Nullable String maskingColor;
+
+    public @Nullable String getMaskingColor() {
+      return maskingColor;
+    }
+
+    public void setMaskingColor(@Nullable String setterArg) {
+      this.maskingColor = setterArg;
+    }
+
+    private @Nullable Boolean showLocalLogs;
+
+    public @Nullable Boolean getShowLocalLogs() {
+      return showLocalLogs;
+    }
+
+    public void setShowLocalLogs(@Nullable Boolean setterArg) {
+      this.showLocalLogs = setterArg;
+    }
+
+    private @Nullable Long imageQualityType;
+
+    public @Nullable Long getImageQualityType() {
+      return imageQualityType;
+    }
+
+    public void setImageQualityType(@Nullable Long setterArg) {
+      this.imageQualityType = setterArg;
+    }
+
+    private @Nullable Long maxScreenshots;
+
+    public @Nullable Long getMaxScreenshots() {
+      return maxScreenshots;
+    }
+
+    public void setMaxScreenshots(@Nullable Long setterArg) {
+      this.maxScreenshots = setterArg;
+    }
+
+    private @Nullable Long maxScreenDuration;
+
+    public @Nullable Long getMaxScreenDuration() {
+      return maxScreenDuration;
+    }
+
+    public void setMaxScreenDuration(@Nullable Long setterArg) {
+      this.maxScreenDuration = setterArg;
+    }
+
+    private @Nullable List<String> disableScreenTracking;
+
+    public @Nullable List<String> getDisableScreenTracking() {
+      return disableScreenTracking;
+    }
+
+    public void setDisableScreenTracking(@Nullable List<String> setterArg) {
+      this.disableScreenTracking = setterArg;
+    }
+
+    private @Nullable List<String> screensMasking;
+
+    public @Nullable List<String> getScreensMasking() {
+      return screensMasking;
+    }
+
+    public void setScreensMasking(@Nullable List<String> setterArg) {
+      this.screensMasking = setterArg;
+    }
+
+    public static final class Builder {
+
+      private @Nullable Boolean overrideUserConfig;
+
+      public @NonNull Builder setOverrideUserConfig(@Nullable Boolean setterArg) {
+        this.overrideUserConfig = setterArg;
+        return this;
+      }
+
+      private @Nullable List<String> blockedFlutterSDKVersions;
+
+      public @NonNull Builder setBlockedFlutterSDKVersions(@Nullable List<String> setterArg) {
+        this.blockedFlutterSDKVersions = setterArg;
+        return this;
+      }
+
+      private @Nullable List<String> blockedFlutterAppVersions;
+
+      public @NonNull Builder setBlockedFlutterAppVersions(@Nullable List<String> setterArg) {
+        this.blockedFlutterAppVersions = setterArg;
+        return this;
+      }
+
+      private @Nullable String maskingColor;
+
+      public @NonNull Builder setMaskingColor(@Nullable String setterArg) {
+        this.maskingColor = setterArg;
+        return this;
+      }
+
+      private @Nullable Boolean showLocalLogs;
+
+      public @NonNull Builder setShowLocalLogs(@Nullable Boolean setterArg) {
+        this.showLocalLogs = setterArg;
+        return this;
+      }
+
+      private @Nullable Long imageQualityType;
+
+      public @NonNull Builder setImageQualityType(@Nullable Long setterArg) {
+        this.imageQualityType = setterArg;
+        return this;
+      }
+
+      private @Nullable Long maxScreenshots;
+
+      public @NonNull Builder setMaxScreenshots(@Nullable Long setterArg) {
+        this.maxScreenshots = setterArg;
+        return this;
+      }
+
+      private @Nullable Long maxScreenDuration;
+
+      public @NonNull Builder setMaxScreenDuration(@Nullable Long setterArg) {
+        this.maxScreenDuration = setterArg;
+        return this;
+      }
+
+      private @Nullable List<String> disableScreenTracking;
+
+      public @NonNull Builder setDisableScreenTracking(@Nullable List<String> setterArg) {
+        this.disableScreenTracking = setterArg;
+        return this;
+      }
+
+      private @Nullable List<String> screensMasking;
+
+      public @NonNull Builder setScreensMasking(@Nullable List<String> setterArg) {
+        this.screensMasking = setterArg;
+        return this;
+      }
+
+      public @NonNull LiveConfigurationPigeon build() {
+        LiveConfigurationPigeon pigeonReturn = new LiveConfigurationPigeon();
+        pigeonReturn.setOverrideUserConfig(overrideUserConfig);
+        pigeonReturn.setBlockedFlutterSDKVersions(blockedFlutterSDKVersions);
+        pigeonReturn.setBlockedFlutterAppVersions(blockedFlutterAppVersions);
+        pigeonReturn.setMaskingColor(maskingColor);
+        pigeonReturn.setShowLocalLogs(showLocalLogs);
+        pigeonReturn.setImageQualityType(imageQualityType);
+        pigeonReturn.setMaxScreenshots(maxScreenshots);
+        pigeonReturn.setMaxScreenDuration(maxScreenDuration);
+        pigeonReturn.setDisableScreenTracking(disableScreenTracking);
+        pigeonReturn.setScreensMasking(screensMasking);
+        return pigeonReturn;
+      }
+    }
+
+    @NonNull
+    ArrayList<Object> toList() {
+      ArrayList<Object> toListResult = new ArrayList<Object>(10);
+      toListResult.add(overrideUserConfig);
+      toListResult.add(blockedFlutterSDKVersions);
+      toListResult.add(blockedFlutterAppVersions);
+      toListResult.add(maskingColor);
+      toListResult.add(showLocalLogs);
+      toListResult.add(imageQualityType);
+      toListResult.add(maxScreenshots);
+      toListResult.add(maxScreenDuration);
+      toListResult.add(disableScreenTracking);
+      toListResult.add(screensMasking);
+      return toListResult;
+    }
+
+    static @NonNull LiveConfigurationPigeon fromList(@NonNull ArrayList<Object> list) {
+      LiveConfigurationPigeon pigeonResult = new LiveConfigurationPigeon();
+      Object overrideUserConfig = list.get(0);
+      pigeonResult.setOverrideUserConfig((Boolean) overrideUserConfig);
+      Object blockedFlutterSDKVersions = list.get(1);
+      pigeonResult.setBlockedFlutterSDKVersions((List<String>) blockedFlutterSDKVersions);
+      Object blockedFlutterAppVersions = list.get(2);
+      pigeonResult.setBlockedFlutterAppVersions((List<String>) blockedFlutterAppVersions);
+      Object maskingColor = list.get(3);
+      pigeonResult.setMaskingColor((String) maskingColor);
+      Object showLocalLogs = list.get(4);
+      pigeonResult.setShowLocalLogs((Boolean) showLocalLogs);
+      Object imageQualityType = list.get(5);
+      pigeonResult.setImageQualityType((imageQualityType == null) ? null : ((imageQualityType instanceof Integer) ? (Integer) imageQualityType : (Long) imageQualityType));
+      Object maxScreenshots = list.get(6);
+      pigeonResult.setMaxScreenshots((maxScreenshots == null) ? null : ((maxScreenshots instanceof Integer) ? (Integer) maxScreenshots : (Long) maxScreenshots));
+      Object maxScreenDuration = list.get(7);
+      pigeonResult.setMaxScreenDuration((maxScreenDuration == null) ? null : ((maxScreenDuration instanceof Integer) ? (Integer) maxScreenDuration : (Long) maxScreenDuration));
+      Object disableScreenTracking = list.get(8);
+      pigeonResult.setDisableScreenTracking((List<String>) disableScreenTracking);
+      Object screensMasking = list.get(9);
+      pigeonResult.setScreensMasking((List<String>) screensMasking);
+      return pigeonResult;
+    }
+  }
+
   public interface Result<T> {
     void success(T result);
 
@@ -830,10 +1062,12 @@ public class Messages {
         case (byte) 132:
           return GoalMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 133:
-          return ScreenshotMessage.fromList((ArrayList<Object>) readValue(buffer));
+          return LiveConfigurationPigeon.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 134:
-          return SessionMessage.fromList((ArrayList<Object>) readValue(buffer));
+          return ScreenshotMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 135:
+          return SessionMessage.fromList((ArrayList<Object>) readValue(buffer));
+        case (byte) 136:
           return StartScreenMessage.fromList((ArrayList<Object>) readValue(buffer));
         default:
           return super.readValueOfType(type, buffer);
@@ -857,14 +1091,17 @@ public class Messages {
       } else if (value instanceof GoalMessage) {
         stream.write(132);
         writeValue(stream, ((GoalMessage) value).toList());
-      } else if (value instanceof ScreenshotMessage) {
+      } else if (value instanceof LiveConfigurationPigeon) {
         stream.write(133);
+        writeValue(stream, ((LiveConfigurationPigeon) value).toList());
+      } else if (value instanceof ScreenshotMessage) {
+        stream.write(134);
         writeValue(stream, ((ScreenshotMessage) value).toList());
       } else if (value instanceof SessionMessage) {
-        stream.write(134);
+        stream.write(135);
         writeValue(stream, ((SessionMessage) value).toList());
       } else if (value instanceof StartScreenMessage) {
-        stream.write(135);
+        stream.write(136);
         writeValue(stream, ((StartScreenMessage) value).toList());
       } else {
         super.writeValue(stream, value);
@@ -875,7 +1112,7 @@ public class Messages {
   /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
   public interface MedalliaDxaNativeApi {
 
-    void initialize(@NonNull SessionMessage msg, Result<Void> result);
+    void initialize(@NonNull SessionMessage msg, Result<LiveConfigurationPigeon> result);
 
     void startScreen(@NonNull StartScreenMessage msg, Result<Void> result);
 
@@ -932,10 +1169,10 @@ public class Messages {
                   if (msgArg == null) {
                     throw new NullPointerException("msgArg unexpectedly null.");
                   }
-                  Result<Void> resultCallback = 
-                      new Result<Void>() {
-                        public void success(Void result) {
-                          wrapped.add(0, null);
+                  Result<LiveConfigurationPigeon> resultCallback = 
+                      new Result<LiveConfigurationPigeon>() {
+                        public void success(LiveConfigurationPigeon result) {
+                          wrapped.add(0, result);
                           reply.reply(wrapped);
                         }
 

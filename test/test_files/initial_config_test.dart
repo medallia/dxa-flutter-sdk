@@ -26,6 +26,7 @@ void main() {
   late MockPlaceholderImageConfig mockPlaceholderImageConfig;
   late MockTracking mockTracking;
   late MockManualTracking mockManualTracking;
+  late MockLiveConfiguration mockLiveConfiguration;
   late dynamic Function(
     String yaml,
   ) loadYaml;
@@ -49,6 +50,7 @@ void main() {
     mockPlaceholderImageConfig = MockPlaceholderImageConfig();
     mockTracking = MockTracking();
     mockManualTracking = MockManualTracking();
+    mockLiveConfiguration = MockLiveConfiguration();
     medalliaDxaConfig = MedalliaDxaConfig.testing(
       mockApi,
       loadYaml,
@@ -58,6 +60,7 @@ void main() {
       mockHttpErrors,
       mockLoggerSDK,
       mockManualTracking,
+      mockLiveConfiguration,
       mockAutoMasking,
       mockFrameTracking,
       mockPlaceholderImageConfig,
