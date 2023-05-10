@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
+import 'package:decibel_sdk/src/features/event_channel/classes/performance_metrics.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
@@ -21,16 +22,16 @@ import 'package:logger/logger.dart';
 
 class SessionReplay with TaskCompleter {
   SessionReplay(
-    this._medalliaDxaConfig,
-    this._logger,
-    this._frameTracking,
-    this.autoMasking,
-    this._placeholderImageConfig,
-    this.widgetsBindingInstance,
-    this.schedulerBindingInstance,
-    this.screenshotTaker,
-    this._nativeApiInstance,
-  ) {
+      this._medalliaDxaConfig,
+      this._logger,
+      this._frameTracking,
+      this.autoMasking,
+      this._placeholderImageConfig,
+      this.widgetsBindingInstance,
+      this.schedulerBindingInstance,
+      this.screenshotTaker,
+      this._nativeApiInstance,
+      this._performanceMetrics) {
     timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
       await tryToTakeScreenshotIfUiHasChanged();
     });
@@ -49,6 +50,8 @@ class SessionReplay with TaskCompleter {
   final ScreenshotTaker screenshotTaker;
   final WidgetsBinding widgetsBindingInstance;
   final SchedulerBinding schedulerBindingInstance;
+  final PerformanceMetrics _performanceMetrics;
+
   late final Tracking _tracking = DependencyInjector.instance.tracking;
   @visibleForTesting
   late Timer timer;
@@ -114,12 +117,21 @@ class SessionReplay with TaskCompleter {
     if (!_currentlyTracking) return;
     final ScreenVisited currentTrackedScreen = _currentTrackedScreen;
     if (currentTrackedScreen.isCurrentScreenOverMaxDuration) return;
+    if (_performanceMetrics.isDeviceStressed) {
+      return _sendOnePlaceholderImageForThisScreen(
+        screenVisited: currentTrackedScreen,
+        placeholderType: PlaceholderType(
+          placeholderTypeEnum: PlaceholderTypeEnum.performanceStress,
+        ),
+      );
+    }
     if (!currentTrackedScreen.recordingAllowed ||
         !_medalliaDxaConfig.recordingAllowed) {
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: currentTrackedScreen,
         placeholderType: PlaceholderType(
-            placeholderTypeEnum: PlaceholderTypeEnum.replayDisabled),
+          placeholderTypeEnum: PlaceholderTypeEnum.replayDisabled,
+        ),
       );
     }
 

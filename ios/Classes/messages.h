@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class FLTDimensionNumberMessage;
 @class FLTDimensionBoolMessage;
 @class FLTGoalMessage;
+@class FLTLiveConfigurationPigeon;
 
 @interface FLTStartScreenMessage : NSObject
 /// `init` unavailable to enforce nonnull fields, see the `make` class method.
@@ -107,11 +108,34 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) NSNumber * value;
 @end
 
+@interface FLTLiveConfigurationPigeon : NSObject
++ (instancetype)makeWithOverrideUserConfig:(nullable NSNumber *)overrideUserConfig
+    blockedFlutterSDKVersions:(nullable NSArray<NSString *> *)blockedFlutterSDKVersions
+    blockedFlutterAppVersions:(nullable NSArray<NSString *> *)blockedFlutterAppVersions
+    maskingColor:(nullable NSString *)maskingColor
+    showLocalLogs:(nullable NSNumber *)showLocalLogs
+    imageQualityType:(nullable NSNumber *)imageQualityType
+    maxScreenshots:(nullable NSNumber *)maxScreenshots
+    maxScreenDuration:(nullable NSNumber *)maxScreenDuration
+    disableScreenTracking:(nullable NSArray<NSString *> *)disableScreenTracking
+    screensMasking:(nullable NSArray<NSString *> *)screensMasking;
+@property(nonatomic, strong, nullable) NSNumber * overrideUserConfig;
+@property(nonatomic, strong, nullable) NSArray<NSString *> * blockedFlutterSDKVersions;
+@property(nonatomic, strong, nullable) NSArray<NSString *> * blockedFlutterAppVersions;
+@property(nonatomic, copy, nullable) NSString * maskingColor;
+@property(nonatomic, strong, nullable) NSNumber * showLocalLogs;
+@property(nonatomic, strong, nullable) NSNumber * imageQualityType;
+@property(nonatomic, strong, nullable) NSNumber * maxScreenshots;
+@property(nonatomic, strong, nullable) NSNumber * maxScreenDuration;
+@property(nonatomic, strong, nullable) NSArray<NSString *> * disableScreenTracking;
+@property(nonatomic, strong, nullable) NSArray<NSString *> * screensMasking;
+@end
+
 /// The codec used by FLTMedalliaDxaNativeApi.
 NSObject<FlutterMessageCodec> *FLTMedalliaDxaNativeApiGetCodec(void);
 
 @protocol FLTMedalliaDxaNativeApi
-- (void)initializeMsg:(FLTSessionMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
+- (void)initializeMsg:(FLTSessionMessage *)msg completion:(void (^)(FLTLiveConfigurationPigeon *_Nullable, FlutterError *_Nullable))completion;
 - (void)startScreenMsg:(FLTStartScreenMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
 - (void)endScreenMsg:(FLTEndScreenMessage *)msg completion:(void (^)(FlutterError *_Nullable))completion;
 - (void)setConsentsValue:(NSNumber *)value error:(FlutterError *_Nullable *_Nonnull)error;

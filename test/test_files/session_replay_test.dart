@@ -28,6 +28,7 @@ void main() {
   late MockPlaceholderImageConfig mockPlaceholderImageConfig;
   late MockTracking mockTracking;
   late MockManualTracking mockManualTracking;
+  late MockPerformanceMetrics mockPerformanceMetrics;
 
   late MockScreenshotTaker mockScreenshotTaker;
   late MockScreenVisited mockScreenVisited;
@@ -55,6 +56,7 @@ void main() {
     mockPlaceholderImageConfig = MockPlaceholderImageConfig();
     mockTracking = MockTracking();
     mockManualTracking = MockManualTracking();
+    mockPerformanceMetrics = MockPerformanceMetrics();
     fakeWidgetsBinding = FakeWidgetsBinding();
     mockSchedulerBinding = MockSchedulerBinding();
     mockBuildContext = MockBuildContext();
@@ -62,16 +64,16 @@ void main() {
     when(mockFrameTracking.newFrameStreamController)
         .thenReturn(StreamController());
     sessionReplay = SessionReplay(
-      mockMedalliaDxaConfig,
-      mockLoggerSDK,
-      mockFrameTracking,
-      mockAutoMasking,
-      mockPlaceholderImageConfig,
-      fakeWidgetsBinding,
-      mockSchedulerBinding,
-      mockScreenshotTaker,
-      mockNativeApi,
-    );
+        mockMedalliaDxaConfig,
+        mockLoggerSDK,
+        mockFrameTracking,
+        mockAutoMasking,
+        mockPlaceholderImageConfig,
+        fakeWidgetsBinding,
+        mockSchedulerBinding,
+        mockScreenshotTaker,
+        mockNativeApi,
+        mockPerformanceMetrics);
 
     DependencyInjector(
       config: mockMedalliaDxaConfig,

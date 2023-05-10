@@ -12,6 +12,18 @@ import UIKit
 import WebKit
 import _Concurrency
 import _StringProcessing
+public enum ImageQualityType : Swift.Int, Swift.Codable {
+  case poor
+  case low
+  case average
+  case high
+  case ultra
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
 public struct PerformanceFlutter {
   public let isStressed: MedalliaDXAFlutter.DeviceStressedTypeFlutter
   public let cpu: Swift.Double
@@ -71,6 +83,38 @@ public enum PlatformType {
   }
 }
 public struct LiveConfigurationFlutter {
+  public var ipHandling: Swift.Int?
+  public var useLiveConfiguration: Swift.Bool
+  public var experienceDataSampleMethod: Swift.Int?
+  public var sessionCookieFlags: Swift.Int?
+  public var leadCookieFlags: Swift.Int?
+  public var analysisDataSampleMethod: Swift.Int?
+  public var analysisSessFlags: Swift.Int?
+  public var analysisLeadFlags: Swift.Int?
+  public var replayDataSampleMethod: Swift.Int?
+  public var replaySessFlags: Swift.Int?
+  public var replayLeadFlags: Swift.Int?
+  public var disableScreenTracking: [Swift.String]?
+  public var screensMasking: [Swift.String]?
+  public var forceHiFi: [Swift.String]?
+  public var forceLoFi: [Swift.String]?
+  public var imageQualityType: Swift.Int?
+  public var videoQualityType: Swift.Int?
+  public var maxScreenDuration: Swift.Int?
+  public var maxScreenshots: Swift.Int?
+  public var recordVideoInForeground: Swift.Bool?
+  public var sessionTimeout: Swift.Int?
+  public var maskingColor: Swift.String?
+  public var showLocalLogs: Swift.Bool?
+  public var allowLogs: Swift.Bool?
+  public var sdkVersionsBlocked: [Swift.String]?
+  public var appVersionsBlocked: [Swift.String]?
+  public var keepVideoData: Swift.Bool?
+  public var maxMemoryUsage: Swift.Int?
+  public var maxCPUUsage: Swift.Int?
+  public var enableAnalytics: Swift.Bool?
+  public var blockedFlutterSDKVersions: [Swift.String]?
+  public var blockedFlutterAppVersions: [Swift.String]?
 }
 public class Configuration {
   public var endpoint: MedalliaDXAFlutter.Endpoint
@@ -131,6 +175,8 @@ extension MedalliaDXAFlutter.DXA {
   public static func setAutomaticMask(_ maskType: MedalliaDXAFlutter.MaskAutomatic)
   public static func mask(rect area: CoreFoundation.CGRect)
   public static func setConsent(_ consent: MedalliaDXAFlutter.Consent)
+  public static func setImageQuality(_ quality: MedalliaDXAFlutter.ImageQualityType)
+  public static func setMaskingColor(_ color: UIKit.UIColor)
   public static func sendHTTPError(statusCode: Swift.Int)
   public static func formSuccess()
   public static func formError(error: Swift.String, selector: UIKit.UIView?)
@@ -161,6 +207,9 @@ extension UIKit.UIViewController {
     set
   }
 }
+extension MedalliaDXAFlutter.ImageQualityType : Swift.Equatable {}
+extension MedalliaDXAFlutter.ImageQualityType : Swift.Hashable {}
+extension MedalliaDXAFlutter.ImageQualityType : Swift.RawRepresentable {}
 extension MedalliaDXAFlutter.DeviceStressedTypeFlutter : Swift.Equatable {}
 extension MedalliaDXAFlutter.DeviceStressedTypeFlutter : Swift.Hashable {}
 extension MedalliaDXAFlutter.DeviceStressedTypeFlutter : Swift.RawRepresentable {}
