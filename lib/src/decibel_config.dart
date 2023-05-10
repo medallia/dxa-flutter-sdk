@@ -146,18 +146,17 @@ class MedalliaDxaConfig {
   bool get recordingAllowed => _recordingAllowed;
   bool get trackingAllowed => _trackingAllowed;
   bool initialized = false;
-  bool get manualTrackingEnabled => _manualTracking.enabled;
 
   /// Initializes MedalliaDxa
   Future<void> initialize(
     int account,
     int property, {
     required enums.DecibelCustomerConsentType consents,
-    required bool manualTrackingEnabled,
+    required bool manualScreenTrackingEnabled,
   }) async {
     final String version = await _getVersion();
-    _manualTracking.enabled = manualTrackingEnabled;
-    _setObservers(manualTrackingEnabled);
+    _manualTracking.enabled = manualScreenTrackingEnabled;
+    _setObservers(manualScreenTrackingEnabled);
     _setEnableConsentsForFlutter(consents);
     final sessionMessage = SessionMessage(
       account: account,

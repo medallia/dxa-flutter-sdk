@@ -4,15 +4,17 @@ import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
 
-class ManualTrackerWidget extends StatefulWidget {
-  const ManualTrackerWidget({Key? key, required this.child}) : super(key: key);
+class ManualScreenTrackerWidget extends StatefulWidget {
+  const ManualScreenTrackerWidget({Key? key, required this.child})
+      : super(key: key);
   final Widget child;
 
   @override
-  State<ManualTrackerWidget> createState() => _ManualTrackerWidgetState();
+  State<ManualScreenTrackerWidget> createState() =>
+      _ManualScreenTrackerWidgetState();
 }
 
-class _ManualTrackerWidgetState extends State<ManualTrackerWidget>
+class _ManualScreenTrackerWidgetState extends State<ManualScreenTrackerWidget>
     with WidgetsBindingObserver {
   final GlobalKey _globalKey = GlobalKey();
   late final Tracking tracking = DependencyInjector.instance.tracking;
