@@ -137,6 +137,10 @@ class SessionReplay {
       await widgetsBindingInstance.endOfFrame;
       _waitingForEndOfFrame = false;
       if (!_currentlyTracking) return;
+      if (_tracking.isPageTransitioning ||
+          !currentTrackedScreen.widgetInTheTree) {
+        return _forceScreenshotNextFrame();
+      }
     }
     final int screenShotId = currentTrackedScreen.uniqueId;
     final String screenShotName = currentTrackedScreen.name;
