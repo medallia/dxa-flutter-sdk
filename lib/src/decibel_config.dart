@@ -18,6 +18,7 @@ import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +36,7 @@ class MedalliaDxaConfig {
       : _nativeApi = MedalliaDxaNativeApi(),
         _loadYaml = yaml_parser.loadYaml,
         _rootBundle = services.rootBundle,
-        _loggerSDK = LoggerSDK.instance,
-        _liveConfiguration = LiveConfiguration() {
+        _loggerSDK = LoggerSDK.instance {
     final frameTracking = FrameTracking(
       postFrameCallback: WidgetsBindingNullSafe.instance!.addPostFrameCallback,
     );
@@ -45,29 +45,40 @@ class MedalliaDxaConfig {
     final WidgetsBinding widgetsBinding = WidgetsBindingNullSafe.instance!;
     final SchedulerBinding schedulerBinding =
         SchedulerBindingNullSafe.instance!;
-    final ScreenshotTaker screenshotTaker =
-        ScreenshotTaker(autoMasking: autoMasking, medalliaDxaConfig: this);
+
     final PerformanceMetrics performanceMetrics = PerformanceMetrics();
 
+    final LiveConfiguration liveConfiguration = LiveConfiguration();
+    final DefaultGlobalSettings defaultGlobalSettings = DefaultGlobalSettings();
+    final GlobalSettings globalSettings = GlobalSettings(
+      liveConfiguration: liveConfiguration,
+      defaultGlobalSettings: defaultGlobalSettings,
+    );
+    _eventChannelManager = EventChannelManager(
+      performanceMetrics: performanceMetrics,
+      liveConfiguration: liveConfiguration,
+    );
+    final ScreenshotTaker screenshotTaker =
+        ScreenshotTaker(autoMasking: autoMasking, medalliaDxaConfig: this);
     _sessionReplay = SessionReplay(
-        this,
-        _loggerSDK,
-        frameTracking,
-        autoMasking,
-        placeholderImageConfig,
-        widgetsBinding,
-        schedulerBinding,
-        screenshotTaker,
-        _nativeApi,
-        performanceMetrics);
-    final tracking = Tracking(this, _loggerSDK, _sessionReplay);
+      this,
+      _loggerSDK,
+      frameTracking,
+      autoMasking,
+      placeholderImageConfig,
+      widgetsBinding,
+      schedulerBinding,
+      screenshotTaker,
+      _nativeApi,
+      performanceMetrics,
+      globalSettings,
+    );
+    final Tracking tracking =
+        Tracking(this, _loggerSDK, _sessionReplay, liveConfiguration);
     _manualTracking = ManualTracking();
     _goalsAndDimensions = GoalsAndDimensions(this, _nativeApi, _loggerSDK);
     _httpErrors = HttpErrors(this, _nativeApi, _loggerSDK);
-    final EventChannelManager eventChannelManager = EventChannelManager(
-      performanceMetrics: performanceMetrics,
-      liveConfiguration: _liveConfiguration,
-    );
+
     DependencyInjector(
       config: this,
       autoMasking: autoMasking,
@@ -78,6 +89,8 @@ class MedalliaDxaConfig {
       tracking: tracking,
       manualTracking: _manualTracking,
       sessionReplay: _sessionReplay,
+      eventChannelManager: _eventChannelManager,
+      globalSettings: globalSettings,
     );
   }
   @visibleForTesting
@@ -90,11 +103,12 @@ class MedalliaDxaConfig {
     this._httpErrors,
     this._loggerSDK,
     this._manualTracking,
-    this._liveConfiguration,
+    this._eventChannelManager,
     AutoMasking autoMasking,
     FrameTracking frameTracking,
     PlaceholderImageConfig placeholderImageConfig,
     Tracking tracking,
+    GlobalSettings globalSettings,
   ) {
     DependencyInjector(
       config: this,
@@ -106,6 +120,8 @@ class MedalliaDxaConfig {
       tracking: tracking,
       manualTracking: _manualTracking,
       sessionReplay: _sessionReplay,
+      eventChannelManager: _eventChannelManager,
+      globalSettings: globalSettings,
     );
   }
 
@@ -116,10 +132,10 @@ class MedalliaDxaConfig {
   ) _loadYaml;
   late SessionReplay _sessionReplay;
   final LoggerSDK _loggerSDK;
-  final LiveConfiguration _liveConfiguration;
   late final ManualTracking _manualTracking;
   late final GoalsAndDimensions _goalsAndDimensions;
   late final HttpErrors _httpErrors;
+  late final EventChannelManager _eventChannelManager;
   late final List<NavigatorObserver> _routeObserversToUseForAutomaticTracking =
       [
     CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver,
@@ -168,9 +184,9 @@ class MedalliaDxaConfig {
 
     final LiveConfigurationPigeon liveConfigurationPigeon =
         await _nativeApi.initialize(sessionMessage);
-    _liveConfiguration.updateFromPigeon(liveConfigurationPigeon);
-
     initialized = true;
+    _eventChannelManager.liveConfiguration
+        .updateFromPigeonClass(liveConfigurationPigeon);
   }
 
   void _setObservers(bool setManualTrackingObservers) {

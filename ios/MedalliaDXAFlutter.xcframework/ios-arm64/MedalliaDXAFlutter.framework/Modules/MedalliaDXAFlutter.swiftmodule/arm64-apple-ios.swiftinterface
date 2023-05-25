@@ -163,6 +163,9 @@ extension MedalliaDXAFlutter.DXA {
   public static func endScreen()
   public static func startNewScreen(name: Swift.String, id: Swift.Int)
   public static func saveScreenShot(screenshot: Foundation.Data, id: Swift.Int, screenName: Swift.String, screenShotTime: Foundation.TimeInterval)
+  public static var appVersion: Swift.String? {
+    get
+  }
 }
 @_hasMissingDesignatedInitializers public class DXA {
   public static func initialize(_ configuration: MedalliaDXAFlutter.Configuration)
@@ -203,6 +206,14 @@ extension MedalliaDXAFlutter.DXA {
 }
 extension UIKit.UIViewController {
   @_Concurrency.MainActor(unsafe) public var dxaScreenName: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor(unsafe) public var dxaDisableRecordingOnThisScreen: Swift.Bool {
+    get
+    set
+  }
+  @_Concurrency.MainActor(unsafe) public var dxaDisableAnalyticsAndRecordingOnThisScreen: Swift.Bool {
     get
     set
   }

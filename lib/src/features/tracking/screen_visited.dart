@@ -1,4 +1,5 @@
 import 'package:decibel_sdk/src/messages.dart';
+import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -16,6 +17,7 @@ class ScreenVisited {
   final bool enableAutomaticPopupTracking;
   final bool recordingAllowed;
   final bool trackingAllowed;
+  final PlaceholderTypeEnum? placeholderTypeEnum;
   final List<ScreenShotTaken> screenshotTakenList;
   final bool enableAutomaticMasking;
   BuildContext? get getCurrentContext {
@@ -48,6 +50,7 @@ class ScreenVisited {
     required this.enableAutomaticMasking,
     required this.recordingAllowed,
     required this.trackingAllowed,
+    required this.placeholderTypeEnum,
   }) : screenshotTakenList = [];
 
   ScreenVisited.standard({
@@ -61,6 +64,7 @@ class ScreenVisited {
     required this.enableAutomaticMasking,
     required this.recordingAllowed,
     required this.trackingAllowed,
+    required this.placeholderTypeEnum,
     this.endTimestamp,
   })  : finished = false,
         isDialog = false,
@@ -86,6 +90,7 @@ class ScreenVisited {
     required this.trackingAllowed,
     required this.screenshotTakenList,
     required this.enableAutomaticMasking,
+    required this.placeholderTypeEnum,
   }) : finished = true;
   ScreenVisited.tabBarChild({
     required this.id,
@@ -97,6 +102,7 @@ class ScreenVisited {
     required this.enableAutomaticMasking,
     required this.recordingAllowed,
     required this.trackingAllowed,
+    required this.placeholderTypeEnum,
     this.listOfMasks = const [],
     this.endTimestamp,
   })  : finished = false,
@@ -114,6 +120,7 @@ class ScreenVisited {
     required this.recordingAllowed,
     required this.trackingAllowed,
     required this.enableAutomaticMasking,
+    required this.placeholderTypeEnum,
     this.endTimestamp,
   })  : finished = false,
         isDialog = true,
@@ -137,6 +144,7 @@ class ScreenVisited {
       enableAutomaticPopupTracking: enableAutomaticPopupTracking,
       recordingAllowed: recordingAllowed,
       trackingAllowed: trackingAllowed,
+      placeholderTypeEnum: placeholderTypeEnum,
       screenshotTakenList: screenshotTakenList,
       enableAutomaticMasking: enableAutomaticMasking,
     );
@@ -160,6 +168,7 @@ class ScreenVisited {
       enableAutomaticPopupTracking: enableAutomaticPopupTracking,
       recordingAllowed: recordingAllowed,
       trackingAllowed: trackingAllowed,
+      placeholderTypeEnum: placeholderTypeEnum,
       enableAutomaticMasking: enableAutomaticMasking,
     );
   }
@@ -180,6 +189,7 @@ class ScreenVisited {
           recordingAllowed ? enableAutomaticPopupRecording : recordingAllowed,
       trackingAllowed:
           trackingAllowed ? enableAutomaticPopupTracking : trackingAllowed,
+      placeholderTypeEnum: placeholderTypeEnum,
       enableAutomaticMasking: enableAutomaticMasking,
     );
   }
@@ -216,6 +226,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required int tabIndex,
     required bool recordingAllowed,
     required bool trackingAllowed,
+    required PlaceholderTypeEnum? placeholderTypeEnum,
     required bool enableAutomaticPopupRecording,
     required bool enableAutomaticPopupTracking,
     required bool enableAutomaticMasking,
@@ -233,6 +244,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
         trackingAllowed: trackingAllowed,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticPopupTracking: enableAutomaticPopupTracking,
+        placeholderTypeEnum: placeholderTypeEnum,
         enableAutomaticMasking: enableAutomaticMasking,
       );
     }).toList();
@@ -249,6 +261,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
       listOfMasks: listOfMasks,
       recordingAllowed: recordingAllowed,
       trackingAllowed: trackingAllowed,
+      placeholderTypeEnum: placeholderTypeEnum,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       enableAutomaticPopupTracking: enableAutomaticPopupTracking,
       enableAutomaticMasking: enableAutomaticMasking,
@@ -265,6 +278,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
     required this.tabBarname,
     required bool recordingAllowed,
     required bool trackingAllowed,
+    required PlaceholderTypeEnum? placeholderTypeEnum,
     required bool enableAutomaticPopupRecording,
     required bool enableAutomaticPopupTracking,
     required List<GlobalKey<State<StatefulWidget>>> listOfMasks,
@@ -278,6 +292,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
           trackingAllowed: trackingAllowed,
           enableAutomaticPopupRecording: enableAutomaticPopupRecording,
           enableAutomaticPopupTracking: enableAutomaticPopupTracking,
+          placeholderTypeEnum: placeholderTypeEnum,
           listOfMasks: listOfMasks,
           enableAutomaticMasking: enableAutomaticMasking,
         );
@@ -296,6 +311,7 @@ class ScreenVisitedTabBar extends ScreenVisited {
       listOfMasks: listOfMasks,
       recordingAllowed: recordingAllowed,
       trackingAllowed: trackingAllowed,
+      placeholderTypeEnum: placeholderTypeEnum,
       enableAutomaticPopupRecording: enableAutomaticPopupRecording,
       enableAutomaticPopupTracking: enableAutomaticPopupTracking,
       enableAutomaticMasking: enableAutomaticMasking,

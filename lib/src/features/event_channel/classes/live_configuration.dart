@@ -1,99 +1,168 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
+import 'package:decibel_sdk/src/utility/global_settings.dart';
+import 'package:flutter/material.dart';
 
 class LiveConfiguration implements EventChannelClass {
   static const String jsonKey = 'live_configuration';
-  bool? overrideUserConfig;
-  List<String?>? blockedFlutterSDKVersions;
-  List<String?>? blockedFlutterAppVersions;
-  String? maskingColor;
-  bool? showLocalLogs;
-  int? imageQualityType;
-  int? maxScreenshots;
-  int? maxScreenDuration;
-  List<String?>? disableScreenTracking;
-  List<String?>? screensMasking;
-  LiveConfiguration({
-    this.overrideUserConfig,
-    this.blockedFlutterSDKVersions,
-    this.blockedFlutterAppVersions,
-    this.maskingColor,
-    this.showLocalLogs,
-    this.imageQualityType,
-    this.maxScreenshots,
-    this.maxScreenDuration,
-    this.disableScreenTracking,
-    this.screensMasking,
-  });
+
+  bool get overrideUserConfig => _overrideUserConfig ?? false;
+  Color? get maskingColor => _maskingColor;
+  Duration? get videoQualityType => _videoQualityType;
+  int? get maxScreenshots => _maxScreenshots;
+  Duration? get maxScreenDuration => _maxScreenDuration;
+  bool? _overrideUserConfig;
+  List<String?>? _blockedFlutterSDKVersions;
+  List<String?>? _blockedFlutterAppVersions;
+  String? _maskingColorString;
+  Color? _maskingColor;
+  bool? _showLocalLogs;
+  int? _imageQualityType;
+  int? _videoQualityTypeInt;
+  Duration? _videoQualityType;
+  int? _maxScreenshots;
+  int? _maxScreenDurationInt;
+  Duration? _maxScreenDuration;
+  List<String?>? _disableScreenTracking;
+  List<String?>? _screensMasking;
 
   void runTasksAfterUpdate() {
-    if (showLocalLogs == true) {
+    convertNativeValuesToFlutterValues();
+
+    if (_showLocalLogs == true) {
       DependencyInjector.instance.loggerSdk.all();
     }
+    if (videoQualityType != null) {
+      DependencyInjector.instance.sessionReplay.updateFrameRate();
+    }
+  }
+
+  void convertNativeValuesToFlutterValues() {
+    if (_maskingColorString != null) {
+      final int? maskingColorInt =
+          int.tryParse(_maskingColorString!, radix: 16);
+      if (maskingColorInt != null) {
+        _maskingColor = Color.fromARGB(
+          255,
+          (maskingColorInt & 0xFF0000) >> 16,
+          (maskingColorInt & 0x00FF00) >> 8,
+          maskingColorInt & 0x0000FF,
+        );
+      }
+    }
+    if (_videoQualityTypeInt != null) {
+      _videoQualityType = _convertFromQualityTypeIntToDurationInMiliseconds(
+        _videoQualityTypeInt!,
+      );
+    }
+    if (_maxScreenDurationInt != null) {
+      _maxScreenDuration = Duration(minutes: _maxScreenDurationInt!);
+    }
+  }
+
+  bool isThisScreenNameDisabledForTracking(String screenName) {
+    return _disableScreenTracking?.contains(screenName) ?? false;
+  }
+
+  bool isThisScreenNameSetToBeMasked(String screenName) {
+    return _screensMasking?.contains(screenName) ?? false;
+  }
+
+  Duration _convertFromQualityTypeIntToDurationInMiliseconds(
+    int videoQualityType,
+  ) {
+    late final Duration duration;
+    switch (videoQualityType) {
+      case 0:
+        duration = const Duration(milliseconds: 500);
+        break;
+      case 1:
+        duration = const Duration(milliseconds: 250);
+        break;
+      case 2:
+        duration = const Duration(milliseconds: 167);
+        break;
+      case 3:
+        duration = const Duration(milliseconds: 125);
+
+        break;
+      case 4:
+        duration = const Duration(milliseconds: 100);
+
+        break;
+      default:
+        duration = const Duration(milliseconds: 250);
+    }
+    return duration;
   }
 
   @override
   void updateFromJson(Map<String, dynamic> jsonData) {
     final Map<String, dynamic> json = jsonData[jsonKey] as Map<String, dynamic>;
-    overrideUserConfig =
+    _overrideUserConfig =
         json['overrideUserConfig'] as bool? ?? overrideUserConfig;
 
-    maskingColor = json['maskingColor'] as String? ?? maskingColor;
-    showLocalLogs = json['showLocalLogs'] as bool? ?? showLocalLogs;
-    imageQualityType = json['imageQualityType'] as int? ?? imageQualityType;
-    maxScreenshots = json['maxScreenshots'] as int? ?? maxScreenshots;
-    maxScreenDuration = json['maxScreenDuration'] as int? ?? maxScreenDuration;
+    _maskingColorString =
+        json['maskingColor'] as String? ?? _maskingColorString;
+    _showLocalLogs = json['showLocalLogs'] as bool? ?? _showLocalLogs;
+    _imageQualityType = json['imageQualityType'] as int? ?? _imageQualityType;
+    _videoQualityTypeInt =
+        json['videoQualityType'] as int? ?? _videoQualityTypeInt;
+    _maxScreenshots = json['maxScreenshots'] as int? ?? maxScreenshots;
+    _maxScreenDurationInt =
+        json['maxScreenDuration'] as int? ?? _maxScreenDurationInt;
 
-    blockedFlutterSDKVersions =
+    _blockedFlutterSDKVersions =
         (json['blockedFlutterSDKVersions'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
-            blockedFlutterSDKVersions;
-    blockedFlutterAppVersions =
+            _blockedFlutterSDKVersions;
+    _blockedFlutterAppVersions =
         (json['blockedFlutterAppVersions'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
-            blockedFlutterAppVersions;
-    disableScreenTracking = (json['disableScreenTracking'] as List<dynamic>?)
+            _blockedFlutterAppVersions;
+    _disableScreenTracking = (json['disableScreenTracking'] as List<dynamic>?)
             ?.map((e) => e as String)
             .toList() ??
-        disableScreenTracking;
-    screensMasking = (json['screensMasking'] as List<dynamic>?)
+        _disableScreenTracking;
+    _screensMasking = (json['screensMasking'] as List<dynamic>?)
             ?.map((e) => e as String)
             .toList() ??
-        screensMasking;
+        _screensMasking;
 
     runTasksAfterUpdate();
   }
 
-  void updateFromPigeon(LiveConfigurationPigeon liveConfigurationFromPigeon) {
-    overrideUserConfig =
+  void updateFromPigeonClass(
+    LiveConfigurationPigeon liveConfigurationFromPigeon,
+  ) {
+    _overrideUserConfig =
         liveConfigurationFromPigeon.overrideUserConfig ?? overrideUserConfig;
-    blockedFlutterSDKVersions =
+    _blockedFlutterSDKVersions =
         liveConfigurationFromPigeon.blockedFlutterSDKVersions ??
-            blockedFlutterSDKVersions;
-    blockedFlutterAppVersions =
+            _blockedFlutterSDKVersions;
+    _blockedFlutterAppVersions =
         liveConfigurationFromPigeon.blockedFlutterAppVersions ??
-            blockedFlutterAppVersions;
-    maskingColor = liveConfigurationFromPigeon.maskingColor ?? maskingColor;
-    showLocalLogs = liveConfigurationFromPigeon.showLocalLogs ?? showLocalLogs;
-    imageQualityType =
-        liveConfigurationFromPigeon.imageQualityType ?? imageQualityType;
-    maxScreenshots =
+            _blockedFlutterAppVersions;
+    _maskingColorString =
+        liveConfigurationFromPigeon.maskingColor ?? _maskingColorString;
+    _showLocalLogs =
+        liveConfigurationFromPigeon.showLocalLogs ?? _showLocalLogs;
+    _imageQualityType =
+        liveConfigurationFromPigeon.imageQualityType ?? _imageQualityType;
+    _videoQualityTypeInt =
+        liveConfigurationFromPigeon.videoQualityType ?? _videoQualityTypeInt;
+    _maxScreenshots =
         liveConfigurationFromPigeon.maxScreenshots ?? maxScreenshots;
-    maxScreenDuration =
-        liveConfigurationFromPigeon.maxScreenDuration ?? maxScreenDuration;
-    disableScreenTracking = liveConfigurationFromPigeon.disableScreenTracking ??
-        disableScreenTracking;
-    screensMasking =
-        liveConfigurationFromPigeon.screensMasking ?? screensMasking;
+    _maxScreenDurationInt =
+        liveConfigurationFromPigeon.maxScreenDuration ?? _maxScreenDurationInt;
+    _disableScreenTracking =
+        liveConfigurationFromPigeon.disableScreenTracking ??
+            _disableScreenTracking;
+    _screensMasking =
+        liveConfigurationFromPigeon.screensMasking ?? _screensMasking;
     runTasksAfterUpdate();
-  }
-
-  @override
-  String toString() {
-    return 'LiveConfiguration(useLiveConfiguration: $overrideUserConfig, blockedFlutterSDKVersions: $blockedFlutterSDKVersions, blockedFlutterAppVersions: $blockedFlutterAppVersions, maskingColor: $maskingColor, showLocalLogs: $showLocalLogs, imageQualityType: $imageQualityType, maxScreenshots: $maxScreenshots, maxScreenDuration: $maxScreenDuration, disableScreenTracking: $disableScreenTracking, screensMasking: $screensMasking)';
   }
 }

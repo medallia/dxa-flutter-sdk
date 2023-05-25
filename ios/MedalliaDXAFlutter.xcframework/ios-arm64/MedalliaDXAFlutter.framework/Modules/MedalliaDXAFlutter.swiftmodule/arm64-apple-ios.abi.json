@@ -2632,6 +2632,13 @@
       },
       {
         "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "MedalliaDXAFlutter"
+      },
+      {
+        "kind": "Import",
         "name": "Foundation",
         "printedName": "Foundation",
         "declKind": "Import",
@@ -9032,6 +9039,71 @@
             "funcSelfKind": "NonMutating"
           },
           {
+            "kind": "Var",
+            "name": "appVersion",
+            "printedName": "appVersion",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:18MedalliaDXAFlutter3DXAC10appVersionSSSgvpZ",
+            "mangledName": "$s18MedalliaDXAFlutter3DXAC10appVersionSSSgvpZ",
+            "moduleName": "MedalliaDXAFlutter",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:18MedalliaDXAFlutter3DXAC10appVersionSSSgvgZ",
+                "mangledName": "$s18MedalliaDXAFlutter3DXAC10appVersionSSSgvgZ",
+                "moduleName": "MedalliaDXAFlutter",
+                "static": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
             "kind": "Function",
             "name": "enableSessionForExperience",
             "printedName": "enableSessionForExperience(_:)",
@@ -10862,6 +10934,178 @@
                 "accessorKind": "_modify"
               }
             ]
+          },
+          {
+            "kind": "Var",
+            "name": "dxaDisableRecordingOnThisScreen",
+            "printedName": "dxaDisableRecordingOnThisScreen",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvp",
+            "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvp",
+            "moduleName": "MedalliaDXAFlutter",
+            "declAttributes": [
+              "Custom",
+              "RawDocComment"
+            ],
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvg",
+                "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvg",
+                "moduleName": "MedalliaDXAFlutter",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvs",
+                "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvs",
+                "moduleName": "MedalliaDXAFlutter",
+                "isFromExtension": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvM",
+                "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE31dxaDisableRecordingOnThisScreenSbvM",
+                "moduleName": "MedalliaDXAFlutter",
+                "implicit": true,
+                "isFromExtension": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "dxaDisableAnalyticsAndRecordingOnThisScreen",
+            "printedName": "dxaDisableAnalyticsAndRecordingOnThisScreen",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvp",
+            "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvp",
+            "moduleName": "MedalliaDXAFlutter",
+            "declAttributes": [
+              "Custom",
+              "RawDocComment"
+            ],
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvg",
+                "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvg",
+                "moduleName": "MedalliaDXAFlutter",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvs",
+                "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvs",
+                "moduleName": "MedalliaDXAFlutter",
+                "isFromExtension": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:So16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvM",
+                "mangledName": "$sSo16UIViewControllerC18MedalliaDXAFlutterE43dxaDisableAnalyticsAndRecordingOnThisScreenSbvM",
+                "moduleName": "MedalliaDXAFlutter",
+                "implicit": true,
+                "isFromExtension": true,
+                "accessorKind": "_modify"
+              }
+            ]
           }
         ],
         "declKind": "Class",
@@ -11076,84 +11320,77 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "IntegerLiteral",
-      "offset": 4374,
+      "offset": 4365,
       "length": 2,
       "value": "15"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "IntegerLiteral",
-      "offset": 4379,
+      "offset": 4370,
       "length": 2,
       "value": "60"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "IntegerLiteral",
-      "offset": 4384,
+      "offset": 4375,
       "length": 2,
       "value": "60"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "IntegerLiteral",
-      "offset": 4389,
+      "offset": 4380,
       "length": 2,
       "value": "24"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "IntegerLiteral",
-      "offset": 4486,
+      "offset": 4477,
       "length": 1,
       "value": "3"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
-      "kind": "FloatLiteral",
-      "offset": 4588,
-      "length": 4,
-      "value": "0.25"
-    },
-    {
-      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "BooleanLiteral",
-      "offset": 4683,
+      "offset": 4569,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "BooleanLiteral",
-      "offset": 6700,
+      "offset": 6586,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "BooleanLiteral",
-      "offset": 6789,
+      "offset": 6675,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "BooleanLiteral",
-      "offset": 6878,
+      "offset": 6764,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "BooleanLiteral",
-      "offset": 6973,
+      "offset": 6859,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/SDKConfiguration.swift",
       "kind": "BooleanLiteral",
-      "offset": 7899,
+      "offset": 7785,
       "length": 5,
       "value": "false"
     },
@@ -11356,42 +11593,56 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
       "kind": "StringLiteral",
-      "offset": 1256,
+      "offset": 1303,
       "length": 25,
       "value": "\".feature.ScreenDetector\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
       "kind": "BooleanLiteral",
-      "offset": 1491,
+      "offset": 1538,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
       "kind": "BooleanLiteral",
-      "offset": 1558,
+      "offset": 1605,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
       "kind": "BooleanLiteral",
-      "offset": 3945,
-      "length": 4,
-      "value": "true"
-    },
-    {
-      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
-      "kind": "BooleanLiteral",
-      "offset": 3978,
+      "offset": 3423,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
       "kind": "BooleanLiteral",
-      "offset": 4034,
+      "offset": 3454,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
+      "kind": "BooleanLiteral",
+      "offset": 4330,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
+      "kind": "BooleanLiteral",
+      "offset": 4363,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Commons\/ScreenDetector.swift",
+      "kind": "BooleanLiteral",
+      "offset": 4419,
       "length": 4,
       "value": "true"
     },
@@ -13029,14 +13280,14 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/LO-FI\/ScreenRecordingLOFIMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 3213,
+      "offset": 3214,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/LO-FI\/ScreenRecordingLOFIMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 4006,
+      "offset": 4030,
       "length": 5,
       "value": "false"
     },
@@ -13330,497 +13581,497 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "BooleanLiteral",
-      "offset": 2313,
+      "offset": 2471,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "BooleanLiteral",
-      "offset": 2529,
+      "offset": 2687,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "BooleanLiteral",
-      "offset": 2599,
+      "offset": 2757,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "BooleanLiteral",
-      "offset": 2865,
+      "offset": 3023,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "BooleanLiteral",
-      "offset": 3081,
+      "offset": 3239,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "BooleanLiteral",
-      "offset": 3172,
+      "offset": 3330,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3488,
+      "offset": 3646,
       "length": 31,
       "value": "\"da_experienceDataSampleMethod\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3564,
+      "offset": 3722,
       "length": 29,
       "value": "\"da_analysisDataSampleMethod\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3636,
+      "offset": 3794,
       "length": 27,
       "value": "\"da_replayDataSampleMethod\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3702,
+      "offset": 3860,
       "length": 20,
       "value": "\"da_sessCookieFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3758,
+      "offset": 3916,
       "length": 20,
       "value": "\"da_leadCookieFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3819,
+      "offset": 3977,
       "length": 19,
       "value": "\"analysisSessFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3876,
+      "offset": 4034,
       "length": 19,
       "value": "\"analysisLeadFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3934,
+      "offset": 4092,
       "length": 17,
       "value": "\"replaySessFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3987,
+      "offset": 4145,
       "length": 17,
       "value": "\"replayLeadFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4035,
+      "offset": 4193,
       "length": 15,
       "value": "\"da_ipHandling\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4092,
+      "offset": 4250,
       "length": 27,
       "value": "\"dst_disableScreenTracking\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4154,
+      "offset": 4312,
       "length": 19,
       "value": "\"dst_screenMasking\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4203,
+      "offset": 4361,
       "length": 15,
       "value": "\"dst_forceHiFi\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4248,
+      "offset": 4406,
       "length": 15,
       "value": "\"dst_forceLoFi\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4296,
+      "offset": 4454,
       "length": 17,
       "value": "\"vs_imageQuality\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4346,
+      "offset": 4504,
       "length": 17,
       "value": "\"vs_videoQuality\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4401,
+      "offset": 4559,
       "length": 22,
       "value": "\"vs_screenMaxDuration\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4458,
+      "offset": 4616,
       "length": 23,
       "value": "\"vs_screenshotMaxCount\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4525,
+      "offset": 4683,
       "length": 28,
       "value": "\"vs_recordVideoInForeground\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4588,
+      "offset": 4746,
       "length": 19,
       "value": "\"da_sessionTimeout\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4640,
+      "offset": 4798,
       "length": 16,
       "value": "\"m_maskingColor\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4690,
+      "offset": 4848,
       "length": 18,
       "value": "\"da_showLocalLogs\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4738,
+      "offset": 4896,
       "length": 14,
       "value": "\"da_allowLogs\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4791,
+      "offset": 4949,
       "length": 26,
       "value": "\"vc_blockediOSSDKVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4856,
+      "offset": 5014,
       "length": 26,
       "value": "\"vc_blockediOSAppVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4916,
+      "offset": 5074,
       "length": 19,
       "value": "\"msc_keepVideoData\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4970,
+      "offset": 5128,
       "length": 20,
       "value": "\"msc_maxMemoryUsage\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5022,
+      "offset": 5180,
       "length": 17,
       "value": "\"msc_maxCPUUsage\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5075,
+      "offset": 5233,
       "length": 21,
       "value": "\"msc_enableAnalytics\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5135,
+      "offset": 5293,
       "length": 25,
       "value": "\"msc_overrideUserConfigs\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5206,
+      "offset": 5364,
       "length": 30,
       "value": "\"vc_blockedFlutterSDKVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5282,
+      "offset": 5440,
       "length": 30,
       "value": "\"vc_blockedFlutterAppVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3488,
+      "offset": 3646,
       "length": 31,
       "value": "\"da_experienceDataSampleMethod\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3564,
+      "offset": 3722,
       "length": 29,
       "value": "\"da_analysisDataSampleMethod\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3636,
+      "offset": 3794,
       "length": 27,
       "value": "\"da_replayDataSampleMethod\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3702,
+      "offset": 3860,
       "length": 20,
       "value": "\"da_sessCookieFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3758,
+      "offset": 3916,
       "length": 20,
       "value": "\"da_leadCookieFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3819,
+      "offset": 3977,
       "length": 19,
       "value": "\"analysisSessFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3876,
+      "offset": 4034,
       "length": 19,
       "value": "\"analysisLeadFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3934,
+      "offset": 4092,
       "length": 17,
       "value": "\"replaySessFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 3987,
+      "offset": 4145,
       "length": 17,
       "value": "\"replayLeadFlags\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4035,
+      "offset": 4193,
       "length": 15,
       "value": "\"da_ipHandling\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4092,
+      "offset": 4250,
       "length": 27,
       "value": "\"dst_disableScreenTracking\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4154,
+      "offset": 4312,
       "length": 19,
       "value": "\"dst_screenMasking\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4203,
+      "offset": 4361,
       "length": 15,
       "value": "\"dst_forceHiFi\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4248,
+      "offset": 4406,
       "length": 15,
       "value": "\"dst_forceLoFi\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4296,
+      "offset": 4454,
       "length": 17,
       "value": "\"vs_imageQuality\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4346,
+      "offset": 4504,
       "length": 17,
       "value": "\"vs_videoQuality\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4401,
+      "offset": 4559,
       "length": 22,
       "value": "\"vs_screenMaxDuration\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4458,
+      "offset": 4616,
       "length": 23,
       "value": "\"vs_screenshotMaxCount\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4525,
+      "offset": 4683,
       "length": 28,
       "value": "\"vs_recordVideoInForeground\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4588,
+      "offset": 4746,
       "length": 19,
       "value": "\"da_sessionTimeout\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4640,
+      "offset": 4798,
       "length": 16,
       "value": "\"m_maskingColor\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4690,
+      "offset": 4848,
       "length": 18,
       "value": "\"da_showLocalLogs\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4738,
+      "offset": 4896,
       "length": 14,
       "value": "\"da_allowLogs\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4791,
+      "offset": 4949,
       "length": 26,
       "value": "\"vc_blockediOSSDKVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4856,
+      "offset": 5014,
       "length": 26,
       "value": "\"vc_blockediOSAppVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4916,
+      "offset": 5074,
       "length": 19,
       "value": "\"msc_keepVideoData\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 4970,
+      "offset": 5128,
       "length": 20,
       "value": "\"msc_maxMemoryUsage\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5022,
+      "offset": 5180,
       "length": 17,
       "value": "\"msc_maxCPUUsage\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5075,
+      "offset": 5233,
       "length": 21,
       "value": "\"msc_enableAnalytics\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5135,
+      "offset": 5293,
       "length": 25,
       "value": "\"msc_overrideUserConfigs\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5206,
+      "offset": 5364,
       "length": 30,
       "value": "\"vc_blockedFlutterSDKVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5282,
+      "offset": 5440,
       "length": 30,
       "value": "\"vc_blockedFlutterAppVersions\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/Configuration\/ConfigurationAPI.swift",
       "kind": "StringLiteral",
-      "offset": 5605,
+      "offset": 5763,
       "length": 16,
       "value": "\".configuration\""
     },
@@ -13981,56 +14232,119 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
       "kind": "IntegerLiteral",
-      "offset": 1400,
+      "offset": 1444,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
       "kind": "IntegerLiteral",
-      "offset": 2002,
+      "offset": 1515,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1615,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2835,
       "length": 1,
       "value": "1"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
       "kind": "IntegerLiteral",
-      "offset": 2487,
+      "offset": 3464,
       "length": 1,
       "value": "1"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
       "kind": "IntegerLiteral",
-      "offset": 2767,
+      "offset": 3744,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
       "kind": "IntegerLiteral",
-      "offset": 3925,
-      "length": 1,
-      "value": "1"
-    },
-    {
-      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
-      "kind": "IntegerLiteral",
-      "offset": 4136,
+      "offset": 4946,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "StringLiteral",
+      "offset": 5114,
+      "length": 66,
+      "value": "\"Screen \""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "StringLiteral",
+      "offset": 5154,
+      "length": 5,
+      "value": "\"nil\""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "StringLiteral",
+      "offset": 5160,
+      "length": 3,
+      "value": "\" has been discarded\""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
       "kind": "IntegerLiteral",
-      "offset": 4521,
+      "offset": 5329,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "StringLiteral",
+      "offset": 6981,
+      "length": 68,
+      "value": "\"New image is nil for screen \""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "StringLiteral",
+      "offset": 7042,
+      "length": 5,
+      "value": "\"nil\""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "StringLiteral",
+      "offset": 7048,
+      "length": 12,
+      "value": "\"\""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
       "kind": "IntegerLiteral",
-      "offset": 6290,
+      "offset": 7140,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "StringLiteral",
+      "offset": 7188,
+      "length": 52,
+      "value": "\"First image has been discarded to avoid transition\""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/SVRCore.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7465,
       "length": 1,
       "value": "1"
     },
@@ -14093,133 +14407,133 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Core.swift",
       "kind": "StringLiteral",
-      "offset": 407,
+      "offset": 493,
       "length": 13,
       "value": "\".read-write\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Core.swift",
       "kind": "StringLiteral",
-      "offset": 569,
+      "offset": 655,
       "length": 21,
       "value": "\".core-configuration\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Core.swift",
       "kind": "BooleanLiteral",
-      "offset": 10568,
+      "offset": 12324,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/HTTP\/HTTPRetrying.swift",
-      "kind": "IntegerLiteral",
-      "offset": 375,
-      "length": 1,
-      "value": "0"
-    },
-    {
-      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/HTTP\/HTTPRetrying.swift",
       "kind": "StringLiteral",
-      "offset": 471,
+      "offset": 410,
       "length": 11,
       "value": "\".retrying\""
     },
     {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Networking\/HTTP\/HTTPRetrying.swift",
+      "kind": "IntegerLiteral",
+      "offset": 607,
+      "length": 1,
+      "value": "0"
+    },
+    {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 1671,
+      "offset": 1685,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 1736,
+      "offset": 1750,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "Array",
-      "offset": 1793,
+      "offset": 1807,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "Array",
-      "offset": 1848,
+      "offset": 1862,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "Array",
-      "offset": 1912,
+      "offset": 1926,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "Array",
-      "offset": 2001,
+      "offset": 2015,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "Array",
-      "offset": 2061,
+      "offset": 2075,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "Array",
-      "offset": 2117,
+      "offset": 2131,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "Array",
-      "offset": 2205,
+      "offset": 2219,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 2275,
+      "offset": 2289,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 2366,
+      "offset": 2380,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "StringLiteral",
-      "offset": 2453,
+      "offset": 2467,
       "length": 21,
       "value": "\".feature.SVR.record\""
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "IntegerLiteral",
-      "offset": 2683,
+      "offset": 2697,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/ScreenRecordingMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 3004,
+      "offset": 3018,
       "length": 4,
       "value": "true"
     },
@@ -14261,7 +14575,7 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/VideoEncoder\/Core\/Video\/VideoBuilder.swift",
       "kind": "IntegerLiteral",
-      "offset": 1090,
+      "offset": 1053,
       "length": 1,
       "value": "1"
     },
@@ -14887,6 +15201,13 @@
       "offset": 854,
       "length": 19,
       "value": "\".feature.RUM-main\""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/RUM\/Core\/RUMCore.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2901,
+      "length": 5,
+      "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/RUM\/Models\/Goal.swift",
@@ -15897,16 +16218,44 @@
       "value": "\"DXAScreenNameTag\""
     },
     {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Utils\/Tags.swift",
+      "kind": "StringLiteral",
+      "offset": 490,
+      "length": 24,
+      "value": "\"DXADisableRecordingTag\""
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Utils\/Tags.swift",
+      "kind": "StringLiteral",
+      "offset": 567,
+      "length": 35,
+      "value": "\"DXADisableRecordingAndTrackingTag\""
+    },
+    {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA Flutter\/Public\/MedalliaDXA+Flutter.swift",
       "kind": "StringLiteral",
-      "offset": 2501,
+      "offset": 2674,
       "length": 29,
       "value": "\".core-configuration-flutter\""
     },
     {
-      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Public\/MedalliaDXA.swift",
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Utils\/Contexts.swift",
       "kind": "BooleanLiteral",
-      "offset": 5724,
+      "offset": 804,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Core\/Utils\/Contexts.swift",
+      "kind": "BooleanLiteral",
+      "offset": 880,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/Public\/DXA.swift",
+      "kind": "BooleanLiteral",
+      "offset": 5728,
       "length": 4,
       "value": "true"
     },
@@ -15948,14 +16297,14 @@
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/HI-FI\/ScreenRecordingHIFIMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 2725,
+      "offset": 2768,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/agustindottaperera\/Documents\/Projects\/ios-Andromeda\/MedalliaDXA\/MedalliaDXA\/SVR\/Core\/ScreenRecording\/ScreenRecordingMode\/HI-FI\/ScreenRecordingHIFIMode.swift",
       "kind": "BooleanLiteral",
-      "offset": 6375,
+      "offset": 6418,
       "length": 4,
       "value": "true"
     },

@@ -264,6 +264,7 @@ class LiveConfigurationPigeon {
     this.maskingColor,
     this.showLocalLogs,
     this.imageQualityType,
+    this.videoQualityType,
     this.maxScreenshots,
     this.maxScreenDuration,
     this.disableScreenTracking,
@@ -282,6 +283,8 @@ class LiveConfigurationPigeon {
 
   int? imageQualityType;
 
+  int? videoQualityType;
+
   int? maxScreenshots;
 
   int? maxScreenDuration;
@@ -298,6 +301,7 @@ class LiveConfigurationPigeon {
       maskingColor,
       showLocalLogs,
       imageQualityType,
+      videoQualityType,
       maxScreenshots,
       maxScreenDuration,
       disableScreenTracking,
@@ -314,10 +318,11 @@ class LiveConfigurationPigeon {
       maskingColor: result[3] as String?,
       showLocalLogs: result[4] as bool?,
       imageQualityType: result[5] as int?,
-      maxScreenshots: result[6] as int?,
-      maxScreenDuration: result[7] as int?,
-      disableScreenTracking: (result[8] as List<Object?>?)?.cast<String?>(),
-      screensMasking: (result[9] as List<Object?>?)?.cast<String?>(),
+      videoQualityType: result[6] as int?,
+      maxScreenshots: result[7] as int?,
+      maxScreenDuration: result[8] as int?,
+      disableScreenTracking: (result[9] as List<Object?>?)?.cast<String?>(),
+      screensMasking: (result[10] as List<Object?>?)?.cast<String?>(),
     );
   }
 }

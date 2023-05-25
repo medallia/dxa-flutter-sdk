@@ -115,6 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
     maskingColor:(nullable NSString *)maskingColor
     showLocalLogs:(nullable NSNumber *)showLocalLogs
     imageQualityType:(nullable NSNumber *)imageQualityType
+    videoQualityType:(nullable NSNumber *)videoQualityType
     maxScreenshots:(nullable NSNumber *)maxScreenshots
     maxScreenDuration:(nullable NSNumber *)maxScreenDuration
     disableScreenTracking:(nullable NSArray<NSString *> *)disableScreenTracking
@@ -125,6 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy, nullable) NSString * maskingColor;
 @property(nonatomic, strong, nullable) NSNumber * showLocalLogs;
 @property(nonatomic, strong, nullable) NSNumber * imageQualityType;
+@property(nonatomic, strong, nullable) NSNumber * videoQualityType;
 @property(nonatomic, strong, nullable) NSNumber * maxScreenshots;
 @property(nonatomic, strong, nullable) NSNumber * maxScreenDuration;
 @property(nonatomic, strong, nullable) NSArray<NSString *> * disableScreenTracking;

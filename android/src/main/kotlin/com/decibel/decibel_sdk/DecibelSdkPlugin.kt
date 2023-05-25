@@ -82,7 +82,9 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
             liveConfiguration.blockedFlutterSDKVersions = config.vcBlockedFlutterSDKVersions
             liveConfiguration.blockedFlutterAppVersions = config.vcBlockedFlutterAppVersions
             liveConfiguration.maskingColor = config.mMaskingColor
-            liveConfiguration.imageQualityType = config.vsImageQuality.toLong()
+            liveConfiguration.imageQualityType = config.vsImageQuality.level.toLong()
+            //TODO update with the correct value from config
+            liveConfiguration.videoQualityType = 1
             liveConfiguration.showLocalLogs = config.daShowLocalLogs
             liveConfiguration.maxScreenshots = config.vsScreenshotMaxCount.toLong()
             liveConfiguration.maxScreenDuration = config.vsScreenMaxDuration.toLong()
@@ -322,7 +324,7 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
                 jsonObject.put("blockedFlutterSDKVersions", JSONArray(newConfig?.vcBlockedFlutterSDKVersions))
                 jsonObject.put("blockedFlutterAppVersions", JSONArray(newConfig?.vcBlockedFlutterAppVersions))
                 jsonObject.put("maskingColor", newConfig?.mMaskingColor)
-                jsonObject.put("imageQualityType", newConfig?.vsImageQuality)
+                jsonObject.put("imageQualityType", newConfig?.vsImageQuality?.level)
                 jsonObject.put("showLocalLogs", newConfig?.daShowLocalLogs)
                 jsonObject.put("maxScreenshots", newConfig?.vsScreenshotMaxCount)
                 jsonObject.put("maxScreenDuration", newConfig?.vsScreenMaxDuration)

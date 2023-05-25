@@ -1,10 +1,12 @@
 import 'package:decibel_sdk/src/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
+import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/manual_tracking/manual_tracking.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
+import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 
@@ -19,6 +21,8 @@ class DependencyInjector {
     required PlaceholderImageConfig placeholderImageConfig,
     required FrameTracking frameTracking,
     required MedalliaDxaNativeApi nativeApi,
+    required EventChannelManager eventChannelManager,
+    required GlobalSettings globalSettings,
   }) {
     return _instance = DependencyInjector._(
       config: config,
@@ -30,6 +34,8 @@ class DependencyInjector {
       placeholderImageConfig: placeholderImageConfig,
       frameTracking: frameTracking,
       nativeApi: nativeApi,
+      eventChannelManager: eventChannelManager,
+      globalSettings: globalSettings,
     );
   }
   DependencyInjector._({
@@ -42,6 +48,8 @@ class DependencyInjector {
     required this.placeholderImageConfig,
     required this.frameTracking,
     required this.nativeApi,
+    required this.eventChannelManager,
+    required this.globalSettings,
   });
   static late DependencyInjector _instance;
 
@@ -56,4 +64,6 @@ class DependencyInjector {
   final PlaceholderImageConfig placeholderImageConfig;
   final FrameTracking frameTracking;
   final MedalliaDxaNativeApi nativeApi;
+  final EventChannelManager eventChannelManager;
+  final GlobalSettings globalSettings;
 }

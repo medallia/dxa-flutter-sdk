@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/messages.dart';
-import 'package:decibel_sdk/src/utility/constants.dart';
+import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
@@ -29,9 +29,10 @@ void main() {
   late MockTracking mockTracking;
   late MockManualTracking mockManualTracking;
   late MockPerformanceMetrics mockPerformanceMetrics;
-
+  late MockEventChannelManager mockEventChannelManager;
   late MockScreenshotTaker mockScreenshotTaker;
   late MockScreenVisited mockScreenVisited;
+  late MockGlobalSettings mockGlobalSettings;
 
   late SessionReplay sessionReplay;
   //Third party
@@ -57,23 +58,31 @@ void main() {
     mockTracking = MockTracking();
     mockManualTracking = MockManualTracking();
     mockPerformanceMetrics = MockPerformanceMetrics();
+    mockEventChannelManager = MockEventChannelManager();
     fakeWidgetsBinding = FakeWidgetsBinding();
     mockSchedulerBinding = MockSchedulerBinding();
     mockBuildContext = MockBuildContext();
+    mockGlobalSettings = MockGlobalSettings();
+
     //this is needed here because the sessionReplay constructor uses it
     when(mockFrameTracking.newFrameStreamController)
         .thenReturn(StreamController());
+    when(mockGlobalSettings.frameRateInMiliseconds)
+        .thenReturn(const Duration(milliseconds: 250));
+    //
     sessionReplay = SessionReplay(
-        mockMedalliaDxaConfig,
-        mockLoggerSDK,
-        mockFrameTracking,
-        mockAutoMasking,
-        mockPlaceholderImageConfig,
-        fakeWidgetsBinding,
-        mockSchedulerBinding,
-        mockScreenshotTaker,
-        mockNativeApi,
-        mockPerformanceMetrics);
+      mockMedalliaDxaConfig,
+      mockLoggerSDK,
+      mockFrameTracking,
+      mockAutoMasking,
+      mockPlaceholderImageConfig,
+      fakeWidgetsBinding,
+      mockSchedulerBinding,
+      mockScreenshotTaker,
+      mockNativeApi,
+      mockPerformanceMetrics,
+      mockGlobalSettings,
+    );
 
     DependencyInjector(
       config: mockMedalliaDxaConfig,
@@ -85,8 +94,13 @@ void main() {
       tracking: mockTracking,
       manualTracking: mockManualTracking,
       sessionReplay: sessionReplay,
+      eventChannelManager: mockEventChannelManager,
+      globalSettings: mockGlobalSettings,
     );
     when(mockLoggerSDK.sessionReplayLogger).thenReturn(mockLogger);
+    when(mockGlobalSettings.maxReplayDurationPerScreen)
+        .thenReturn(const Duration(minutes: 5));
+    when(mockGlobalSettings.maxScreenshotCount).thenReturn(1200);
 
     //setUp for capture image.
     when(
@@ -528,7 +542,7 @@ AND the start focus time will have a relative value of the maximum replay durati
         //constant for maximum replay duration per screen
         when(mockScreenVisited.timestamp).thenReturn(
           DateTime.now().millisecondsSinceEpoch -
-              SDKConstants.maxReplayDurationPerScreen.inMilliseconds -
+              mockGlobalSettings.maxReplayDurationPerScreen.inMilliseconds -
               1,
         );
         await sessionReplay.closeScreenVideo(mockScreenVisited);
@@ -540,7 +554,7 @@ AND the start focus time will have a relative value of the maximum replay durati
                   as ScreenshotMessage)
               .startFocusTime,
           mockScreenVisited.timestamp +
-              SDKConstants.maxReplayDurationPerScreen.inMilliseconds,
+              mockGlobalSettings.maxReplayDurationPerScreen.inMilliseconds,
         );
       });
     });

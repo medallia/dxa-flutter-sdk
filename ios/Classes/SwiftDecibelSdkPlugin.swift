@@ -28,8 +28,8 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
 
         }
-        
-        let fltLiveConfiguration = FLTLiveConfigurationPigeon.make(withOverrideUserConfig: NSNumber(value: liveConfiguration.useLiveConfiguration), blockedFlutterSDKVersions: liveConfiguration.blockedFlutterSDKVersions, blockedFlutterAppVersions: liveConfiguration.blockedFlutterAppVersions, maskingColor: liveConfiguration.maskingColor, showLocalLogs: liveConfiguration.showLocalLogs == nil ? nil : NSNumber(value:liveConfiguration.showLocalLogs!) , imageQualityType: liveConfiguration.imageQualityType == nil ? nil: NSNumber(value:liveConfiguration.imageQualityType!), maxScreenshots: liveConfiguration.maxScreenshots == nil ? nil : NSNumber(value: liveConfiguration.maxScreenshots!), maxScreenDuration: liveConfiguration.maxScreenDuration == nil ? nil : NSNumber(value: liveConfiguration.maxScreenDuration!), disableScreenTracking: liveConfiguration.disableScreenTracking, screensMasking: liveConfiguration.screensMasking)
+                
+        let fltLiveConfiguration = buildLiveConfigurationPigeonClass(liveConfiguration: liveConfiguration)
         completion(fltLiveConfiguration, nil)
         
     }
@@ -204,6 +204,36 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
         
     }
     
+    private func buildLiveConfigurationPigeonClass(liveConfiguration: MedalliaDXAFlutter.LiveConfigurationFlutter) -> FLTLiveConfigurationPigeon {
+        var showLocalLogs: NSNumber? = nil
+        if liveConfiguration.showLocalLogs != nil {
+            showLocalLogs = NSNumber(value:liveConfiguration.showLocalLogs!)
+        }
+        
+        var imageQualityType: NSNumber? = nil
+        if liveConfiguration.imageQualityType != nil {
+            imageQualityType = NSNumber(value:liveConfiguration.imageQualityType!)
+        }
+        
+        var videoQualityType: NSNumber? = nil
+        if liveConfiguration.videoQualityType != nil {
+            videoQualityType = NSNumber(value:liveConfiguration.videoQualityType!)
+        }
+        
+        var maxScreenshots: NSNumber? = nil
+        if liveConfiguration.maxScreenshots != nil {
+            maxScreenshots = NSNumber(value:liveConfiguration.maxScreenshots!)
+        }
+        
+        var maxScreenDuration: NSNumber? = nil
+        if liveConfiguration.maxScreenDuration != nil {
+            maxScreenDuration = NSNumber(value:liveConfiguration.maxScreenDuration!)
+        }
+        
+        let fltLiveConfiguration = FLTLiveConfigurationPigeon.make(withOverrideUserConfig: NSNumber(value: liveConfiguration.useLiveConfiguration), blockedFlutterSDKVersions: liveConfiguration.blockedFlutterSDKVersions, blockedFlutterAppVersions: liveConfiguration.blockedFlutterAppVersions, maskingColor: liveConfiguration.maskingColor, showLocalLogs: showLocalLogs , imageQualityType: imageQualityType, videoQualityType: videoQualityType, maxScreenshots: maxScreenshots, maxScreenDuration: maxScreenDuration, disableScreenTracking: liveConfiguration.disableScreenTracking, screensMasking: liveConfiguration.screensMasking)
+        return fltLiveConfiguration
+    }
+    
     
 }
 extension SwiftDecibelSdkPlugin : DXADelegate {
@@ -216,6 +246,7 @@ extension SwiftDecibelSdkPlugin : DXADelegate {
             dictData["disableScreenTracking"] = configuration.disableScreenTracking
             dictData["screensMasking"] = configuration.screensMasking
             dictData["imageQualityType"] = configuration.imageQualityType
+            dictData["videoQualityType"] = configuration.videoQualityType
             dictData["maxScreenshots"] = configuration.maxScreenshots
             dictData["maxScreenDuration"] = configuration.maxScreenDuration
             dictData["maskingColor"] = configuration.maskingColor

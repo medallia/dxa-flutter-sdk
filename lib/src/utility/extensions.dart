@@ -1,6 +1,7 @@
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
-import 'package:decibel_sdk/src/utility/constants.dart';
+import 'package:decibel_sdk/src/utility/dependency_injector.dart';
+import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -108,11 +109,19 @@ extension ScreenVisitedFinder on List<ScreenVisited> {
 extension ScreenVisitedExt on ScreenVisited {
   bool get isCurrentScreenOverMaxDuration {
     return DateTime.now().millisecondsSinceEpoch - timestamp >
-        SDKConstants.maxReplayDurationPerScreen.inMilliseconds;
+        DependencyInjector
+            .instance.globalSettings.maxReplayDurationPerScreen.inMilliseconds;
+  }
+
+  bool get isCurrentScreenOverMaxScreenshotCount {
+    return screenshotTakenList.length >=
+        DependencyInjector.instance.globalSettings.maxScreenshotCount;
   }
 
   int get maximumDurationForLastScreenshot =>
-      timestamp + SDKConstants.maxReplayDurationPerScreen.inMilliseconds;
+      timestamp +
+      DependencyInjector
+          .instance.globalSettings.maxReplayDurationPerScreen.inMilliseconds;
 
   ///Checks if this screenVisited is the tab with the given a id or the parent
   ///TabBar of this screen has the same id
