@@ -123,12 +123,13 @@ class MedalliaDxaConfig {
   late final List<NavigatorObserver> _routeObserversToUseForAutomaticTracking =
       [
     CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver,
-    CustomRouteObserver.automaticTrackingRouteObserver
+    CustomRouteObserver.automaticTrackingRouteAnimationObserver
   ];
   late final List<NavigatorObserver> _routeObserversToUseForManualTracking = [
     CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver,
     CustomRouteObserver.manualTrackingRouteObserver,
   ];
+
   final List<NavigatorObserver> currentRouteObservers = [];
 
   bool _trackingAllowed = false;
