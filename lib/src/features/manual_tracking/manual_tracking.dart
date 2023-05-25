@@ -3,6 +3,7 @@ import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/widgets.dart';
 
 class ManualTracking {
@@ -41,6 +42,7 @@ startNewScreen is not supported when the DXA SDK is working in automatic trackin
       enableAutomaticPopupTracking: true,
       recordingAllowed: true,
       trackingAllowed: true,
+      placeholderTypeEnum: null,
     );
     tracking.startScreen(newScreenVisited);
   }
@@ -63,6 +65,7 @@ class ScreenVisitedManual extends ScreenVisited {
     required bool enableAutomaticPopupTracking,
     required bool recordingAllowed,
     required bool trackingAllowed,
+    required PlaceholderTypeEnum? placeholderTypeEnum,
   }) : super(
           id: id,
           name: name,
@@ -79,6 +82,7 @@ class ScreenVisitedManual extends ScreenVisited {
           enableAutomaticMasking: enableAutomaticMasking,
           recordingAllowed: recordingAllowed,
           trackingAllowed: trackingAllowed,
+          placeholderTypeEnum: placeholderTypeEnum,
         ) {
     //Every time a new ScreenVisitedManual is created, we increase the counter
     DependencyInjector.instance.manualTracking.screenCounter++;
@@ -124,6 +128,7 @@ class ScreenVisitedManual extends ScreenVisited {
       enableAutomaticPopupTracking: enableAutomaticPopupTracking,
       recordingAllowed: recordingAllowed,
       trackingAllowed: trackingAllowed,
+      placeholderTypeEnum: placeholderTypeEnum,
     );
   }
 }

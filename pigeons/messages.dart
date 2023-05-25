@@ -104,6 +104,7 @@ class LiveConfigurationPigeon {
   String? maskingColor;
   bool? showLocalLogs;
   int? imageQualityType;
+  int? videoQualityType;
   int? maxScreenshots;
   int? maxScreenDuration;
   List<String?>? disableScreenTracking;
@@ -115,6 +116,7 @@ class LiveConfigurationPigeon {
     this.maskingColor,
     this.showLocalLogs,
     this.imageQualityType,
+    this.videoQualityType,
     this.maxScreenshots,
     this.maxScreenDuration,
     this.disableScreenTracking,

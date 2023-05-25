@@ -27,6 +27,8 @@ void main() {
   late MockTracking mockTracking;
   late MockManualTracking mockManualTracking;
   late MockLiveConfiguration mockLiveConfiguration;
+  late MockEventChannelManager mockEventChannelManager;
+  late MockGlobalSettings mockGlobalSettings;
   late dynamic Function(
     String yaml,
   ) loadYaml;
@@ -51,22 +53,27 @@ void main() {
     mockTracking = MockTracking();
     mockManualTracking = MockManualTracking();
     mockLiveConfiguration = MockLiveConfiguration();
+    mockEventChannelManager = MockEventChannelManager();
+    mockGlobalSettings = MockGlobalSettings();
+
     medalliaDxaConfig = MedalliaDxaConfig.testing(
-      mockApi,
-      loadYaml,
-      mockGoalsAndDimensions,
-      assetBundleMock,
-      mockSessionReplay,
-      mockHttpErrors,
-      mockLoggerSDK,
-      mockManualTracking,
-      mockLiveConfiguration,
-      mockAutoMasking,
-      mockFrameTracking,
-      mockPlaceholderImageConfig,
-      mockTracking,
-    );
+        mockApi,
+        loadYaml,
+        mockGoalsAndDimensions,
+        assetBundleMock,
+        mockSessionReplay,
+        mockHttpErrors,
+        mockLoggerSDK,
+        mockManualTracking,
+        mockEventChannelManager,
+        mockAutoMasking,
+        mockFrameTracking,
+        mockPlaceholderImageConfig,
+        mockTracking,
+        mockGlobalSettings);
     when(mockSessionReplay.autoMasking).thenReturn(mockAutoMasking);
+    when(mockEventChannelManager.liveConfiguration)
+        .thenReturn(mockLiveConfiguration);
   });
 
   group('initalize method', () {

@@ -867,6 +867,16 @@ public class Messages {
       this.imageQualityType = setterArg;
     }
 
+    private @Nullable Long videoQualityType;
+
+    public @Nullable Long getVideoQualityType() {
+      return videoQualityType;
+    }
+
+    public void setVideoQualityType(@Nullable Long setterArg) {
+      this.videoQualityType = setterArg;
+    }
+
     private @Nullable Long maxScreenshots;
 
     public @Nullable Long getMaxScreenshots() {
@@ -951,6 +961,13 @@ public class Messages {
         return this;
       }
 
+      private @Nullable Long videoQualityType;
+
+      public @NonNull Builder setVideoQualityType(@Nullable Long setterArg) {
+        this.videoQualityType = setterArg;
+        return this;
+      }
+
       private @Nullable Long maxScreenshots;
 
       public @NonNull Builder setMaxScreenshots(@Nullable Long setterArg) {
@@ -987,6 +1004,7 @@ public class Messages {
         pigeonReturn.setMaskingColor(maskingColor);
         pigeonReturn.setShowLocalLogs(showLocalLogs);
         pigeonReturn.setImageQualityType(imageQualityType);
+        pigeonReturn.setVideoQualityType(videoQualityType);
         pigeonReturn.setMaxScreenshots(maxScreenshots);
         pigeonReturn.setMaxScreenDuration(maxScreenDuration);
         pigeonReturn.setDisableScreenTracking(disableScreenTracking);
@@ -997,13 +1015,14 @@ public class Messages {
 
     @NonNull
     ArrayList<Object> toList() {
-      ArrayList<Object> toListResult = new ArrayList<Object>(10);
+      ArrayList<Object> toListResult = new ArrayList<Object>(11);
       toListResult.add(overrideUserConfig);
       toListResult.add(blockedFlutterSDKVersions);
       toListResult.add(blockedFlutterAppVersions);
       toListResult.add(maskingColor);
       toListResult.add(showLocalLogs);
       toListResult.add(imageQualityType);
+      toListResult.add(videoQualityType);
       toListResult.add(maxScreenshots);
       toListResult.add(maxScreenDuration);
       toListResult.add(disableScreenTracking);
@@ -1025,13 +1044,15 @@ public class Messages {
       pigeonResult.setShowLocalLogs((Boolean) showLocalLogs);
       Object imageQualityType = list.get(5);
       pigeonResult.setImageQualityType((imageQualityType == null) ? null : ((imageQualityType instanceof Integer) ? (Integer) imageQualityType : (Long) imageQualityType));
-      Object maxScreenshots = list.get(6);
+      Object videoQualityType = list.get(6);
+      pigeonResult.setVideoQualityType((videoQualityType == null) ? null : ((videoQualityType instanceof Integer) ? (Integer) videoQualityType : (Long) videoQualityType));
+      Object maxScreenshots = list.get(7);
       pigeonResult.setMaxScreenshots((maxScreenshots == null) ? null : ((maxScreenshots instanceof Integer) ? (Integer) maxScreenshots : (Long) maxScreenshots));
-      Object maxScreenDuration = list.get(7);
+      Object maxScreenDuration = list.get(8);
       pigeonResult.setMaxScreenDuration((maxScreenDuration == null) ? null : ((maxScreenDuration instanceof Integer) ? (Integer) maxScreenDuration : (Long) maxScreenDuration));
-      Object disableScreenTracking = list.get(8);
+      Object disableScreenTracking = list.get(9);
       pigeonResult.setDisableScreenTracking((List<String>) disableScreenTracking);
-      Object screensMasking = list.get(9);
+      Object screensMasking = list.get(10);
       pigeonResult.setScreensMasking((List<String>) screensMasking);
       return pigeonResult;
     }

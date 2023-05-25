@@ -337,6 +337,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     maskingColor:(nullable NSString *)maskingColor
     showLocalLogs:(nullable NSNumber *)showLocalLogs
     imageQualityType:(nullable NSNumber *)imageQualityType
+    videoQualityType:(nullable NSNumber *)videoQualityType
     maxScreenshots:(nullable NSNumber *)maxScreenshots
     maxScreenDuration:(nullable NSNumber *)maxScreenDuration
     disableScreenTracking:(nullable NSArray<NSString *> *)disableScreenTracking
@@ -348,6 +349,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   pigeonResult.maskingColor = maskingColor;
   pigeonResult.showLocalLogs = showLocalLogs;
   pigeonResult.imageQualityType = imageQualityType;
+  pigeonResult.videoQualityType = videoQualityType;
   pigeonResult.maxScreenshots = maxScreenshots;
   pigeonResult.maxScreenDuration = maxScreenDuration;
   pigeonResult.disableScreenTracking = disableScreenTracking;
@@ -362,10 +364,11 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   pigeonResult.maskingColor = GetNullableObjectAtIndex(list, 3);
   pigeonResult.showLocalLogs = GetNullableObjectAtIndex(list, 4);
   pigeonResult.imageQualityType = GetNullableObjectAtIndex(list, 5);
-  pigeonResult.maxScreenshots = GetNullableObjectAtIndex(list, 6);
-  pigeonResult.maxScreenDuration = GetNullableObjectAtIndex(list, 7);
-  pigeonResult.disableScreenTracking = GetNullableObjectAtIndex(list, 8);
-  pigeonResult.screensMasking = GetNullableObjectAtIndex(list, 9);
+  pigeonResult.videoQualityType = GetNullableObjectAtIndex(list, 6);
+  pigeonResult.maxScreenshots = GetNullableObjectAtIndex(list, 7);
+  pigeonResult.maxScreenDuration = GetNullableObjectAtIndex(list, 8);
+  pigeonResult.disableScreenTracking = GetNullableObjectAtIndex(list, 9);
+  pigeonResult.screensMasking = GetNullableObjectAtIndex(list, 10);
   return pigeonResult;
 }
 + (nullable FLTLiveConfigurationPigeon *)nullableFromList:(NSArray *)list {
@@ -379,6 +382,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     (self.maskingColor ?: [NSNull null]),
     (self.showLocalLogs ?: [NSNull null]),
     (self.imageQualityType ?: [NSNull null]),
+    (self.videoQualityType ?: [NSNull null]),
     (self.maxScreenshots ?: [NSNull null]),
     (self.maxScreenDuration ?: [NSNull null]),
     (self.disableScreenTracking ?: [NSNull null]),

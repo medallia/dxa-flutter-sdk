@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:decibel_sdk/src/decibel_config.dart';
+import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/untracked_screens.dart';
@@ -10,6 +11,7 @@ import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
+import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -18,6 +20,7 @@ class Tracking with TrackingCompleter {
     this.medalliaDxaConfig,
     this._logger,
     this._sessionReplay,
+    this._liveConfiguration,
   ) {
     _untrackedScreens = UntrackedScreens(this);
   }
@@ -25,6 +28,7 @@ class Tracking with TrackingCompleter {
   final MedalliaDxaConfig medalliaDxaConfig;
   final LoggerSDK _logger;
   final SessionReplay _sessionReplay;
+  final LiveConfiguration _liveConfiguration;
   late final UntrackedScreens _untrackedScreens;
   Logger get logger => _logger.trackingLogger;
   final MedalliaDxaNativeApi _apiInstance = MedalliaDxaNativeApi();
@@ -96,6 +100,33 @@ class Tracking with TrackingCompleter {
           (tabBarNames == null && tabBarIndex == null),
     );
 
+    PlaceholderTypeEnum? placeholderTypeEnum;
+    bool trackingAllowedMerge = trackingAllowed;
+    bool recordingAllowedMerge = recordingAllowed;
+
+    if (!recordingAllowed) {
+      placeholderTypeEnum = PlaceholderTypeEnum.replayDisabled;
+    }
+
+    String screenNameLiveConfig = name;
+    //For TabBars we want the child name and not the parent name to check
+    //for live config features
+    if (tabBarNames != null && tabBarIndex != null) {
+      screenNameLiveConfig = tabBarNames[tabBarIndex];
+    }
+    //Detect disabled tracking for screens in liveconfig
+    if (_liveConfiguration
+        .isThisScreenNameDisabledForTracking(screenNameLiveConfig)) {
+      trackingAllowedMerge = false;
+    }
+
+    //Detect screen masking for screens in liveconfig
+    if (_liveConfiguration
+        .isThisScreenNameSetToBeMasked(screenNameLiveConfig)) {
+      recordingAllowedMerge = false;
+      placeholderTypeEnum = PlaceholderTypeEnum.liveConfig;
+    }
+
     final int timestamp = DateTime.now().millisecondsSinceEpoch;
 
     late ScreenVisited screenVisited;
@@ -108,8 +139,9 @@ class Tracking with TrackingCompleter {
         tabBarNames: tabBarNames,
         tabIndex: tabBarIndex,
         listOfMasks: listOfMasks,
-        recordingAllowed: recordingAllowed,
-        trackingAllowed: trackingAllowed,
+        recordingAllowed: recordingAllowedMerge,
+        trackingAllowed: trackingAllowedMerge,
+        placeholderTypeEnum: placeholderTypeEnum,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticPopupTracking: enableAutomaticPopupTracking,
         enableAutomaticMasking: enableAutomaticMasking,
@@ -121,8 +153,9 @@ class Tracking with TrackingCompleter {
         captureKey: captureKey,
         timestamp: timestamp,
         name: name,
-        recordingAllowed: recordingAllowed,
-        trackingAllowed: trackingAllowed,
+        recordingAllowed: recordingAllowedMerge,
+        trackingAllowed: trackingAllowedMerge,
+        placeholderTypeEnum: placeholderTypeEnum,
         enableAutomaticPopupRecording: enableAutomaticPopupRecording,
         enableAutomaticPopupTracking: enableAutomaticPopupTracking,
         enableAutomaticMasking: enableAutomaticMasking,

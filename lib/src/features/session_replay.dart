@@ -13,6 +13,7 @@ import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +32,9 @@ class SessionReplay with TaskCompleter {
       this.schedulerBindingInstance,
       this.screenshotTaker,
       this._nativeApiInstance,
-      this._performanceMetrics) {
-    timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
+      this._performanceMetrics,
+      this._globalSettings) {
+    timer = Timer.periodic(_globalSettings.frameRateInMiliseconds, (_) async {
       await tryToTakeScreenshotIfUiHasChanged();
     });
     _frameTracking.newFrameStreamController.stream.listen((timeStamp) {
@@ -51,7 +53,7 @@ class SessionReplay with TaskCompleter {
   final WidgetsBinding widgetsBindingInstance;
   final SchedulerBinding schedulerBindingInstance;
   final PerformanceMetrics _performanceMetrics;
-
+  final GlobalSettings _globalSettings;
   late final Tracking _tracking = DependencyInjector.instance.tracking;
   @visibleForTesting
   late Timer timer;
@@ -95,13 +97,18 @@ class SessionReplay with TaskCompleter {
 
   void startPeriodicTimer() {
     if (timer.isActive) return;
-    timer = Timer.periodic(const Duration(milliseconds: 250), (_) async {
+    timer = Timer.periodic(_globalSettings.frameRateInMiliseconds, (_) async {
       await tryToTakeScreenshotIfUiHasChanged();
     });
   }
 
   void stopPeriodicTimer() {
     timer.cancel();
+  }
+
+  void updateFrameRate() {
+    stopPeriodicTimer();
+    startPeriodicTimer();
   }
 
   void clearMasks() {
@@ -117,6 +124,7 @@ class SessionReplay with TaskCompleter {
     if (!_currentlyTracking) return;
     final ScreenVisited currentTrackedScreen = _currentTrackedScreen;
     if (currentTrackedScreen.isCurrentScreenOverMaxDuration) return;
+    if (currentTrackedScreen.isCurrentScreenOverMaxScreenshotCount) return;
     if (_performanceMetrics.isDeviceStressed) {
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: currentTrackedScreen,
@@ -127,10 +135,13 @@ class SessionReplay with TaskCompleter {
     }
     if (!currentTrackedScreen.recordingAllowed ||
         !_medalliaDxaConfig.recordingAllowed) {
+      final PlaceholderTypeEnum placeholderTypeEnum =
+          currentTrackedScreen.placeholderTypeEnum ??
+              PlaceholderTypeEnum.replayDisabled;
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: currentTrackedScreen,
         placeholderType: PlaceholderType(
-          placeholderTypeEnum: PlaceholderTypeEnum.replayDisabled,
+          placeholderTypeEnum: placeholderTypeEnum,
         ),
       );
     }
@@ -203,6 +214,7 @@ class SessionReplay with TaskCompleter {
   ///Resends the last screenshot to native (with a new focusTime) only
   ///if there's been a second or more without any new screenshots
   Future<void> closeScreenVideo(ScreenVisited screenVisited) async {
+    if (screenVisited.isCurrentScreenOverMaxScreenshotCount) return;
     if (screenVisited.screenshotTakenList.isEmpty) {
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: screenVisited,
@@ -277,14 +289,17 @@ class SessionReplay with TaskCompleter {
   }
 }
 
-@visibleForTesting
 class ScreenshotTaker with TrackingCompleter {
   final AutoMasking autoMasking;
   final MedalliaDxaConfig medalliaDxaConfig;
-
-  final _maskColor = Paint()..color = Colors.grey;
-
-  ScreenshotTaker({required this.autoMasking, required this.medalliaDxaConfig});
+  Paint get _maskColor =>
+      Paint()..color = DependencyInjector.instance.globalSettings.maskColor;
+  final Paint _borderColor = Paint()
+    ..color = const Color.fromARGB(255, 255, 255, 255);
+  ScreenshotTaker({
+    required this.autoMasking,
+    required this.medalliaDxaConfig,
+  });
 
   Future<ByteData?> captureImage({
     required ScreenVisited screenVisited,
@@ -367,7 +382,11 @@ class ScreenshotTaker with TrackingCompleter {
 
   void _paintMaskWithCoordinates(Canvas canvas, Set<Rect> coordinates) {
     for (final coordinate in coordinates) {
-      canvas.drawRect(coordinate, _maskColor);
+      canvas.drawRect(
+        coordinate,
+        _borderColor,
+      );
+      canvas.drawRect(coordinate.deflate(2), _maskColor);
     }
   }
 }

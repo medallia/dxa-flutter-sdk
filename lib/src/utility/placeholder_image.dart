@@ -10,7 +10,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 enum PlaceholderTypeEnum {
   replayDisabled,
   noPreviewAvailable,
-  performanceStress
+  performanceStress,
+  liveConfig
 }
 
 class PlaceholderType {
@@ -28,6 +29,9 @@ class PlaceholderType {
 
       case PlaceholderTypeEnum.performanceStress:
         return 'The device is stressed';
+
+      case PlaceholderTypeEnum.liveConfig:
+        return 'Video recording masked for this screen';
 
       default:
         return 'No preview available';
