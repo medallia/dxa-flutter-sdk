@@ -142,7 +142,6 @@ class MedalliaDxaConfig {
       _sessionReplay.stopPeriodicTimer();
       _sessionReplay.sendPlaceholderImage();
     }
-    _recordingAllowed = value;
   }
 
   bool get recordingAllowed => _recordingAllowed;
