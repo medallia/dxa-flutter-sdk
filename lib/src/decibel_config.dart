@@ -123,12 +123,13 @@ class MedalliaDxaConfig {
   late final List<NavigatorObserver> _routeObserversToUseForAutomaticTracking =
       [
     CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver,
-    CustomRouteObserver.automaticTrackingRouteObserver
+    CustomRouteObserver.automaticTrackingRouteAnimationObserver
   ];
   late final List<NavigatorObserver> _routeObserversToUseForManualTracking = [
     CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver,
     CustomRouteObserver.manualTrackingRouteObserver,
   ];
+
   final List<NavigatorObserver> currentRouteObservers = [];
 
   bool _trackingAllowed = false;
@@ -141,6 +142,7 @@ class MedalliaDxaConfig {
       _sessionReplay.stopPeriodicTimer();
       _sessionReplay.sendPlaceholderImage();
     }
+    _recordingAllowed = value;
   }
 
   bool get recordingAllowed => _recordingAllowed;

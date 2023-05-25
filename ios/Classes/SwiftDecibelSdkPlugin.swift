@@ -249,4 +249,18 @@ extension SwiftDecibelSdkPlugin : DXADelegate {
             print("Performance JSON serialization error: \(error)")
         }
     }
+    
+    public func enableSession(forAnalysisValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+        DecibelSDK.multiPlatform.enableSessionForAnalysis(value as! Bool)
+    }
+    
+    public func enableSession(forReplayValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+        DecibelSDK.multiPlatform.enableSessionForReplay(value as! Bool)
+    }
+    
+    public func enableScreen(forAnalysisValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+        DecibelSDK.multiPlatform.enableScreenForAnalysis(value as! Bool)
+    }
+    
+    
 }

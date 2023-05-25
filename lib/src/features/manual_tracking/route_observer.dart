@@ -25,7 +25,7 @@ class ManualRouteObserver extends RouteObserver<PageRoute<dynamic>>
 
     if (route is ModalRoute) {
       _handleRouteAnimationTransition(route, (bool transitioning) {
-        tracking.isPageTransitioning = transitioning;
+        tracking.isRouteAnimating = transitioning;
       });
       WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
         if (route is PopupRoute) {
@@ -46,7 +46,7 @@ class ManualRouteObserver extends RouteObserver<PageRoute<dynamic>>
     logger.d('didReplace');
     if (newRoute is ModalRoute) {
       _handleRouteAnimationTransition(newRoute, (bool transitioning) {
-        tracking.isPageTransitioning = transitioning;
+        tracking.isRouteAnimating = transitioning;
       });
       WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
         if (newRoute is PopupRoute) {
@@ -70,7 +70,7 @@ class ManualRouteObserver extends RouteObserver<PageRoute<dynamic>>
     if (route is ModalRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route, (bool transitioning) {
-          tracking.isPageTransitioning = transitioning;
+          tracking.isRouteAnimating = transitioning;
         });
       });
     }

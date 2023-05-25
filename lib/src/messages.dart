@@ -361,23 +361,23 @@ class _MedalliaDxaNativeApiCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128: 
+      case 128:
         return DimensionBoolMessage.decode(readValue(buffer)!);
-      case 129: 
+      case 129:
         return DimensionNumberMessage.decode(readValue(buffer)!);
-      case 130: 
+      case 130:
         return DimensionStringMessage.decode(readValue(buffer)!);
-      case 131: 
+      case 131:
         return EndScreenMessage.decode(readValue(buffer)!);
-      case 132: 
+      case 132:
         return GoalMessage.decode(readValue(buffer)!);
-      case 133: 
+      case 133:
         return LiveConfigurationPigeon.decode(readValue(buffer)!);
-      case 134: 
+      case 134:
         return ScreenshotMessage.decode(readValue(buffer)!);
-      case 135: 
+      case 135:
         return SessionMessage.decode(readValue(buffer)!);
-      case 136: 
+      case 136:
         return StartScreenMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -512,7 +512,8 @@ class MedalliaDxaNativeApi {
 
   Future<void> sendDimensionWithString(DimensionStringMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithString', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithString',
+        codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -534,7 +535,8 @@ class MedalliaDxaNativeApi {
 
   Future<void> sendDimensionWithNumber(DimensionNumberMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithNumber', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDimensionWithNumber',
+        codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_msg]) as List<Object?>?;
@@ -602,8 +604,7 @@ class MedalliaDxaNativeApi {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.sendDataOverWifiOnly', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(null) as List<Object?>?;
+    final List<Object?>? replyList = await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -644,7 +645,8 @@ class MedalliaDxaNativeApi {
 
   Future<void> enableSessionForExperience(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForExperience', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForExperience',
+        codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_value]) as List<Object?>?;
@@ -666,7 +668,8 @@ class MedalliaDxaNativeApi {
 
   Future<void> enableSessionForAnalysis(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForAnalysis', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForAnalysis',
+        codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_value]) as List<Object?>?;
@@ -710,7 +713,8 @@ class MedalliaDxaNativeApi {
 
   Future<void> enableScreenForAnalysis(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableScreenForAnalysis', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.enableScreenForAnalysis',
+        codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_value]) as List<Object?>?;
@@ -734,8 +738,7 @@ class MedalliaDxaNativeApi {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.getWebViewProperties', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(null) as List<Object?>?;
+    final List<Object?>? replyList = await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -761,8 +764,7 @@ class MedalliaDxaNativeApi {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionId', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(null) as List<Object?>?;
+    final List<Object?>? replyList = await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -788,8 +790,7 @@ class MedalliaDxaNativeApi {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionUrl', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(null) as List<Object?>?;
+    final List<Object?>? replyList = await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

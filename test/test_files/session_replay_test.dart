@@ -117,7 +117,7 @@ void main() {
       when(mockScreenVisited.widgetInTheTree).thenReturn(true);
     },
     () {
-      when(mockTracking.isPageTransitioning).thenReturn(false);
+      when(mockTracking.areThereOngoingAnimations).thenReturn(false);
     },
     () {
       sessionReplay.didUiChangeValue = true;
@@ -277,13 +277,13 @@ method''', () async {
       setVariablesToAllowTakeScreenshot();
       when(mockScreenVisited.screenshotTakenList).thenReturn([]);
       //WHEN a page is transitioning
-      when(mockTracking.isPageTransitioning).thenReturn(true);
+      when(mockTracking.areThereOngoingAnimations).thenReturn(true);
       //AND the SDK is trying to take a screenshot
       await sessionReplay.tryToTakeScreenshotIfUiHasChanged();
       //THEN no screenshot should be taken.
       verifyNever(mockNativeApi.saveScreenshot(any));
       //WHEN it is no longer transitioning
-      when(mockTracking.isPageTransitioning).thenReturn(false);
+      when(mockTracking.areThereOngoingAnimations).thenReturn(false);
       //AND the next frame is rendered
       await fakeWidgetsBinding.invokeFrameCallbackAndAwaitFutures();
       //THEN the screenshot is sent to native without having to call the take screenshot method
@@ -305,7 +305,7 @@ method''', () async {
       when(mockScreenVisited.screenshotTakenList).thenReturn([]);
 
       //WHEN a page is transitioning
-      when(mockTracking.isPageTransitioning).thenReturn(true);
+      when(mockTracking.areThereOngoingAnimations).thenReturn(true);
       //AND the SDK is trying to take multiple screenshots
 
       await sessionReplay.tryToTakeScreenshotIfUiHasChanged();
@@ -314,7 +314,7 @@ method''', () async {
       //THEN no screenshot should be taken.
       verifyNever(mockNativeApi.saveScreenshot(any));
       //WHEN it is no longer transitioning
-      when(mockTracking.isPageTransitioning).thenReturn(false);
+      when(mockTracking.areThereOngoingAnimations).thenReturn(false);
       //AND the next frame is rendered
       await fakeWidgetsBinding.invokeFrameCallbackAndAwaitFutures();
       //THEN the screenshot is sent to native only ONCE
@@ -532,7 +532,6 @@ AND the start focus time will have a relative value of the maximum replay durati
               1,
         );
         await sessionReplay.closeScreenVideo(mockScreenVisited);
-
         //AND a screenshot will be sent to native
         //AND the start focus time will have a relative value of the maximum
         //replay duration

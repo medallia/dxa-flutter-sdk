@@ -549,12 +549,6 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
         returnValueForMissingStub: false,
       ) as bool);
   @override
-  bool get manualTrackingEnabled => (super.noSuchMethod(
-        Invocation.getter(#manualTrackingEnabled),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-  @override
   void setRecordingAllowed(bool? value) => super.noSuchMethod(
         Invocation.method(
           #setRecordingAllowed,
@@ -2057,6 +2051,20 @@ class MockTracking extends _i1.Mock implements _i10.Tracking {
         returnValueForMissingStub: null,
       );
   @override
+  bool get isRouteAnimating => (super.noSuchMethod(
+        Invocation.getter(#isRouteAnimating),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  set isRouteAnimating(bool? _isRouteAnimating) => super.noSuchMethod(
+        Invocation.setter(
+          #isRouteAnimating,
+          _isRouteAnimating,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
   _i8.Logger get logger => (super.noSuchMethod(
         Invocation.getter(#logger),
         returnValue: _FakeLogger_6(
@@ -2075,15 +2083,21 @@ class MockTracking extends _i1.Mock implements _i10.Tracking {
         returnValueForMissingStub: <_i13.ScreenVisited>[],
       ) as List<_i13.ScreenVisited>);
   @override
-  bool get isPageTransitioning => (super.noSuchMethod(
-        Invocation.getter(#isPageTransitioning),
+  bool get areThereOngoingAnimations => (super.noSuchMethod(
+        Invocation.getter(#areThereOngoingAnimations),
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
   @override
-  set isPageTransitioning(bool? transitioning) => super.noSuchMethod(
+  bool get isTabBarAnimating => (super.noSuchMethod(
+        Invocation.getter(#isTabBarAnimating),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  set isTabBarAnimating(bool? transitioning) => super.noSuchMethod(
         Invocation.setter(
-          #isPageTransitioning,
+          #isTabBarAnimating,
           transitioning,
         ),
         returnValueForMissingStub: null,
