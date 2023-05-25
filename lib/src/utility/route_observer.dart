@@ -10,23 +10,22 @@ import 'package:logger/logger.dart';
 class CustomRouteObserver {
   static final RouteObserver<ModalRoute<void>> screenWidgetRouteObserver =
       RouteObserver<ModalRoute<void>>();
-  static final RouteObserver generalRouteObserver =
-      MyRouteObserver(LoggerSDK.instance);
+  static final RouteObserver routeAnimationObserver =
+      RouteAnimationObserver(LoggerSDK.instance);
 }
 
-class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
-  MyRouteObserver(
-    this._logger,
-  );
+class RouteAnimationObserver extends RouteObserver<PageRoute<dynamic>> {
+  RouteAnimationObserver(this._logger);
   late final Tracking tracking = DependencyInjector.instance.tracking;
-
   final LoggerSDK _logger;
   Logger get logger => _logger.routeObserverLogger;
+  final Map<TransitionRoute, AnimationStatus> _routesWithActiveAnimation =
+      <TransitionRoute, AnimationStatus>{};
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     logger.d('didPush');
-    if (route is ModalRoute) {
+    if (route is TransitionRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
@@ -74,7 +73,7 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     logger.d('didReplace');
 
-    if (newRoute is ModalRoute) {
+    if (newRoute is TransitionRoute) {
       newRoute.animation?.addStatusListener((status) {
         _animationListener(status, newRoute);
       });
@@ -98,7 +97,7 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
   void didRemove(Route route, Route? previousRoute) {
     logger.d('didRemove');
 
-    if (route is ModalRoute) {
+    if (route is TransitionRoute) {
       route.animation?.addStatusListener((status) {
         _animationListener(status, route);
       });
@@ -107,17 +106,26 @@ class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
     super.didRemove(route, previousRoute);
   }
 
-  void _animationListener(AnimationStatus status, ModalRoute route) {
-    if (route.offstage) return;
-    if (status == AnimationStatus.completed ||
-        status == AnimationStatus.dismissed) {
-      tracking.isPageTransitioning = false;
-      route.animation?.removeStatusListener((status) {
-        _animationListener(status, route);
-      });
+  void _animationListener(AnimationStatus status, TransitionRoute route) {
+    statusChanged(route, status);
+    tracking.isRouteAnimating = isAnyRouteAnimating();
+  }
+
+  void statusChanged(TransitionRoute route, AnimationStatus status) {
+    if (status == AnimationStatus.dismissed ||
+        status == AnimationStatus.completed) {
+      _routesWithActiveAnimation.remove(route);
     } else {
-      tracking.isPageTransitioning = true;
+      _routesWithActiveAnimation.update(
+        route,
+        (value) => status,
+        ifAbsent: () => status,
+      );
     }
+  }
+
+  bool isAnyRouteAnimating() {
+    return _routesWithActiveAnimation.isNotEmpty;
   }
 
   void checkForDialogPopOrRemove(Route dialogRoute) {

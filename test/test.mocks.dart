@@ -1714,6 +1714,20 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
         returnValueForMissingStub: null,
       );
   @override
+  bool get isRouteAnimating => (super.noSuchMethod(
+        Invocation.getter(#isRouteAnimating),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  set isRouteAnimating(bool? _isRouteAnimating) => super.noSuchMethod(
+        Invocation.setter(
+          #isRouteAnimating,
+          _isRouteAnimating,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
   _i7.Logger get logger => (super.noSuchMethod(
         Invocation.getter(#logger),
         returnValue: _FakeLogger_5(
@@ -1732,15 +1746,21 @@ class MockTracking extends _i1.Mock implements _i8.Tracking {
         returnValueForMissingStub: <_i12.ScreenVisited>[],
       ) as List<_i12.ScreenVisited>);
   @override
-  bool get isPageTransitioning => (super.noSuchMethod(
-        Invocation.getter(#isPageTransitioning),
+  bool get areThereOngoingAnimations => (super.noSuchMethod(
+        Invocation.getter(#areThereOngoingAnimations),
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
   @override
-  set isPageTransitioning(bool? transitioning) => super.noSuchMethod(
+  bool get isTabBarAnimating => (super.noSuchMethod(
+        Invocation.getter(#isTabBarAnimating),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  set isTabBarAnimating(bool? transitioning) => super.noSuchMethod(
         Invocation.setter(
-          #isPageTransitioning,
+          #isTabBarAnimating,
           transitioning,
         ),
         returnValueForMissingStub: null,
@@ -2133,8 +2153,8 @@ class MockScreenVisited extends _i1.Mock implements _i12.ScreenVisited {
       (super.noSuchMethod(
         Invocation.getter(#listOfMasks),
         returnValue: <_i4.GlobalKey<_i4.State<_i4.StatefulWidget>>>[],
-        returnValueForMissingStub: <
-            _i4.GlobalKey<_i4.State<_i4.StatefulWidget>>>[],
+        returnValueForMissingStub: <_i4
+            .GlobalKey<_i4.State<_i4.StatefulWidget>>>[],
       ) as List<_i4.GlobalKey<_i4.State<_i4.StatefulWidget>>>);
   @override
   bool get isDialog => (super.noSuchMethod(

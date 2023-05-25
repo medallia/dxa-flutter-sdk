@@ -108,7 +108,7 @@ class MedalliaDxaConfig {
   late final HttpErrors _httpErrors;
   late final List<NavigatorObserver> _routeObserversToUse = [
     CustomRouteObserver.screenWidgetRouteObserver,
-    CustomRouteObserver.generalRouteObserver
+    CustomRouteObserver.routeAnimationObserver
   ];
   final List<NavigatorObserver> currentRouteObservers = [];
 

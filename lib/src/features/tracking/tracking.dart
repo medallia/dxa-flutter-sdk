@@ -38,16 +38,18 @@ class Tracking with TrackingCompleter {
       List.empty(growable: true);
   List<ScreenVisited> get visitedScreensList => _visitedScreensList;
   ScreenVisited? screenVisitedWhenAppWentToBackground;
-  int _transitioningPages = 0;
   ScreenVisited? get lastUntrackedOrTrackedScreenVisited =>
       _untrackedScreens.lastUntrackedOrTrackedScreenVisited;
-  bool get isPageTransitioning => _transitioningPages > 0;
-  set isPageTransitioning(bool transitioning) {
+  bool get areThereOngoingAnimations => isRouteAnimating || isTabBarAnimating;
+  bool isRouteAnimating = false;
+  int _animatingTabBars = 0;
+  bool get isTabBarAnimating => _animatingTabBars > 0;
+  set isTabBarAnimating(bool transitioning) {
     if (transitioning) {
-      _transitioningPages++;
+      _animatingTabBars++;
     } else {
-      if (_transitioningPages == 0) return;
-      _transitioningPages--;
+      if (_animatingTabBars == 0) return;
+      _animatingTabBars--;
     }
   }
 
@@ -295,16 +297,16 @@ class Tracking with TrackingCompleter {
       if (tabController.indexIsChanging) {
         //needed because of multiple calls to this will mess up the number of
         //pages transitioning count
-        if (isPageTransitioning != tabController.indexIsChanging) {
-          isPageTransitioning = tabController.indexIsChanging;
+        if (isTabBarAnimating != tabController.indexIsChanging) {
+          isTabBarAnimating = tabController.indexIsChanging;
         }
         return;
       }
     }
     //needed because of multiple calls to this will mess up the number of
     //pages transitioning count
-    if (isPageTransitioning != tabController.indexIsChanging) {
-      isPageTransitioning = tabController.indexIsChanging;
+    if (isTabBarAnimating != tabController.indexIsChanging) {
+      isTabBarAnimating = tabController.indexIsChanging;
     }
 
     if (tabController.index != tabController.previousIndex &&
