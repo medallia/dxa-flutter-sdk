@@ -9,16 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 class CustomRouteObserver {
-  static final RouteObserver<ModalRoute<void>>
+  static final RouteObserver<TransitionRoute<void>>
       screenWidgetAndMaskWidgetRouteObserver =
-      RouteObserver<ModalRoute<void>>();
+      RouteObserver<TransitionRoute<void>>();
   static final RouteObserver automaticTrackingRouteAnimationObserver =
       RouteAnimationObserver(LoggerSDK.instance);
   static final RouteObserver manualTrackingRouteObserver =
       ManualRouteObserver(LoggerSDK.instance);
 }
 
-class RouteAnimationObserver extends RouteObserver<PageRoute<dynamic>> {
+class RouteAnimationObserver extends RouteObserver<TransitionRoute<dynamic>> {
   RouteAnimationObserver(this._logger);
   late final Tracking tracking = DependencyInjector.instance.tracking;
   final LoggerSDK _logger;
@@ -30,9 +30,12 @@ class RouteAnimationObserver extends RouteObserver<PageRoute<dynamic>> {
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     logger.d('didPush');
     if (route is TransitionRoute) {
-      route.animation?.addStatusListener((status) {
-        _animationListener(status, route);
-      });
+      if (route.animation != null) {
+        route.animation!.addStatusListener((status) {
+          _animationListener(status, route);
+        });
+        _animationListener(route.animation!.status, route);
+      }
     }
     if (route is PopupRoute) {
       if (previousRoute != null && previousRoute is PageRoute) {
@@ -78,9 +81,12 @@ class RouteAnimationObserver extends RouteObserver<PageRoute<dynamic>> {
     logger.d('didReplace');
 
     if (newRoute is TransitionRoute) {
-      newRoute.animation?.addStatusListener((status) {
-        _animationListener(status, newRoute);
-      });
+      if (newRoute.animation != null) {
+        newRoute.animation!.addStatusListener((status) {
+          _animationListener(status, newRoute);
+        });
+        _animationListener(newRoute.animation!.status, newRoute);
+      }
     }
     if (oldRoute != null) {
       checkForDialogPopOrRemove(oldRoute);
@@ -102,9 +108,12 @@ class RouteAnimationObserver extends RouteObserver<PageRoute<dynamic>> {
     logger.d('didRemove');
 
     if (route is TransitionRoute) {
-      route.animation?.addStatusListener((status) {
-        _animationListener(status, route);
-      });
+      if (route.animation != null) {
+        route.animation!.addStatusListener((status) {
+          _animationListener(status, route);
+        });
+        _animationListener(route.animation!.status, route);
+      }
     }
 
     super.didRemove(route, previousRoute);
