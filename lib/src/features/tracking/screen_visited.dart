@@ -182,7 +182,7 @@ class ScreenVisited {
       id: routeId,
       name: '$name-dialog',
       timestamp: timestamp,
-      listOfMasks: listOfMasks,
+      listOfMasks: [],
       captureKey: captureKey,
       dialogContext: dialogContext,
       recordingAllowed:

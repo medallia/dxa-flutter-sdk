@@ -41,6 +41,7 @@ void main() {
   late FakeWidgetsBinding fakeWidgetsBinding;
   late MockSchedulerBinding mockSchedulerBinding;
   late MockBuildContext mockBuildContext;
+  late MockCustomRouteObserver mockCustomRouteObserver;
 
   setUp(() {
     WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +64,7 @@ void main() {
     mockSchedulerBinding = MockSchedulerBinding();
     mockBuildContext = MockBuildContext();
     mockGlobalSettings = MockGlobalSettings();
+    mockCustomRouteObserver = MockCustomRouteObserver();
 
     //this is needed here because the sessionReplay constructor uses it
     when(mockFrameTracking.newFrameStreamController)
@@ -96,6 +98,7 @@ void main() {
       sessionReplay: sessionReplay,
       eventChannelManager: mockEventChannelManager,
       globalSettings: mockGlobalSettings,
+      customRouteObserver: mockCustomRouteObserver,
     );
     when(mockLoggerSDK.sessionReplayLogger).thenReturn(mockLogger);
     when(mockGlobalSettings.maxReplayDurationPerScreen)

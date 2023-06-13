@@ -8,6 +8,7 @@ import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.d
 import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart';
 import 'package:decibel_sdk/src/features/manual_tracking/manual_tracking.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
+import 'package:decibel_sdk/src/features/tracking/route_observer.dart';
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
@@ -40,8 +41,12 @@ import 'test_files/session_replay_test.dart' as session_replay_test;
   MockSpec<PerformanceMetrics>(),
   MockSpec<LiveConfiguration>(),
   MockSpec<EventChannelManager>(),
+  MockSpec<CustomRouteObserver>(),
+
   MockSpec<ScreenVisited>(),
-  MockSpec<GlobalSettings>(),
+  MockSpec<GlobalSettings>(
+    unsupportedMembers: {#returnCorrectConfig},
+  ),
   //Third parties
   MockSpec<Logger>(),
   //Flutter classes

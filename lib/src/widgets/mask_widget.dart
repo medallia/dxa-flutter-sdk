@@ -24,6 +24,10 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   late List<GlobalKey> listOfMasks;
   late final Logger logger =
       DependencyInjector.instance.loggerSdk.maskWidgetLogger;
+  late final CustomRouteObserver customRouteObserver =
+      DependencyInjector.instance.customRouteObserver;
+  RouteObserver? widgetRouteObserverForNavigator;
+  ModalRoute<Object?>? route;
   @override
   void initState() {
     logger.d('initState - child runtimeType: ${widget.child.runtimeType}');
@@ -37,10 +41,23 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    listOfMasks = MaskList.of(context)!.listOfMasks;
-    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver
-        .subscribe(this, ModalRoute.of(context)!);
+    final maybeListOfMasks = MaskList.of(context)?.listOfMasks;
+    if (maybeListOfMasks == null) {
+      listOfMasks = [];
+      return;
+    }
+    listOfMasks = maybeListOfMasks;
     logger.d('didChangeDependencies - listsOfMasks $listOfMasks');
+
+    route = ModalRoute.of(context);
+    if (route == null) return;
+    final NavigatorState? widgetNavigator = Navigator.maybeOf(context);
+    if (widgetNavigator != null) {
+      final observer =
+          customRouteObserver.observerToSubscribeFromWidget(widgetNavigator);
+      observer?.subscribe(this, route!);
+      widgetRouteObserverForNavigator = observer;
+    }
   }
 
   @override
@@ -48,8 +65,7 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
     logger.d('dispose');
 
     removeMask(globalKey);
-    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver
-        .unsubscribe(this);
+    widgetRouteObserverForNavigator?.unsubscribe(this);
     super.dispose();
   }
 
@@ -64,44 +80,30 @@ class _ActiveMaskWidgetState extends State<_ActiveMaskWidget> with RouteAware {
   void didPopNext() {
     logger.d('didPopNext');
 
-    // WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
     addMask(globalKey);
-    // });
   }
 
   @override
   void didPop() {
     logger.d('didPop');
-
-    removeMask(globalKey);
   }
 
   @override
   void didPushNext() {
     logger.d('didPushNext');
-
-    removeMask(globalKey);
   }
 
   void addMask(GlobalKey globalKey) {
     logger.d('addMask $globalKey');
 
-    // if (listOfMasks == null)
-    //   throw (StateError("MaskWidget must have an ancestor ScreenWidget"));
     if (!listOfMasks.contains(globalKey)) {
       listOfMasks.add(globalKey);
     }
-
-    // if (!SessionReplay.instance.widgetsToMaskList.contains(globalKey)) {
-    //   SessionReplay.instance.widgetsToMaskList.add(globalKey);
-    // }
   }
 
   void removeMask(GlobalKey globalKey) {
     logger.d('removeMask $globalKey');
 
-    //   final List<GlobalKey>? listOfMasks = _MaskList.of(context)?.listOfMasks;
-    //   if (listOfMasks == null) return;
     if (listOfMasks.contains(globalKey)) {
       listOfMasks.remove(globalKey);
     }
