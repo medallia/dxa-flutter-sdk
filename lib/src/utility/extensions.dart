@@ -16,7 +16,7 @@ extension ElementExt on Element {
 
   bool containsScreenWidget() {
     bool flag = false;
-    int depth = 100;
+    int depth = 1000;
     void findChild(Element parentElement) {
       parentElement.visitChildElements((element) {
         if (element.widget.runtimeType == ScreenWidget) {

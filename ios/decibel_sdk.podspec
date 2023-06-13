@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'decibel_sdk'
-  s.version          = '1.1.3'
+  s.version          = '1.2.0'
   s.summary          = 'Decibel SDK flutter binding'
   s.description      = <<-DESC
 Decibel SDK flutter binding

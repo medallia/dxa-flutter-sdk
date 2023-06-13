@@ -29,6 +29,8 @@ void main() {
   late MockLiveConfiguration mockLiveConfiguration;
   late MockEventChannelManager mockEventChannelManager;
   late MockGlobalSettings mockGlobalSettings;
+  late MockCustomRouteObserver mockCustomRouteObserver;
+
   late dynamic Function(
     String yaml,
   ) loadYaml;
@@ -55,7 +57,7 @@ void main() {
     mockLiveConfiguration = MockLiveConfiguration();
     mockEventChannelManager = MockEventChannelManager();
     mockGlobalSettings = MockGlobalSettings();
-
+    mockCustomRouteObserver = MockCustomRouteObserver();
     medalliaDxaConfig = MedalliaDxaConfig.testing(
         mockApi,
         loadYaml,
@@ -66,6 +68,7 @@ void main() {
         mockLoggerSDK,
         mockManualTracking,
         mockEventChannelManager,
+        mockCustomRouteObserver,
         mockAutoMasking,
         mockFrameTracking,
         mockPlaceholderImageConfig,

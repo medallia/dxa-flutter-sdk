@@ -36,7 +36,9 @@ class MedalliaDxaConfig {
       : _nativeApi = MedalliaDxaNativeApi(),
         _loadYaml = yaml_parser.loadYaml,
         _rootBundle = services.rootBundle,
-        _loggerSDK = LoggerSDK.instance {
+        _loggerSDK = LoggerSDK.instance,
+        _customRouteObserver =
+            CustomRouteObserver(RouteObserverOtherNavigators()) {
     final frameTracking = FrameTracking(
       postFrameCallback: WidgetsBindingNullSafe.instance!.addPostFrameCallback,
     );
@@ -91,6 +93,7 @@ class MedalliaDxaConfig {
       sessionReplay: _sessionReplay,
       eventChannelManager: _eventChannelManager,
       globalSettings: globalSettings,
+      customRouteObserver: _customRouteObserver,
     );
   }
   @visibleForTesting
@@ -104,6 +107,7 @@ class MedalliaDxaConfig {
     this._loggerSDK,
     this._manualTracking,
     this._eventChannelManager,
+    this._customRouteObserver,
     AutoMasking autoMasking,
     FrameTracking frameTracking,
     PlaceholderImageConfig placeholderImageConfig,
@@ -122,6 +126,7 @@ class MedalliaDxaConfig {
       sessionReplay: _sessionReplay,
       eventChannelManager: _eventChannelManager,
       globalSettings: globalSettings,
+      customRouteObserver: _customRouteObserver,
     );
   }
 
@@ -132,21 +137,18 @@ class MedalliaDxaConfig {
   ) _loadYaml;
   late SessionReplay _sessionReplay;
   final LoggerSDK _loggerSDK;
+  final CustomRouteObserver _customRouteObserver;
   late final ManualTracking _manualTracking;
   late final GoalsAndDimensions _goalsAndDimensions;
   late final HttpErrors _httpErrors;
   late final EventChannelManager _eventChannelManager;
-  late final List<NavigatorObserver> _routeObserversToUseForAutomaticTracking =
-      [
-    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver,
-    CustomRouteObserver.automaticTrackingRouteAnimationObserver
-  ];
-  late final List<NavigatorObserver> _routeObserversToUseForManualTracking = [
-    CustomRouteObserver.screenWidgetAndMaskWidgetRouteObserver,
-    CustomRouteObserver.manualTrackingRouteObserver,
-  ];
+  List<NavigatorObserver> get currentRouteObservers => initialized
+      ? _customRouteObserver.getNewObservers(
+          automaticTracking: automaticTracking,
+        )
+      : [];
 
-  final List<NavigatorObserver> currentRouteObservers = [];
+  // final List<NavigatorObserver> currentRouteObservers = [];
 
   bool _trackingAllowed = false;
   bool _recordingAllowed = false;
@@ -163,6 +165,7 @@ class MedalliaDxaConfig {
   bool get recordingAllowed => _recordingAllowed;
   bool get trackingAllowed => _trackingAllowed;
   bool initialized = false;
+  late bool automaticTracking;
 
   /// Initializes MedalliaDxa
   Future<void> initialize(
@@ -173,7 +176,7 @@ class MedalliaDxaConfig {
   }) async {
     final String version = await _getVersion();
     _manualTracking.enabled = manualScreenTrackingEnabled;
-    _setObservers(manualScreenTrackingEnabled);
+    automaticTracking = !manualScreenTrackingEnabled;
     _setEnableConsentsForFlutter(consents);
     final sessionMessage = SessionMessage(
       account: account,
@@ -187,16 +190,6 @@ class MedalliaDxaConfig {
     initialized = true;
     _eventChannelManager.liveConfiguration
         .updateFromPigeonClass(liveConfigurationPigeon);
-  }
-
-  void _setObservers(bool setManualTrackingObservers) {
-    if (currentRouteObservers.isEmpty) {
-      currentRouteObservers.addAll(
-        setManualTrackingObservers
-            ? _routeObserversToUseForManualTracking
-            : _routeObserversToUseForAutomaticTracking,
-      );
-    }
   }
 
   Future<String> _getVersion() async {

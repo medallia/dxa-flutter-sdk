@@ -47,7 +47,7 @@ class PlaceholderImageConfig {
       HashMap();
 
   ByteData? placeHolderIcon;
-  static const Size _fallbackSize = Size(200, 500);
+  static final Size _fallbackSize = Size(200, 500);
   Size lastSize = _fallbackSize;
 
   FutureOr<ByteData> getPlaceholderImage(

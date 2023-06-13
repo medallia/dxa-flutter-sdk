@@ -4,6 +4,7 @@ import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dar
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:decibel_sdk/src/features/manual_tracking/manual_tracking.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
+import 'package:decibel_sdk/src/features/tracking/route_observer.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/global_settings.dart';
@@ -23,20 +24,21 @@ class DependencyInjector {
     required MedalliaDxaNativeApi nativeApi,
     required EventChannelManager eventChannelManager,
     required GlobalSettings globalSettings,
+    required CustomRouteObserver customRouteObserver,
   }) {
     return _instance = DependencyInjector._(
-      config: config,
-      tracking: tracking,
-      manualTracking: manualTracking,
-      sessionReplay: sessionReplay,
-      loggerSdk: loggerSdk,
-      autoMasking: autoMasking,
-      placeholderImageConfig: placeholderImageConfig,
-      frameTracking: frameTracking,
-      nativeApi: nativeApi,
-      eventChannelManager: eventChannelManager,
-      globalSettings: globalSettings,
-    );
+        config: config,
+        tracking: tracking,
+        manualTracking: manualTracking,
+        sessionReplay: sessionReplay,
+        loggerSdk: loggerSdk,
+        autoMasking: autoMasking,
+        placeholderImageConfig: placeholderImageConfig,
+        frameTracking: frameTracking,
+        nativeApi: nativeApi,
+        eventChannelManager: eventChannelManager,
+        globalSettings: globalSettings,
+        customRouteObserver: customRouteObserver);
   }
   DependencyInjector._({
     required this.config,
@@ -50,6 +52,7 @@ class DependencyInjector {
     required this.nativeApi,
     required this.eventChannelManager,
     required this.globalSettings,
+    required this.customRouteObserver,
   });
   static late DependencyInjector _instance;
 
@@ -66,4 +69,5 @@ class DependencyInjector {
   final MedalliaDxaNativeApi nativeApi;
   final EventChannelManager eventChannelManager;
   final GlobalSettings globalSettings;
+  final CustomRouteObserver customRouteObserver;
 }
