@@ -689,6 +689,25 @@ void FLTMedalliaDxaNativeApiSetup(id<FlutterBinaryMessenger> binaryMessenger, NS
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
+        initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.sendImageQuality"
+        binaryMessenger:binaryMessenger
+        codec:FLTMedalliaDxaNativeApiGetCodec()];
+    if (api) {
+      NSCAssert([api respondsToSelector:@selector(sendImageQualityImageQuality:error:)], @"FLTMedalliaDxaNativeApi api (%@) doesn't respond to @selector(sendImageQualityImageQuality:error:)", api);
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        NSArray *args = message;
+        NSNumber *arg_imageQuality = GetNullableObjectAtIndex(args, 0);
+        FlutterError *error;
+        [api sendImageQualityImageQuality:arg_imageQuality error:&error];
+        callback(wrapResult(nil, error));
+      }];
+    } else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [[FlutterBasicMessageChannel alloc]
         initWithName:@"dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForExperience"
         binaryMessenger:binaryMessenger
         codec:FLTMedalliaDxaNativeApiGetCodec()];

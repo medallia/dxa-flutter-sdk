@@ -431,6 +431,61 @@ THEN getPlaceholderImage is called''', () async {
           .called(1);
       verify(mockNativeApi.saveScreenshot(any)).called(1);
     });
+    test('''
+WHEN close screen video is called
+AND dxa config has recording disabled
+THEN a placeholder image with no permissions text will be sent to native
+''', () async {
+      //setup to create place holder image
+
+      when(mockScreenVisited.getCurrentContext).thenReturn(mockBuildContext);
+      //WHEN close screen video is called
+      //AND last screenshot is null
+      await sessionReplay.closeScreenVideo(mockScreenVisited);
+
+      //THEN no screenshot is sent to native
+      verify(mockNativeApi.saveScreenshot(any)).called(1);
+      verify(
+        mockPlaceholderImageConfig.getPlaceholderImage(
+          any,
+          any,
+        ),
+      ).called(1);
+
+      //WHEN last screenshoot is not null
+      when(mockScreenVisited.screenshotTakenList).thenReturn([
+        ScreenShotTaken(
+          isPlaceholder: false,
+          screenshotMessage: ScreenshotMessage(
+            screenshotData: ByteData(3).buffer.asUint8List(),
+            screenId: 0,
+            screenName: 'screenName',
+            //AND has a startFocusTime bigger than 1 second
+            startFocusTime: DateTime.now().millisecondsSinceEpoch - 2000,
+          ),
+        ),
+      ]);
+      //(not exceeding isCurrentScreenOverMaxDuration)
+      when(mockScreenVisited.timestamp)
+          .thenReturn(DateTime.now().millisecondsSinceEpoch - 10000);
+      when(mockScreenVisited.endTimestamp)
+          .thenReturn(DateTime.now().millisecondsSinceEpoch);
+      when(mockMedalliaDxaConfig.recordingAllowed).thenReturn(false);
+      await sessionReplay.closeScreenVideo(mockScreenVisited);
+      expect(
+        (verify(
+          mockPlaceholderImageConfig.getPlaceholderImage(
+            any,
+            captureAny,
+          ),
+        ).captured.single as PlaceholderType)
+            .placeholderTypeEnum,
+        PlaceholderTypeEnum.noPermission,
+      );
+
+      //THEN a screenshot will be sent to native
+      verify(mockNativeApi.saveScreenshot(any)).called(1);
+    });
     group('close screen video', () {
       test('''
 WHEN close screen video is called
@@ -474,6 +529,7 @@ THEN a screenshot will be sent to native
             .thenReturn(DateTime.now().millisecondsSinceEpoch - 10000);
         when(mockScreenVisited.endTimestamp)
             .thenReturn(DateTime.now().millisecondsSinceEpoch);
+        when(mockMedalliaDxaConfig.recordingAllowed).thenReturn(true);
         await sessionReplay.closeScreenVideo(mockScreenVisited);
         verifyNever(
           mockPlaceholderImageConfig.getPlaceholderImage(
@@ -512,6 +568,7 @@ THEN a screenshot will NOT be sent to native
 
         when(mockScreenVisited.timestamp)
             .thenReturn(DateTime.now().millisecondsSinceEpoch - 10000);
+        when(mockMedalliaDxaConfig.recordingAllowed).thenReturn(true);
         await sessionReplay.closeScreenVideo(mockScreenVisited);
         //AND a screenshot will NOT be sent to native
         verifyNever(mockNativeApi.saveScreenshot(any));
@@ -548,6 +605,7 @@ AND the start focus time will have a relative value of the maximum replay durati
               mockGlobalSettings.maxReplayDurationPerScreen.inMilliseconds -
               1,
         );
+        when(mockMedalliaDxaConfig.recordingAllowed).thenReturn(true);
         await sessionReplay.closeScreenVideo(mockScreenVisited);
         //AND a screenshot will be sent to native
         //AND the start focus time will have a relative value of the maximum

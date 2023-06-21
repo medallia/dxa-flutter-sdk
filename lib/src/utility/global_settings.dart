@@ -1,4 +1,5 @@
 import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart';
+import 'package:decibel_sdk/src/features/image_quality.dart';
 import 'package:flutter/material.dart';
 
 class GlobalSettings {
@@ -49,6 +50,16 @@ class GlobalSettings {
     );
   }
 
+  ImageQuality? userImageQuality;
+  ImageQuality get imageQuality {
+    return returnCorrectConfig<ImageQuality>(
+      overrideUserConfig: liveConfiguration.overrideUserConfig,
+      liveConfig: liveConfiguration.imageQualityType,
+      userConfig: userImageQuality,
+      defaultConfig: defaultGlobalSettings.imageQuality,
+    );
+  }
+
   ///Returns either the User config, Live config or Default config depending
   ///on the overrideUserConfig parameter and the potential null values
   T returnCorrectConfig<T>({
@@ -69,4 +80,5 @@ class DefaultGlobalSettings {
   final int maxScreenshotCount = 1200;
   final Duration frameRateInMiliseconds = const Duration(milliseconds: 250);
   final Color maskColor = Colors.grey;
+  final ImageQuality imageQuality = ImageQuality.average;
 }

@@ -17,14 +17,14 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
         if  let consents = msg.consents as? Int {
             let nativeConsents: Consent = translateConsentsFlutterToIos(flutterConsents: consents)
             let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property),consent: nativeConsents)
-            configuration.endpoint = .production
+            
             
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
 
             
         } else  {
             let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property))
-            configuration.endpoint = .production
+            
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
 
         }
@@ -103,6 +103,13 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
         DXA.sendHTTPError(statusCode: Int(truncating: msg))
     }
     
+    public func sendImageQualityImageQuality(_ imageQuality: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
+        guard let imageQualityValue = ImageQualityType(rawValue: Int(truncating: imageQuality)) else {
+            return
+        }
+        DXA.setImageQuality(imageQualityValue)
+    }
+
     public func getWebViewProperties(completion: (String?, FlutterError?)->Void) {
         let webViewProperties = DXA.webViewProperties
         if webViewProperties != nil {

@@ -9,6 +9,7 @@ import 'package:decibel_sdk/src/features/event_channel/classes/live_configuratio
 import 'package:decibel_sdk/src/features/event_channel/classes/performance_metrics.dart';
 import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';
+import 'package:decibel_sdk/src/features/image_quality.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.dart';
 import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart';
 import 'package:decibel_sdk/src/features/manual_tracking/manual_tracking.dart';
@@ -52,7 +53,7 @@ class MedalliaDxaConfig {
 
     final LiveConfiguration liveConfiguration = LiveConfiguration();
     final DefaultGlobalSettings defaultGlobalSettings = DefaultGlobalSettings();
-    final GlobalSettings globalSettings = GlobalSettings(
+    _globalSettings = GlobalSettings(
       liveConfiguration: liveConfiguration,
       defaultGlobalSettings: defaultGlobalSettings,
     );
@@ -73,7 +74,7 @@ class MedalliaDxaConfig {
       screenshotTaker,
       _nativeApi,
       performanceMetrics,
-      globalSettings,
+      _globalSettings,
     );
     final Tracking tracking =
         Tracking(this, _loggerSDK, _sessionReplay, liveConfiguration);
@@ -92,7 +93,7 @@ class MedalliaDxaConfig {
       manualTracking: _manualTracking,
       sessionReplay: _sessionReplay,
       eventChannelManager: _eventChannelManager,
-      globalSettings: globalSettings,
+      globalSettings: _globalSettings,
       customRouteObserver: _customRouteObserver,
     );
   }
@@ -142,6 +143,7 @@ class MedalliaDxaConfig {
   late final GoalsAndDimensions _goalsAndDimensions;
   late final HttpErrors _httpErrors;
   late final EventChannelManager _eventChannelManager;
+  late final GlobalSettings _globalSettings;
   List<NavigatorObserver> get currentRouteObservers => initialized
       ? _customRouteObserver.getNewObservers(
           automaticTracking: automaticTracking,
@@ -316,6 +318,15 @@ class MedalliaDxaConfig {
     int statusCode,
   ) async {
     await _httpErrors.sendStatusCode(statusCode);
+  }
+
+  void setMaskColor(Color color) {
+    _globalSettings.userMaskColor = color;
+  }
+
+  Future<void> setImageQuality(ImageQuality imageQuality) async {
+    _globalSettings.userImageQuality = imageQuality;
+    await _nativeApi.sendImageQuality(imageQuality.integerValue());
   }
 
   void startNewScreen(String name) {

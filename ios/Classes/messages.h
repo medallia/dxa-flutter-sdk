@@ -148,6 +148,7 @@ NSObject<FlutterMessageCodec> *FLTMedalliaDxaNativeApiGetCodec(void);
 - (void)sendGoalMsg:(FLTGoalMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendDataOverWifiOnlyWithError:(FlutterError *_Nullable *_Nonnull)error;
 - (void)sendHttpErrorMsg:(NSNumber *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)sendImageQualityImageQuality:(NSNumber *)imageQuality error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)enableSessionForExperienceValue:(NSNumber *)value error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)enableSessionForAnalysisValue:(NSNumber *)value error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)enableSessionForReplayValue:(NSNumber *)value error:(FlutterError *_Nullable *_Nonnull)error;

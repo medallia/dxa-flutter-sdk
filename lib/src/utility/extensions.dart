@@ -146,3 +146,18 @@ extension ScreenVisitedExt on ScreenVisited {
     }
   }
 }
+
+extension StringToHex on String {
+  String get sanitizeStringToHex {
+    final RegExp hexRegex = RegExp('[0-9A-Fa-f]+');
+    final Iterable<Match> matches = hexRegex.allMatches(this);
+
+    final sanitizedStringBuffer = StringBuffer();
+
+    for (final Match match in matches) {
+      sanitizedStringBuffer.write(match.group(0));
+    }
+
+    return sanitizedStringBuffer.toString();
+  }
+}
