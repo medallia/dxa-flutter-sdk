@@ -141,6 +141,7 @@ abstract class MedalliaDxaNativeApi {
   void sendGoal(GoalMessage msg);
   void sendDataOverWifiOnly();
   void sendHttpError(int msg);
+  void sendImageQuality(int imageQuality);
   void enableSessionForExperience(bool value);
   void enableSessionForAnalysis(bool value);
   void enableSessionForReplay(bool value);

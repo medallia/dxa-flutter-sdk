@@ -77,6 +77,14 @@ class DecibelSdk {
     return MedalliaDxaConfig().sendHttpError(statusCode);
   }
 
+  static void setMaskColor(Color color) {
+    MedalliaDxaConfig().setMaskColor(color.withAlpha(255));
+  }
+
+  static void setImageQuality(ImageQuality imageQuality) {
+    MedalliaDxaConfig().setImageQuality(imageQuality);
+  }
+
   static void setAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
     return MedalliaDxaConfig().setAutoMasking(widgetsToMask);
   }

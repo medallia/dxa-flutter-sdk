@@ -1155,6 +1155,8 @@ public class Messages {
 
     void sendHttpError(@NonNull Long msg);
 
+    void sendImageQuality(@NonNull Long imageQuality);
+
     void enableSessionForExperience(@NonNull Boolean value);
 
     void enableSessionForAnalysis(@NonNull Boolean value);
@@ -1499,6 +1501,33 @@ public class Messages {
                     throw new NullPointerException("msgArg unexpectedly null.");
                   }
                   api.sendHttpError((msgArg == null) ? null : msgArg.longValue());
+                  wrapped.add(0, null);
+                } catch (Error | RuntimeException exception) {
+                  ArrayList<Object> wrappedError = wrapError(exception);
+                  wrapped = wrappedError;
+                }
+                reply.reply(wrapped);
+              });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(
+                binaryMessenger, "dev.flutter.pigeon.MedalliaDxaNativeApi.sendImageQuality", getCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+              (message, reply) -> {
+                ArrayList<Object> wrapped = new ArrayList<Object>();
+                try {
+                  ArrayList<Object> args = (ArrayList<Object>) message;
+                  assert args != null;
+                  Number imageQualityArg = (Number) args.get(0);
+                  if (imageQualityArg == null) {
+                    throw new NullPointerException("imageQualityArg unexpectedly null.");
+                  }
+                  api.sendImageQuality((imageQualityArg == null) ? null : imageQualityArg.longValue());
                   wrapped.add(0, null);
                 } catch (Error | RuntimeException exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);

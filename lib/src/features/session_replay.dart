@@ -129,7 +129,7 @@ class SessionReplay with TaskCompleter {
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: currentTrackedScreen,
         placeholderType: PlaceholderType(
-          placeholderTypeEnum: PlaceholderTypeEnum.performanceStress,
+          placeholderTypeEnum: _performanceMetrics.getPlaceholderType,
         ),
       );
     }
@@ -219,6 +219,14 @@ class SessionReplay with TaskCompleter {
   ///if there's been a second or more without any new screenshots
   Future<void> closeScreenVideo(ScreenVisited screenVisited) async {
     if (screenVisited.isCurrentScreenOverMaxScreenshotCount) return;
+    if (!_medalliaDxaConfig.recordingAllowed) {
+      return _sendOnePlaceholderImageForThisScreen(
+        screenVisited: screenVisited,
+        placeholderType: PlaceholderType(
+          placeholderTypeEnum: PlaceholderTypeEnum.noPermission,
+        ),
+      );
+    }
     if (screenVisited.screenshotTakenList.isEmpty) {
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: screenVisited,
@@ -277,7 +285,8 @@ class SessionReplay with TaskCompleter {
         '''
       _sendOnePlaceholderImageForThisScreen - 
       screenName: ${screenVisited.name} - 
-      screenId: ${screenVisited.uniqueId}
+      screenId: ${screenVisited.uniqueId} -
+      text: ${placeholderType.getPlaceholderText()}
       ''',
       );
 

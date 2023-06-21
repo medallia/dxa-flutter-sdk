@@ -10,8 +10,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 enum PlaceholderTypeEnum {
   replayDisabled,
   noPreviewAvailable,
-  performanceStress,
-  liveConfig
+  performanceStressCpu,
+  performanceStressBattery,
+  performanceStressMemory,
+  liveConfig,
+  noPermission,
 }
 
 class PlaceholderType {
@@ -22,16 +25,25 @@ class PlaceholderType {
   String getPlaceholderText() {
     switch (placeholderTypeEnum) {
       case PlaceholderTypeEnum.replayDisabled:
-        return 'Replay Disabled';
+        return 'Video disabled on this screen';
 
       case PlaceholderTypeEnum.noPreviewAvailable:
-        return 'No preview available';
+        return 'No video could be recorded for this screen';
 
-      case PlaceholderTypeEnum.performanceStress:
-        return 'The device is stressed';
+      case PlaceholderTypeEnum.performanceStressMemory:
+        return 'Screen not recorded due to high memory usage';
+
+      case PlaceholderTypeEnum.performanceStressCpu:
+        return 'Screen not recorded due to high CPU usage';
+
+      case PlaceholderTypeEnum.performanceStressBattery:
+        return 'Screen not recorded due to low battery';
 
       case PlaceholderTypeEnum.liveConfig:
         return 'Video recording masked for this screen';
+
+      case PlaceholderTypeEnum.noPermission:
+        return 'No permissions to record this screen';
 
       default:
         return 'No preview available';
@@ -58,9 +70,11 @@ class PlaceholderImageConfig {
     if (context == null) {
       size = lastSize;
     } else {
-      size = MediaQuery.of(context).size;
-      if (size.width <= 0 || size.height <= 0) {
+      final Size? maybeSize = MediaQuery.maybeOf(context)?.size;
+      if (maybeSize == null || maybeSize.width <= 0 || maybeSize.height <= 0) {
         size = _fallbackSize;
+      } else {
+        size = maybeSize;
       }
     }
     lastSize = size;
@@ -90,9 +104,10 @@ class PlaceholderImageConfig {
       Rect.fromLTWH(0, 0, screenWidth, screenHeight),
     );
     //Texxt configuration
-    final textStyle = TextStyle(
+    final double textWidthWithMargin = screenWidth * 0.9;
+    const textStyle = TextStyle(
       color: Colors.black,
-      fontSize: screenWidth * 0.1,
+      fontSize: 24,
     );
     final textSpan = TextSpan(
       text: placeholderType.getPlaceholderText(),
@@ -104,7 +119,7 @@ class PlaceholderImageConfig {
       textAlign: TextAlign.center,
     );
     textPainter.layout(
-      maxWidth: size.width,
+      maxWidth: textWidthWithMargin,
     );
     const double textHeightPadding = 16;
     final double textHeight = textPainter.height;
@@ -113,24 +128,25 @@ class PlaceholderImageConfig {
     final ByteData byteData = await _getPlaceholderIcon();
     final DrawableRoot svgRoot =
         await svg.fromSvgBytes(byteData.buffer.asUint8List(), 'rawSvg');
+    final int imageHeight = textWidth ~/ svgRoot.viewport.size.aspectRatio;
+    final double imageWidth = textWidth;
     final ui.Image image = await svgRoot
         .toPicture(
-            size: Size(
-                screenWidth, screenHeight - textHeight - textHeightPadding))
+          size: Size(imageWidth, imageHeight.toDouble()),
+        )
         .toImage(
-          screenWidth.toInt(),
-          (screenHeight - textHeight - textHeightPadding).toInt(),
+          imageWidth.toInt(),
+          imageHeight,
         );
+    final double yOffset =
+        (screenHeight - (textHeight + image.height + textHeightPadding)) / 2;
+    final imageOffset = Offset((screenWidth - textWidth) / 2, yOffset);
+
     canvas.drawColor(Colors.white, ui.BlendMode.color);
-    canvas.drawImage(image, Offset.zero, Paint()..color = Colors.blue);
+    canvas.drawImage(image, imageOffset, Paint()..color = Colors.blue);
     //Layout configuration
-    late final double textHeightOffset;
-    if (screenHeight > screenWidth) {
-      textHeightOffset = (screenHeight / 2) +
-          (screenWidth / svgRoot.viewport.size.aspectRatio) / 2;
-    } else {
-      textHeightOffset = image.height.toDouble() + textHeightPadding / 2;
-    }
+    final double textHeightOffset =
+        yOffset + image.height.toDouble() + textHeightPadding;
 
     final double xCenter = (screenWidth - textWidth) / 2;
     final double yCenter = textHeightOffset;

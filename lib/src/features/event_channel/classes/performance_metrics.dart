@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:decibel_sdk/src/utility/extensions.dart';
+import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/services.dart';
 
 import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
@@ -50,6 +51,22 @@ class PerformanceMetrics implements EventChannelClass {
         return PerformanceMetricsStresstedType.battery;
       default:
         return PerformanceMetricsStresstedType.none;
+    }
+  }
+
+  PlaceholderTypeEnum get getPlaceholderType {
+    switch (_stresstedType) {
+      case PerformanceMetricsStresstedType.memory:
+        return PlaceholderTypeEnum.performanceStressMemory;
+
+      case PerformanceMetricsStresstedType.cpu:
+        return PlaceholderTypeEnum.performanceStressCpu;
+
+      case PerformanceMetricsStresstedType.battery:
+        return PlaceholderTypeEnum.performanceStressBattery;
+
+      default:
+        return PlaceholderTypeEnum.replayDisabled;
     }
   }
 }

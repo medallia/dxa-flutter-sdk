@@ -1,5 +1,5 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.7.1 (swiftlang-5.7.1.135.3 clang-1400.0.29.51)
+// swift-compiler-version: Apple Swift version 5.8 (swiftlang-5.8.0.124.2 clang-1403.0.22.11.100)
 // swift-module-flags: -target arm64-apple-ios11.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name MedalliaDXAFlutter
 // swift-module-flags-ignorable: -enable-bare-slash-regex
 import AVFoundation
@@ -117,20 +117,8 @@ public struct LiveConfigurationFlutter {
   public var blockedFlutterAppVersions: [Swift.String]?
 }
 public class Configuration {
-  public var endpoint: MedalliaDXAFlutter.Endpoint
-  public init(account: Swift.String, property: Swift.String, consent: MedalliaDXAFlutter.Consent = .recordingAndTracking, crashReporterEnabled: Swift.Bool = true, mobileDataEnable: Swift.Bool = true, sessionReplayEnabled: Swift.Bool = true, manualScreenTracking: Swift.Bool = false)
+  public init(account: Swift.String, property: Swift.String, consent: MedalliaDXAFlutter.Consent = .recordingAndTracking, crashReporterEnabled: Swift.Bool = true, mobileDataEnable: Swift.Bool = true, manualScreenTracking: Swift.Bool = false)
   @objc deinit
-}
-public enum Endpoint {
-  case production
-  case staging
-  case sigma
-  case omega
-  public static func == (a: MedalliaDXAFlutter.Endpoint, b: MedalliaDXAFlutter.Endpoint) -> Swift.Bool
-  public func hash(into hasher: inout Swift.Hasher)
-  public var hashValue: Swift.Int {
-    get
-  }
 }
 public enum MaskAutomatic {
   case labels
@@ -159,7 +147,7 @@ public enum MaskView {
   }
 }
 extension MedalliaDXAFlutter.DXA {
-  public static func initialize(configuration: MedalliaDXAFlutter.Configuration, multiplatform: MedalliaDXAFlutter.Platform, dxaDelegate: MedalliaDXAFlutter.DXADelegate? = nil) -> MedalliaDXAFlutter.LiveConfigurationFlutter
+  public static func initialize(configuration: MedalliaDXAFlutter.Configuration, multiplatform: MedalliaDXAFlutter.Platform, dxaDelegate: (any MedalliaDXAFlutter.DXADelegate)? = nil) -> MedalliaDXAFlutter.LiveConfigurationFlutter
   public static func endScreen()
   public static func startNewScreen(name: Swift.String, id: Swift.Int)
   public static func saveScreenShot(screenshot: Foundation.Data, id: Swift.Int, screenName: Swift.String, screenShotTime: Foundation.TimeInterval)
@@ -228,8 +216,6 @@ extension MedalliaDXAFlutter.Consent : Swift.Equatable {}
 extension MedalliaDXAFlutter.Consent : Swift.Hashable {}
 extension MedalliaDXAFlutter.PlatformType : Swift.Equatable {}
 extension MedalliaDXAFlutter.PlatformType : Swift.Hashable {}
-extension MedalliaDXAFlutter.Endpoint : Swift.Equatable {}
-extension MedalliaDXAFlutter.Endpoint : Swift.Hashable {}
 extension MedalliaDXAFlutter.MaskAutomatic : Swift.Equatable {}
 extension MedalliaDXAFlutter.MaskAutomatic : Swift.Hashable {}
 extension MedalliaDXAFlutter.MaskView : Swift.Equatable {}

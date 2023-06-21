@@ -1,6 +1,8 @@
 import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
+import 'package:decibel_sdk/src/features/image_quality.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
+import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:flutter/material.dart';
 
@@ -12,13 +14,15 @@ class LiveConfiguration implements EventChannelClass {
   Duration? get videoQualityType => _videoQualityType;
   int? get maxScreenshots => _maxScreenshots;
   Duration? get maxScreenDuration => _maxScreenDuration;
+  ImageQuality? get imageQualityType => _imageQualityType;
   bool? _overrideUserConfig;
   List<String?>? _blockedFlutterSDKVersions;
   List<String?>? _blockedFlutterAppVersions;
   String? _maskingColorString;
   Color? _maskingColor;
   bool? _showLocalLogs;
-  int? _imageQualityType;
+  int? _imageQualityTypeInt;
+  ImageQuality? _imageQualityType;
   int? _videoQualityTypeInt;
   Duration? _videoQualityType;
   int? _maxScreenshots;
@@ -31,8 +35,9 @@ class LiveConfiguration implements EventChannelClass {
     convertNativeValuesToFlutterValues();
 
     if (_showLocalLogs == true) {
-      DependencyInjector.instance.loggerSdk.all();
+      localLogsEnablingLogic();
     }
+
     if (videoQualityType != null) {
       DependencyInjector.instance.sessionReplay.updateFrameRate();
     }
@@ -40,8 +45,10 @@ class LiveConfiguration implements EventChannelClass {
 
   void convertNativeValuesToFlutterValues() {
     if (_maskingColorString != null) {
+      final String maskingColorSantizedScreen =
+          _maskingColorString!.sanitizeStringToHex;
       final int? maskingColorInt =
-          int.tryParse(_maskingColorString!, radix: 16);
+          int.tryParse(maskingColorSantizedScreen, radix: 16);
       if (maskingColorInt != null) {
         _maskingColor = Color.fromARGB(
           255,
@@ -58,6 +65,22 @@ class LiveConfiguration implements EventChannelClass {
     }
     if (_maxScreenDurationInt != null) {
       _maxScreenDuration = Duration(minutes: _maxScreenDurationInt!);
+    }
+    if (_imageQualityTypeInt != null) {
+      _imageQualityType =
+          ImageQualityConverter.getImageQuality(_imageQualityTypeInt!);
+    }
+  }
+
+  void localLogsEnablingLogic() {
+    final loggerInstance = DependencyInjector.instance.loggerSdk;
+    if (overrideUserConfig) {
+      loggerInstance.all();
+      return;
+    }
+    if (!loggerInstance.enabled) {
+      loggerInstance.all();
+      return;
     }
   }
 
@@ -106,7 +129,8 @@ class LiveConfiguration implements EventChannelClass {
     _maskingColorString =
         json['maskingColor'] as String? ?? _maskingColorString;
     _showLocalLogs = json['showLocalLogs'] as bool? ?? _showLocalLogs;
-    _imageQualityType = json['imageQualityType'] as int? ?? _imageQualityType;
+    _imageQualityTypeInt =
+        json['imageQualityType'] as int? ?? _imageQualityTypeInt;
     _videoQualityTypeInt =
         json['videoQualityType'] as int? ?? _videoQualityTypeInt;
     _maxScreenshots = json['maxScreenshots'] as int? ?? maxScreenshots;
@@ -150,8 +174,8 @@ class LiveConfiguration implements EventChannelClass {
         liveConfigurationFromPigeon.maskingColor ?? _maskingColorString;
     _showLocalLogs =
         liveConfigurationFromPigeon.showLocalLogs ?? _showLocalLogs;
-    _imageQualityType =
-        liveConfigurationFromPigeon.imageQualityType ?? _imageQualityType;
+    _imageQualityTypeInt =
+        liveConfigurationFromPigeon.imageQualityType ?? _imageQualityTypeInt;
     _videoQualityTypeInt =
         liveConfigurationFromPigeon.videoQualityType ?? _videoQualityTypeInt;
     _maxScreenshots =
