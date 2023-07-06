@@ -43,7 +43,6 @@ import 'test_files/session_replay_test.dart' as session_replay_test;
   MockSpec<LiveConfiguration>(),
   MockSpec<EventChannelManager>(),
   MockSpec<CustomRouteObserver>(),
-
   MockSpec<ScreenVisited>(),
   MockSpec<GlobalSettings>(
     unsupportedMembers: {#returnCorrectConfig},

@@ -2611,8 +2611,8 @@ class MockManualTracking extends _i1.Mock implements _i29.ManualTracking {
       (super.noSuchMethod(
         Invocation.getter(#listOfMasks),
         returnValue: <_i5.GlobalKey<_i5.State<_i5.StatefulWidget>>>[],
-        returnValueForMissingStub: <_i5
-            .GlobalKey<_i5.State<_i5.StatefulWidget>>>[],
+        returnValueForMissingStub: <
+            _i5.GlobalKey<_i5.State<_i5.StatefulWidget>>>[],
       ) as List<_i5.GlobalKey<_i5.State<_i5.StatefulWidget>>>);
   @override
   set dialogContext(_i5.BuildContext? _dialogContext) => super.noSuchMethod(
@@ -3003,8 +3003,8 @@ class MockScreenVisited extends _i1.Mock implements _i13.ScreenVisited {
       (super.noSuchMethod(
         Invocation.getter(#listOfMasks),
         returnValue: <_i5.GlobalKey<_i5.State<_i5.StatefulWidget>>>[],
-        returnValueForMissingStub: <_i5
-            .GlobalKey<_i5.State<_i5.StatefulWidget>>>[],
+        returnValueForMissingStub: <
+            _i5.GlobalKey<_i5.State<_i5.StatefulWidget>>>[],
       ) as List<_i5.GlobalKey<_i5.State<_i5.StatefulWidget>>>);
   @override
   bool get isDialog => (super.noSuchMethod(
