@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
 import 'package:decibel_sdk/src/features/tracking/tracking.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
@@ -55,6 +57,34 @@ extension RenderObjectPaintBounds on RenderObject {
     final Size size = paintBounds.size;
     return Rect.fromLTWH(translation.x, translation.y, size.width, size.height);
   }
+
+  RectAndRotation globalPaintBoundsWithAncestor(RenderObject ancestor) {
+    final matrix = getTransformTo(ancestor);
+    final translation = matrix.getTranslation();
+    final scale = matrix.getMaxScaleOnAxis();
+    final cosineZ = matrix.getRow(1).storage[1] / scale;
+    final sineZ = matrix.getRow(1).storage[0] / scale;
+
+    final Size size = paintBounds.size;
+    return RectAndRotation(
+      Rect.fromLTRB(
+        translation.x,
+        translation.y,
+        translation.x + size.width * scale,
+        translation.y + size.height * scale,
+      ),
+      cosineZ,
+      sineZ,
+    );
+  }
+}
+
+class RectAndRotation {
+  final Rect rect;
+  final double cosine;
+  final double sine;
+
+  RectAndRotation(this.rect, this.cosine, this.sine);
 }
 
 extension ObjectExt<T> on T {

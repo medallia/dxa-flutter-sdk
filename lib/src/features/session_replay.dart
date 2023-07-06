@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -328,7 +329,9 @@ class ScreenshotTaker with TrackingCompleter {
   Paint get _maskColor =>
       Paint()..color = DependencyInjector.instance.globalSettings.maskColor;
   final Paint _borderColor = Paint()
-    ..color = const Color.fromARGB(255, 255, 255, 255);
+    ..color = const Color.fromARGB(255, 255, 255, 255)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2;
   ScreenshotTaker({
     required this.autoMasking,
     required this.medalliaDxaConfig,
@@ -347,23 +350,19 @@ class ScreenshotTaker with TrackingCompleter {
       final double width = size.width;
       final double height = size.height;
       final recorder = ui.PictureRecorder();
-      final canvas = Canvas(
-        recorder,
-        Rect.fromLTWH(0, 0, width, height),
-      );
 
-      late Set<Rect> manualMaskCoordinates;
+      late Set<RectAndRotation> manualMaskCoordinates;
 
       final Rect frame = renderObject.globalPaintBounds;
-
-      final Offset newPosition = Offset(frame.left, frame.top);
-      // final int startFocusTime = DateTime.now().millisecondsSinceEpoch;
+      final Offset offset = Offset(frame.left, frame.top);
 
       late ui.Image image;
       if (screenVisited.enableAutomaticMasking) {
         autoMasking.setAutoMasking(screenVisited.rootElementForAutomasking);
       }
-      manualMaskCoordinates = _saveMaskPosition(screenVisited.listOfMasks);
+      manualMaskCoordinates =
+          _saveMaskPosition(screenVisited.listOfMasks, renderObject, offset);
+
       return endScreenTasksCompleterWrapper<ByteData?>(() async {
         try {
           uiChangedReset();
@@ -373,12 +372,16 @@ class ScreenshotTaker with TrackingCompleter {
           forceScreeshotNextFrame();
           return null;
         }
-        canvas.drawImage(image, newPosition, Paint());
+        final canvas = Canvas(
+          recorder,
+        );
+        canvas.drawImage(image, offset, Paint());
         _paintMaskWithCoordinates(canvas, manualMaskCoordinates);
 
-        final resultImage = await recorder
-            .endRecording()
-            .toImage(width.toInt(), height.toInt());
+        final resultImage = await recorder.endRecording().toImage(
+              width.toInt(),
+              height.toInt(),
+            );
         final resultImageData =
             await resultImage.toByteData(format: ui.ImageByteFormat.png);
 
@@ -388,38 +391,73 @@ class ScreenshotTaker with TrackingCompleter {
     return null;
   }
 
-  Set<Rect> _saveMaskPosition(List<GlobalKey> widgetsToMaskList) {
-    final Set<Rect> coordinates = {};
+  Set<RectAndRotation> _saveMaskPosition(
+    List<GlobalKey> widgetsToMaskList,
+    RenderObject ancestor,
+    Offset offset,
+  ) {
+    final Set<RectAndRotation> coordinates = {};
+
     for (final globalKey in widgetsToMaskList) {
       final RenderObject? renderObject = globalKey.renderObject;
       //TODO: this is used for tabbars because they share masks references,
       //research how to avoid this
       if (renderObject == null) continue;
-      coordinates.addAll(_getMaskCoordinates(renderObject));
+      coordinates.addAll(_getMaskCoordinates(renderObject, ancestor, offset));
     }
     autoMasking.renderObjectsToMask
         .removeWhere((element) => element.attached == false);
     for (final renderObject in autoMasking.renderObjectsToMask) {
-      coordinates.addAll(_getMaskCoordinates(renderObject));
+      coordinates.addAll(_getMaskCoordinates(renderObject, ancestor, offset));
     }
     return coordinates;
   }
 
-  Set<Rect> _getMaskCoordinates(RenderObject renderObject) {
-    final Set<Rect> coordinates = {};
-    renderObject.globalPaintBounds.let((it) {
-      coordinates.add(it);
+  Set<RectAndRotation> _getMaskCoordinates(
+    RenderObject renderObject,
+    RenderObject ancestor,
+    Offset offset,
+  ) {
+    final Set<RectAndRotation> coordinates = {};
+    renderObject.globalPaintBoundsWithAncestor(ancestor).let((it) {
+      coordinates
+          .add(RectAndRotation(it.rect.shift(offset), it.cosine, it.sine));
     });
     return coordinates;
   }
 
-  void _paintMaskWithCoordinates(Canvas canvas, Set<Rect> coordinates) {
+  void _paintMaskWithCoordinates(
+      Canvas canvas, Set<RectAndRotation> coordinates) {
     for (final coordinate in coordinates) {
-      canvas.drawRect(
-        coordinate,
-        _borderColor,
+      final path = Path();
+      final rect = coordinate.rect;
+      final width = rect.right - rect.left;
+      final height = rect.bottom - rect.top;
+
+      final xcosine = width * coordinate.cosine;
+      final xsine = width * coordinate.sine;
+      final ysine = height * coordinate.sine;
+      final ycosine = height * coordinate.cosine;
+
+      //Point1
+      path.moveTo(rect.left, rect.top);
+      //Point2
+      path.lineTo(rect.left + xcosine, rect.top + xsine);
+      //Point3
+      path.lineTo(
+        rect.left + xcosine - ysine,
+        rect.top + xsine + ycosine,
       );
-      canvas.drawRect(coordinate.deflate(2), _maskColor);
+      //Point4
+      path.lineTo(rect.left - ysine, rect.top + ycosine);
+      //
+      path.close();
+      canvas.drawPath(path, _maskColor);
+      //   canvas.drawRect(
+      //   coordinate,
+      //   _borderColor,
+      // );
+      canvas.drawPath(path, _borderColor);
     }
   }
 }
