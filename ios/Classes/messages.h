@@ -52,11 +52,15 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)makeWithAccount:(NSNumber *)account
     property:(NSNumber *)property
     consents:(NSNumber *)consents
-    version:(NSString *)version;
+    version:(NSString *)version
+    crashReporterEnabled:(NSNumber *)crashReporterEnabled
+    mobileDataEnabled:(NSNumber *)mobileDataEnabled;
 @property(nonatomic, strong) NSNumber * account;
 @property(nonatomic, strong) NSNumber * property;
 @property(nonatomic, strong) NSNumber * consents;
 @property(nonatomic, copy) NSString * version;
+@property(nonatomic, strong) NSNumber * crashReporterEnabled;
+@property(nonatomic, strong) NSNumber * mobileDataEnabled;
 @end
 
 @interface FLTScreenshotMessage : NSObject

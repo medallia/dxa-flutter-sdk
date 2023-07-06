@@ -121,20 +121,20 @@ class SessionReplay with TaskCompleter {
   }
 
   Future<void> _tryToTakeScreenshot() async {
+    if (!_medalliaDxaConfig.isSdkRunning) return;
     if (!_currentlyTracking) return;
     final ScreenVisited currentTrackedScreen = _currentTrackedScreen;
     if (currentTrackedScreen.isCurrentScreenOverMaxDuration) return;
     if (currentTrackedScreen.isCurrentScreenOverMaxScreenshotCount) return;
-    if (_performanceMetrics.isDeviceStressed) {
+    if (!_medalliaDxaConfig.recordingAllowed) {
       return _sendOnePlaceholderImageForThisScreen(
         screenVisited: currentTrackedScreen,
         placeholderType: PlaceholderType(
-          placeholderTypeEnum: _performanceMetrics.getPlaceholderType,
+          placeholderTypeEnum: PlaceholderTypeEnum.noPermission,
         ),
       );
     }
-    if (!currentTrackedScreen.recordingAllowed ||
-        !_medalliaDxaConfig.recordingAllowed) {
+    if (!currentTrackedScreen.recordingAllowed) {
       final PlaceholderTypeEnum placeholderTypeEnum =
           currentTrackedScreen.placeholderTypeEnum ??
               PlaceholderTypeEnum.replayDisabled;
@@ -142,6 +142,14 @@ class SessionReplay with TaskCompleter {
         screenVisited: currentTrackedScreen,
         placeholderType: PlaceholderType(
           placeholderTypeEnum: placeholderTypeEnum,
+        ),
+      );
+    }
+    if (_performanceMetrics.isDeviceStressed) {
+      return _sendOnePlaceholderImageForThisScreen(
+        screenVisited: currentTrackedScreen,
+        placeholderType: PlaceholderType(
+          placeholderTypeEnum: _performanceMetrics.getPlaceholderType,
         ),
       );
     }

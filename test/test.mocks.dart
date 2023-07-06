@@ -5,37 +5,39 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i7;
 import 'dart:collection' as _i11;
-import 'dart:developer' as _i29;
-import 'dart:typed_data' as _i21;
+import 'dart:developer' as _i31;
+import 'dart:typed_data' as _i23;
 import 'dart:ui' as _i12;
 
+import 'package:decibel_sdk/src/decibel_class_interface.dart' as _i19;
 import 'package:decibel_sdk/src/decibel_config.dart' as _i9;
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart'
     as _i3;
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart'
-    as _i20;
-import 'package:decibel_sdk/src/features/consents.dart' as _i19;
+    as _i21;
+import 'package:decibel_sdk/src/features/consents.dart' as _i20;
 import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart'
     as _i15;
 import 'package:decibel_sdk/src/features/event_channel/classes/performance_metrics.dart'
     as _i14;
 import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart'
-    as _i28;
-import 'package:decibel_sdk/src/features/frame_tracking.dart' as _i25;
+    as _i30;
+import 'package:decibel_sdk/src/features/frame_tracking.dart' as _i27;
+import 'package:decibel_sdk/src/features/image_quality.dart' as _i22;
 import 'package:decibel_sdk/src/features/manual_analytics/goals_and_dimensions.dart'
-    as _i22;
+    as _i24;
 import 'package:decibel_sdk/src/features/manual_analytics/http_errors.dart'
-    as _i23;
+    as _i25;
 import 'package:decibel_sdk/src/features/manual_tracking/manual_tracking.dart'
-    as _i27;
+    as _i29;
 import 'package:decibel_sdk/src/features/session_replay.dart' as _i4;
 import 'package:decibel_sdk/src/features/tracking/route_observer.dart' as _i16;
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart' as _i13;
 import 'package:decibel_sdk/src/features/tracking/tracking.dart' as _i10;
 import 'package:decibel_sdk/src/messages.dart' as _i2;
 import 'package:decibel_sdk/src/utility/global_settings.dart' as _i18;
-import 'package:decibel_sdk/src/utility/logger_sdk.dart' as _i24;
-import 'package:decibel_sdk/src/utility/placeholder_image.dart' as _i26;
+import 'package:decibel_sdk/src/utility/logger_sdk.dart' as _i26;
+import 'package:decibel_sdk/src/utility/placeholder_image.dart' as _i28;
 import 'package:flutter/foundation.dart' as _i17;
 import 'package:flutter/material.dart' as _i5;
 import 'package:flutter/scheduler.dart' as _i6;
@@ -502,6 +504,16 @@ class MockMedalliaDxaNativeApi extends _i1.Mock
         returnValueForMissingStub: _i7.Future<void>.value(),
       ) as _i7.Future<void>);
   @override
+  _i7.Future<void> sendImageQuality(int? arg_imageQuality) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #sendImageQuality,
+          [arg_imageQuality],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+  @override
   _i7.Future<void> enableSessionForExperience(bool? arg_value) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -575,20 +587,6 @@ class MockMedalliaDxaNativeApi extends _i1.Mock
 /// See the documentation for Mockito's code generation for more information.
 class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
   @override
-  bool get initialized => (super.noSuchMethod(
-        Invocation.getter(#initialized),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-  @override
-  set initialized(bool? _initialized) => super.noSuchMethod(
-        Invocation.setter(
-          #initialized,
-          _initialized,
-        ),
-        returnValueForMissingStub: null,
-      );
-  @override
   bool get automaticTracking => (super.noSuchMethod(
         Invocation.getter(#automaticTracking),
         returnValue: false,
@@ -599,6 +597,20 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
         Invocation.setter(
           #automaticTracking,
           _automaticTracking,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  String get sdkVersion => (super.noSuchMethod(
+        Invocation.getter(#sdkVersion),
+        returnValue: '',
+        returnValueForMissingStub: '',
+      ) as String);
+  @override
+  set sdkVersion(String? _sdkVersion) => super.noSuchMethod(
+        Invocation.setter(
+          #sdkVersion,
+          _sdkVersion,
         ),
         returnValueForMissingStub: null,
       );
@@ -621,37 +633,32 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
         returnValueForMissingStub: false,
       ) as bool);
   @override
-  void setRecordingAllowed(bool? value) => super.noSuchMethod(
+  bool get isSdkRunning => (super.noSuchMethod(
+        Invocation.getter(#isSdkRunning),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  void blockSdk() => super.noSuchMethod(
         Invocation.method(
-          #setRecordingAllowed,
-          [value],
+          #blockSdk,
+          [],
         ),
         returnValueForMissingStub: null,
       );
   @override
-  _i7.Future<void> initialize(
-    int? account,
-    int? property, {
-    required _i19.DecibelCustomerConsentType? consents,
-    required bool? manualScreenTrackingEnabled,
-  }) =>
+  _i7.Future<void> initialize({required _i19.DxaConfig? dxaConfig}) =>
       (super.noSuchMethod(
         Invocation.method(
           #initialize,
-          [
-            account,
-            property,
-          ],
-          {
-            #consents: consents,
-            #manualScreenTrackingEnabled: manualScreenTrackingEnabled,
-          },
+          [],
+          {#dxaConfig: dxaConfig},
         ),
         returnValue: _i7.Future<void>.value(),
         returnValueForMissingStub: _i7.Future<void>.value(),
       ) as _i7.Future<void>);
   @override
-  _i7.Future<void> setConsents(_i19.DecibelCustomerConsentType? consents) =>
+  _i7.Future<void> setConsents(_i20.DecibelCustomerConsentType? consents) =>
       (super.noSuchMethod(
         Invocation.method(
           #setConsents,
@@ -732,7 +739,7 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
         returnValueForMissingStub: _i7.Future<String?>.value(),
       ) as _i7.Future<String?>);
   @override
-  void setAutoMasking(Set<_i20.AutoMaskingTypeEnum>? widgetsToMask) =>
+  void setAutoMasking(Set<_i21.AutoMaskingTypeEnum>? widgetsToMask) =>
       super.noSuchMethod(
         Invocation.method(
           #setAutoMasking,
@@ -741,7 +748,7 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
         returnValueForMissingStub: null,
       );
   @override
-  void disableAutoMasking(Set<_i20.AutoMaskingTypeEnum>? widgetsToUnmask) =>
+  void disableAutoMasking(Set<_i21.AutoMaskingTypeEnum>? widgetsToUnmask) =>
       super.noSuchMethod(
         Invocation.method(
           #disableAutoMasking,
@@ -816,6 +823,24 @@ class MockMedalliaDxaConfig extends _i1.Mock implements _i9.MedalliaDxaConfig {
         Invocation.method(
           #sendHttpError,
           [statusCode],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+  @override
+  void setMaskColor(_i12.Color? color) => super.noSuchMethod(
+        Invocation.method(
+          #setMaskColor,
+          [color],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  _i7.Future<void> setImageQuality(_i22.ImageQuality? imageQuality) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setImageQuality,
+          [imageQuality],
         ),
         returnValue: _i7.Future<void>.value(),
         returnValueForMissingStub: _i7.Future<void>.value(),
@@ -1147,7 +1172,7 @@ class MockScreenshotTaker extends _i1.Mock implements _i4.ScreenshotTaker {
         ),
       ) as _i10.Tracking);
   @override
-  _i7.Future<_i21.ByteData?> captureImage({
+  _i7.Future<_i23.ByteData?> captureImage({
     required _i13.ScreenVisited? screenVisited,
     required _i12.VoidCallback? uiChangedReset,
     required _i12.VoidCallback? forceScreeshotNextFrame,
@@ -1164,9 +1189,9 @@ class MockScreenshotTaker extends _i1.Mock implements _i4.ScreenshotTaker {
             #screenSizeCallback: screenSizeCallback,
           },
         ),
-        returnValue: _i7.Future<_i21.ByteData?>.value(),
-        returnValueForMissingStub: _i7.Future<_i21.ByteData?>.value(),
-      ) as _i7.Future<_i21.ByteData?>);
+        returnValue: _i7.Future<_i23.ByteData?>.value(),
+        returnValueForMissingStub: _i7.Future<_i23.ByteData?>.value(),
+      ) as _i7.Future<_i23.ByteData?>);
   @override
   _i7.Future<void> startScreenTasksCompleterWrapper(
           _i7.Future<void> Function()? function) =>
@@ -1263,7 +1288,7 @@ class MockScreenshotTaker extends _i1.Mock implements _i4.ScreenshotTaker {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGoalsAndDimensions extends _i1.Mock
-    implements _i22.GoalsAndDimensions {
+    implements _i24.GoalsAndDimensions {
   @override
   _i8.Logger get logger => (super.noSuchMethod(
         Invocation.getter(#logger),
@@ -1465,13 +1490,13 @@ class MockAutoMasking extends _i1.Mock implements _i3.AutoMasking {
         ),
       ) as _i8.Logger);
   @override
-  Set<_i20.AutoMaskingType> get autoMaskingTypeSet => (super.noSuchMethod(
+  Set<_i21.AutoMaskingType> get autoMaskingTypeSet => (super.noSuchMethod(
         Invocation.getter(#autoMaskingTypeSet),
-        returnValue: <_i20.AutoMaskingType>{},
-        returnValueForMissingStub: <_i20.AutoMaskingType>{},
-      ) as Set<_i20.AutoMaskingType>);
+        returnValue: <_i21.AutoMaskingType>{},
+        returnValueForMissingStub: <_i21.AutoMaskingType>{},
+      ) as Set<_i21.AutoMaskingType>);
   @override
-  set autoMaskingTypeSet(Set<_i20.AutoMaskingType>? value) =>
+  set autoMaskingTypeSet(Set<_i21.AutoMaskingType>? value) =>
       super.noSuchMethod(
         Invocation.setter(
           #autoMaskingTypeSet,
@@ -1481,7 +1506,7 @@ class MockAutoMasking extends _i1.Mock implements _i3.AutoMasking {
       );
   @override
   void removeUnmaskedTypesFromAutoMaskingTypeSet(
-          Set<_i20.AutoMaskingType>? set) =>
+          Set<_i21.AutoMaskingType>? set) =>
       super.noSuchMethod(
         Invocation.method(
           #removeUnmaskedTypesFromAutoMaskingTypeSet,
@@ -1508,7 +1533,7 @@ class MockAutoMasking extends _i1.Mock implements _i3.AutoMasking {
   @override
   Set<_i5.RenderObject> getRenderObjectsByAutoMaskingType(
     _i5.BuildContext? context,
-    Set<_i20.AutoMaskingType>? autoMaskingTypeSet,
+    Set<_i21.AutoMaskingType>? autoMaskingTypeSet,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1526,7 +1551,7 @@ class MockAutoMasking extends _i1.Mock implements _i3.AutoMasking {
 /// A class which mocks [HttpErrors].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockHttpErrors extends _i1.Mock implements _i23.HttpErrors {
+class MockHttpErrors extends _i1.Mock implements _i25.HttpErrors {
   @override
   _i8.Logger get logger => (super.noSuchMethod(
         Invocation.getter(#logger),
@@ -1655,7 +1680,7 @@ class MockHttpErrors extends _i1.Mock implements _i23.HttpErrors {
 /// A class which mocks [LoggerSDK].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLoggerSDK extends _i1.Mock implements _i24.LoggerSDK {
+class MockLoggerSDK extends _i1.Mock implements _i26.LoggerSDK {
   @override
   bool get enabled => (super.noSuchMethod(
         Invocation.getter(#enabled),
@@ -1951,7 +1976,7 @@ class MockLoggerSDK extends _i1.Mock implements _i24.LoggerSDK {
 /// A class which mocks [FrameTracking].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockFrameTracking extends _i1.Mock implements _i25.FrameTracking {
+class MockFrameTracking extends _i1.Mock implements _i27.FrameTracking {
   @override
   void Function(void Function(Duration)) get postFrameCallback =>
       (super.noSuchMethod(
@@ -2012,24 +2037,24 @@ class MockFrameTracking extends _i1.Mock implements _i25.FrameTracking {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockPlaceholderImageConfig extends _i1.Mock
-    implements _i26.PlaceholderImageConfig {
+    implements _i28.PlaceholderImageConfig {
   @override
-  _i11.HashMap<_i26.PlaceholderImageId, _i21.ByteData>
+  _i11.HashMap<_i28.PlaceholderImageId, _i23.ByteData>
       get placeholderImageByteDataMap => (super.noSuchMethod(
             Invocation.getter(#placeholderImageByteDataMap),
             returnValue:
-                _FakeHashMap_12<_i26.PlaceholderImageId, _i21.ByteData>(
+                _FakeHashMap_12<_i28.PlaceholderImageId, _i23.ByteData>(
               this,
               Invocation.getter(#placeholderImageByteDataMap),
             ),
             returnValueForMissingStub:
-                _FakeHashMap_12<_i26.PlaceholderImageId, _i21.ByteData>(
+                _FakeHashMap_12<_i28.PlaceholderImageId, _i23.ByteData>(
               this,
               Invocation.getter(#placeholderImageByteDataMap),
             ),
-          ) as _i11.HashMap<_i26.PlaceholderImageId, _i21.ByteData>);
+          ) as _i11.HashMap<_i28.PlaceholderImageId, _i23.ByteData>);
   @override
-  set placeHolderIcon(_i21.ByteData? _placeHolderIcon) => super.noSuchMethod(
+  set placeHolderIcon(_i23.ByteData? _placeHolderIcon) => super.noSuchMethod(
         Invocation.setter(
           #placeHolderIcon,
           _placeHolderIcon,
@@ -2057,9 +2082,9 @@ class MockPlaceholderImageConfig extends _i1.Mock
         returnValueForMissingStub: null,
       );
   @override
-  _i7.FutureOr<_i21.ByteData> getPlaceholderImage(
+  _i7.FutureOr<_i23.ByteData> getPlaceholderImage(
     _i5.BuildContext? context,
-    _i26.PlaceholderType? placeholderType,
+    _i28.PlaceholderType? placeholderType,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -2069,10 +2094,10 @@ class MockPlaceholderImageConfig extends _i1.Mock
             placeholderType,
           ],
         ),
-        returnValue: _i7.Future<_i21.ByteData>.value(_i21.ByteData(0)),
+        returnValue: _i7.Future<_i23.ByteData>.value(_i23.ByteData(0)),
         returnValueForMissingStub:
-            _i7.Future<_i21.ByteData>.value(_i21.ByteData(0)),
-      ) as _i7.FutureOr<_i21.ByteData>);
+            _i7.Future<_i23.ByteData>.value(_i23.ByteData(0)),
+      ) as _i7.FutureOr<_i23.ByteData>);
 }
 
 /// A class which mocks [Tracking].
@@ -2531,7 +2556,7 @@ class MockTracking extends _i1.Mock implements _i10.Tracking {
 /// A class which mocks [ManualTracking].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockManualTracking extends _i1.Mock implements _i27.ManualTracking {
+class MockManualTracking extends _i1.Mock implements _i29.ManualTracking {
   @override
   _i5.GlobalKey<_i5.State<_i5.StatefulWidget>> get captureKey =>
       (super.noSuchMethod(
@@ -2642,6 +2667,12 @@ class MockPerformanceMetrics extends _i1.Mock
         returnValueForMissingStub: false,
       ) as bool);
   @override
+  _i28.PlaceholderTypeEnum get getPlaceholderType => (super.noSuchMethod(
+        Invocation.getter(#getPlaceholderType),
+        returnValue: _i28.PlaceholderTypeEnum.replayDisabled,
+        returnValueForMissingStub: _i28.PlaceholderTypeEnum.replayDisabled,
+      ) as _i28.PlaceholderTypeEnum);
+  @override
   void updateFromJson(Map<String, dynamic>? jsonData) => super.noSuchMethod(
         Invocation.method(
           #updateFromJson,
@@ -2667,6 +2698,21 @@ class MockPerformanceMetrics extends _i1.Mock
 /// See the documentation for Mockito's code generation for more information.
 class MockLiveConfiguration extends _i1.Mock implements _i15.LiveConfiguration {
   @override
+  bool get isCurrentSdkVersionBlocked => (super.noSuchMethod(
+        Invocation.getter(#isCurrentSdkVersionBlocked),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  set isCurrentSdkVersionBlocked(bool? _isCurrentSdkVersionBlocked) =>
+      super.noSuchMethod(
+        Invocation.setter(
+          #isCurrentSdkVersionBlocked,
+          _isCurrentSdkVersionBlocked,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
   bool get overrideUserConfig => (super.noSuchMethod(
         Invocation.getter(#overrideUserConfig),
         returnValue: false,
@@ -2684,6 +2730,14 @@ class MockLiveConfiguration extends _i1.Mock implements _i15.LiveConfiguration {
   void convertNativeValuesToFlutterValues() => super.noSuchMethod(
         Invocation.method(
           #convertNativeValuesToFlutterValues,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void localLogsEnablingLogic() => super.noSuchMethod(
+        Invocation.method(
+          #localLogsEnablingLogic,
           [],
         ),
         returnValueForMissingStub: null,
@@ -2731,7 +2785,7 @@ class MockLiveConfiguration extends _i1.Mock implements _i15.LiveConfiguration {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockEventChannelManager extends _i1.Mock
-    implements _i28.EventChannelManager {
+    implements _i30.EventChannelManager {
   @override
   _i14.PerformanceMetrics get performanceMetrics => (super.noSuchMethod(
         Invocation.getter(#performanceMetrics),
@@ -3191,6 +3245,15 @@ class MockGlobalSettings extends _i1.Mock implements _i18.GlobalSettings {
         returnValueForMissingStub: null,
       );
   @override
+  set userImageQuality(_i22.ImageQuality? _userImageQuality) =>
+      super.noSuchMethod(
+        Invocation.setter(
+          #userImageQuality,
+          _userImageQuality,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
   Duration get maxReplayDurationPerScreen => (super.noSuchMethod(
         Invocation.getter(#maxReplayDurationPerScreen),
         returnValue: _FakeDuration_21(
@@ -3232,6 +3295,12 @@ class MockGlobalSettings extends _i1.Mock implements _i18.GlobalSettings {
           Invocation.getter(#frameRateInMiliseconds),
         ),
       ) as Duration);
+  @override
+  _i22.ImageQuality get imageQuality => (super.noSuchMethod(
+        Invocation.getter(#imageQuality),
+        returnValue: _i22.ImageQuality.poor,
+        returnValueForMissingStub: _i22.ImageQuality.poor,
+      ) as _i22.ImageQuality);
   @override
   T returnCorrectConfig<T>({
     required bool? overrideUserConfig,
@@ -3368,6 +3437,15 @@ class MockLogger extends _i1.Mock implements _i8.Logger {
         ),
         returnValueForMissingStub: null,
       );
+  @override
+  bool isClosed() => (super.noSuchMethod(
+        Invocation.method(
+          #isClosed,
+          [],
+        ),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
   @override
   void close() => super.noSuchMethod(
         Invocation.method(
@@ -3710,7 +3788,7 @@ class MockSchedulerBinding extends _i1.Mock implements _i6.SchedulerBinding {
     _i6.TaskCallback<T>? task,
     _i6.Priority? priority, {
     String? debugLabel,
-    _i29.Flow? flow,
+    _i31.Flow? flow,
   }) =>
       (super.noSuchMethod(
         Invocation.method(

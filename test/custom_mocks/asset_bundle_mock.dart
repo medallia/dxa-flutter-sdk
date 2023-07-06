@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
@@ -41,6 +42,13 @@ homepage: 'https://decibel-documentation.gitbook.io/decibelsdk/flutter/getstarte
   Future<T> loadStructuredData<T>(
       String key, Future<T> Function(String value) parser) {
     // TODO: implement loadStructuredData
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<T> loadStructuredBinaryData<T>(
+      String key, FutureOr<T> Function(ByteData data) parser) {
+    // TODO: implement loadStructuredBinaryData
     throw UnimplementedError();
   }
 }

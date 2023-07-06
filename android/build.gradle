@@ -54,5 +54,5 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.decibel:decibel-android-sdk-builder-prod-flutter:LIVECONFIG-16-FLUTTER-SNAPSHOT"
+    implementation "com.decibel:decibel-android-sdk-builder-prod-flutter:LIVECONFIG-20-FLUTTER-SNAPSHOT"
 }

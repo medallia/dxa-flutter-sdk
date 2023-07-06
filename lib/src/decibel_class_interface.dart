@@ -47,18 +47,9 @@ class DecibelSdk {
     return MedalliaDxaConfig().getWebViewProperties();
   }
 
-  static Future<void> initialize(
-    int account,
-    int property, {
-    enums.DecibelCustomerConsentType consents =
-        enums.DecibelCustomerConsentType.recordingAndTracking,
-    bool manualScreenTrackingEnabled = false,
-  }) async {
+  static Future<void> initialize({required DxaConfig dxaConfig}) async {
     await MedalliaDxaConfig().initialize(
-      account,
-      property,
-      consents: consents,
-      manualScreenTrackingEnabled: manualScreenTrackingEnabled,
+      dxaConfig: dxaConfig,
     );
   }
 
@@ -135,4 +126,21 @@ class DecibelSdk {
   static Future<void> enableScreenForAnalysis(bool value) async {
     return MedalliaDxaConfig().enableScreenForAnalysis(value);
   }
+}
+
+class DxaConfig {
+  final int property;
+  final int account;
+  final enums.DecibelCustomerConsentType consents;
+  final bool manualScreenTrackingEnabled;
+  final bool crashReporterEnabled;
+  final bool mobileDataEnabled;
+  DxaConfig({
+    required this.property,
+    required this.account,
+    this.consents = enums.DecibelCustomerConsentType.recordingAndTracking,
+    this.manualScreenTrackingEnabled = false,
+    this.crashReporterEnabled = true,
+    this.mobileDataEnabled = true,
+  });
 }

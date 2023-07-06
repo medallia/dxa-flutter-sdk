@@ -1,6 +1,13 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: avoid_positional_boolean_parameters
 
 import 'dart:async';
+
+import 'package:decibel_sdk/src/decibel_class_interface.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart' as services;
+import 'package:yaml/yaml.dart' as yaml_parser;
 
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
@@ -22,10 +29,6 @@ import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:decibel_sdk/src/utility/placeholder_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart' as services;
-import 'package:yaml/yaml.dart' as yaml_parser;
 
 /// MedalliaDxa main class
 class MedalliaDxaConfig {
@@ -144,54 +147,66 @@ class MedalliaDxaConfig {
   late final HttpErrors _httpErrors;
   late final EventChannelManager _eventChannelManager;
   late final GlobalSettings _globalSettings;
-  List<NavigatorObserver> get currentRouteObservers => initialized
+  List<NavigatorObserver> get currentRouteObservers => _initialized
       ? _customRouteObserver.getNewObservers(
           automaticTracking: automaticTracking,
         )
       : [];
 
-  // final List<NavigatorObserver> currentRouteObservers = [];
-
   bool _trackingAllowed = false;
-  bool _recordingAllowed = false;
-  void setRecordingAllowed(bool value) {
-    _recordingAllowed = value;
+  bool _recordingAllowedValue = false;
+  bool get _recordingAllowed => _recordingAllowedValue;
+  set _recordingAllowed(bool value) {
+    _recordingAllowedValue = value;
     if (value) {
       _sessionReplay.startPeriodicTimer();
     } else {
       _sessionReplay.stopPeriodicTimer();
+      if (_blocked) return;
       _sessionReplay.sendPlaceholderImage();
     }
   }
 
   bool get recordingAllowed => _recordingAllowed;
   bool get trackingAllowed => _trackingAllowed;
-  bool initialized = false;
+  bool _initialized = false;
+  bool _blocked = false;
+  void blockSdk() {
+    _blocked = true;
+    _trackingAllowed = false;
+    _recordingAllowed = false;
+  }
+
+  bool get isSdkRunning => _initialized && !_blocked;
   late bool automaticTracking;
+  late final String sdkVersion;
 
   /// Initializes MedalliaDxa
-  Future<void> initialize(
-    int account,
-    int property, {
-    required enums.DecibelCustomerConsentType consents,
-    required bool manualScreenTrackingEnabled,
+  Future<void> initialize({
+    required DxaConfig dxaConfig,
   }) async {
-    final String version = await _getVersion();
-    _manualTracking.enabled = manualScreenTrackingEnabled;
-    automaticTracking = !manualScreenTrackingEnabled;
-    _setEnableConsentsForFlutter(consents);
+    sdkVersion = await _getVersion();
+    _manualTracking.enabled = dxaConfig.manualScreenTrackingEnabled;
+    automaticTracking = !dxaConfig.manualScreenTrackingEnabled;
+
     final sessionMessage = SessionMessage(
-      account: account,
-      property: property,
-      consents: consents.integerValue(),
-      version: version,
+      account: dxaConfig.account,
+      property: dxaConfig.property,
+      consents: dxaConfig.consents.integerValue(),
+      version: sdkVersion,
+      crashReporterEnabled: dxaConfig.crashReporterEnabled,
+      mobileDataEnabled: dxaConfig.mobileDataEnabled,
     );
 
     final LiveConfigurationPigeon liveConfigurationPigeon =
         await _nativeApi.initialize(sessionMessage);
-    initialized = true;
+
     _eventChannelManager.liveConfiguration
         .updateFromPigeonClass(liveConfigurationPigeon);
+    if (!_eventChannelManager.liveConfiguration.isCurrentSdkVersionBlocked) {
+      _setEnableConsentsForFlutter(dxaConfig.consents);
+      _initialized = true;
+    }
   }
 
   Future<String> _getVersion() async {
@@ -245,7 +260,7 @@ class MedalliaDxaConfig {
   }
 
   Future<String?> getWebViewProperties() async {
-    assert(initialized);
+    assert(_initialized);
     return _nativeApi.getWebViewProperties();
   }
 
@@ -271,7 +286,7 @@ class MedalliaDxaConfig {
 
   ///Only for debug purposes
   Future<String> getSessionId() async {
-    assert(initialized);
+    assert(_initialized);
     final String sessionIdWithPrefix = await _nativeApi.getSessionId();
     return sessionIdWithPrefix.lastIndexOf('-').let((it) {
       return sessionIdWithPrefix.substring(it + 1);
@@ -279,7 +294,7 @@ class MedalliaDxaConfig {
   }
 
   Future<String> getSessionUrl() async {
-    assert(initialized);
+    assert(_initialized);
     return _nativeApi.getSessionUrl();
   }
 
@@ -355,14 +370,15 @@ class MedalliaDxaConfig {
     switch (consents) {
       case enums.DecibelCustomerConsentType.none:
         _trackingAllowed = false;
-        setRecordingAllowed(false);
+        _recordingAllowed = false;
+
         break;
       case enums.DecibelCustomerConsentType.tracking:
-        setRecordingAllowed(false);
+        _recordingAllowed = false;
         _trackingAllowed = true;
         break;
       case enums.DecibelCustomerConsentType.recordingAndTracking:
-        setRecordingAllowed(true);
+        _recordingAllowed = true;
         _trackingAllowed = true;
         break;
       default:

@@ -328,6 +328,32 @@ public class Messages {
       this.version = setterArg;
     }
 
+    private @NonNull Boolean crashReporterEnabled;
+
+    public @NonNull Boolean getCrashReporterEnabled() {
+      return crashReporterEnabled;
+    }
+
+    public void setCrashReporterEnabled(@NonNull Boolean setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"crashReporterEnabled\" is null.");
+      }
+      this.crashReporterEnabled = setterArg;
+    }
+
+    private @NonNull Boolean mobileDataEnabled;
+
+    public @NonNull Boolean getMobileDataEnabled() {
+      return mobileDataEnabled;
+    }
+
+    public void setMobileDataEnabled(@NonNull Boolean setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"mobileDataEnabled\" is null.");
+      }
+      this.mobileDataEnabled = setterArg;
+    }
+
     /** Constructor is private to enforce null safety; use Builder. */
     private SessionMessage() {}
 
@@ -361,23 +387,41 @@ public class Messages {
         return this;
       }
 
+      private @Nullable Boolean crashReporterEnabled;
+
+      public @NonNull Builder setCrashReporterEnabled(@NonNull Boolean setterArg) {
+        this.crashReporterEnabled = setterArg;
+        return this;
+      }
+
+      private @Nullable Boolean mobileDataEnabled;
+
+      public @NonNull Builder setMobileDataEnabled(@NonNull Boolean setterArg) {
+        this.mobileDataEnabled = setterArg;
+        return this;
+      }
+
       public @NonNull SessionMessage build() {
         SessionMessage pigeonReturn = new SessionMessage();
         pigeonReturn.setAccount(account);
         pigeonReturn.setProperty(property);
         pigeonReturn.setConsents(consents);
         pigeonReturn.setVersion(version);
+        pigeonReturn.setCrashReporterEnabled(crashReporterEnabled);
+        pigeonReturn.setMobileDataEnabled(mobileDataEnabled);
         return pigeonReturn;
       }
     }
 
     @NonNull
     ArrayList<Object> toList() {
-      ArrayList<Object> toListResult = new ArrayList<Object>(4);
+      ArrayList<Object> toListResult = new ArrayList<Object>(6);
       toListResult.add(account);
       toListResult.add(property);
       toListResult.add(consents);
       toListResult.add(version);
+      toListResult.add(crashReporterEnabled);
+      toListResult.add(mobileDataEnabled);
       return toListResult;
     }
 
@@ -391,6 +435,10 @@ public class Messages {
       pigeonResult.setConsents((consents == null) ? null : ((consents instanceof Integer) ? (Integer) consents : (Long) consents));
       Object version = list.get(3);
       pigeonResult.setVersion((String) version);
+      Object crashReporterEnabled = list.get(4);
+      pigeonResult.setCrashReporterEnabled((Boolean) crashReporterEnabled);
+      Object mobileDataEnabled = list.get(5);
+      pigeonResult.setMobileDataEnabled((Boolean) mobileDataEnabled);
       return pigeonResult;
     }
   }

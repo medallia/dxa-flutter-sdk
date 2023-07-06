@@ -18,6 +18,7 @@ class LiveConfiguration implements EventChannelClass {
   bool? _overrideUserConfig;
   List<String?>? _blockedFlutterSDKVersions;
   List<String?>? _blockedFlutterAppVersions;
+  bool isCurrentSdkVersionBlocked = false;
   String? _maskingColorString;
   Color? _maskingColor;
   bool? _showLocalLogs;
@@ -40,6 +41,14 @@ class LiveConfiguration implements EventChannelClass {
 
     if (videoQualityType != null) {
       DependencyInjector.instance.sessionReplay.updateFrameRate();
+    }
+    if (_blockedFlutterSDKVersions != null &&
+        _blockedFlutterSDKVersions!.isNotEmpty) {
+      final String sdkVersion = DependencyInjector.instance.config.sdkVersion;
+      if (_blockedFlutterSDKVersions!.contains(sdkVersion)) {
+        isCurrentSdkVersionBlocked = true;
+        DependencyInjector.instance.config.blockSdk();
+      }
     }
   }
 

@@ -2,12 +2,12 @@ part of 'screen_widget/screen_widget.dart';
 
 class MaskWidget extends StatelessWidget {
   const MaskWidget({required this.child});
-  bool get isSdkInitialized => DependencyInjector.instance.config.initialized;
+  bool get isSdkRunning => DependencyInjector.instance.config.isSdkRunning;
 
   final Widget child;
   @override
   Widget build(BuildContext context) {
-    return isSdkInitialized ? _ActiveMaskWidget(child: child) : child;
+    return isSdkRunning ? _ActiveMaskWidget(child: child) : child;
   }
 }
 

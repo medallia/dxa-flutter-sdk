@@ -153,12 +153,16 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 + (instancetype)makeWithAccount:(NSNumber *)account
     property:(NSNumber *)property
     consents:(NSNumber *)consents
-    version:(NSString *)version {
+    version:(NSString *)version
+    crashReporterEnabled:(NSNumber *)crashReporterEnabled
+    mobileDataEnabled:(NSNumber *)mobileDataEnabled {
   FLTSessionMessage* pigeonResult = [[FLTSessionMessage alloc] init];
   pigeonResult.account = account;
   pigeonResult.property = property;
   pigeonResult.consents = consents;
   pigeonResult.version = version;
+  pigeonResult.crashReporterEnabled = crashReporterEnabled;
+  pigeonResult.mobileDataEnabled = mobileDataEnabled;
   return pigeonResult;
 }
 + (FLTSessionMessage *)fromList:(NSArray *)list {
@@ -171,6 +175,10 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   NSAssert(pigeonResult.consents != nil, @"");
   pigeonResult.version = GetNullableObjectAtIndex(list, 3);
   NSAssert(pigeonResult.version != nil, @"");
+  pigeonResult.crashReporterEnabled = GetNullableObjectAtIndex(list, 4);
+  NSAssert(pigeonResult.crashReporterEnabled != nil, @"");
+  pigeonResult.mobileDataEnabled = GetNullableObjectAtIndex(list, 5);
+  NSAssert(pigeonResult.mobileDataEnabled != nil, @"");
   return pigeonResult;
 }
 + (nullable FLTSessionMessage *)nullableFromList:(NSArray *)list {
@@ -182,6 +190,8 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     (self.property ?: [NSNull null]),
     (self.consents ?: [NSNull null]),
     (self.version ?: [NSNull null]),
+    (self.crashReporterEnabled ?: [NSNull null]),
+    (self.mobileDataEnabled ?: [NSNull null]),
   ];
 }
 @end
