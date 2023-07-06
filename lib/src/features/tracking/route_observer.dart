@@ -137,9 +137,10 @@ class RouteAnimationObserver extends TransitionRouteAnimationObserverClasses {
 
   final LoggerSDK _logger;
   Logger get logger => _logger.routeObserverLogger;
-
+  bool get isSdkRunning => DependencyInjector.instance.config.isSdkRunning;
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (!isSdkRunning) return;
     logger.d('didPush');
     if (previousRoute == null && _customRouteObserver.rootNotFound) {
       _customRouteObserver.rootRoute = route;
@@ -198,6 +199,7 @@ class RouteAnimationObserver extends TransitionRouteAnimationObserverClasses {
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    if (!isSdkRunning) return;
     logger.d('didReplace');
     //check if the old route is root route to update root route
     if (_customRouteObserver.rootRoute == oldRoute) {
@@ -219,6 +221,7 @@ class RouteAnimationObserver extends TransitionRouteAnimationObserverClasses {
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (!isSdkRunning) return;
     logger.d('didPop');
 
     checkForDialogPopOrRemove(route);
@@ -230,6 +233,7 @@ class RouteAnimationObserver extends TransitionRouteAnimationObserverClasses {
 
   @override
   void didRemove(Route route, Route? previousRoute) {
+    if (!isSdkRunning) return;
     logger.d('didRemove');
 
     if (route is TransitionRoute) {
@@ -323,8 +327,6 @@ class RouteObserverOtherNavigators {
     }
   }
 }
-
-abstract class RouteAnimationTransitionHandler {}
 
 abstract class TransitionRouteAnimationObserverClasses
     extends RouteObserver<TransitionRoute<dynamic>> {

@@ -151,6 +151,9 @@ void main() {
       //Keep this stub at the end of the list together with the stub mentioned.
       when(mockMedalliaDxaConfig.recordingAllowed).thenReturn(true);
     },
+    () {
+      when(mockMedalliaDxaConfig.isSdkRunning).thenReturn(true);
+    }
   ];
   void setVariablesToAllowTakeScreenshot() {
     for (final stub in stubsToAllowTakeScreenshot) {

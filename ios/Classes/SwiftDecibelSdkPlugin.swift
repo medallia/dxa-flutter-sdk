@@ -16,7 +16,8 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
         var liveConfiguration: MedalliaDXAFlutter.LiveConfigurationFlutter
         if  let consents = msg.consents as? Int {
             let nativeConsents: Consent = translateConsentsFlutterToIos(flutterConsents: consents)
-            let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property),consent: nativeConsents)
+            print(nativeConsents)
+            let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property),consent: nativeConsents, crashReporterEnabled: msg.crashReporterEnabled as! Bool, mobileDataEnable: msg.mobileDataEnabled as! Bool)
             
             
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)

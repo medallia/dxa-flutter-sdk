@@ -40,11 +40,15 @@ class SessionMessage {
   final int property;
   final int consents;
   final String version;
+  final bool crashReporterEnabled;
+  final bool mobileDataEnabled;
   const SessionMessage({
     required this.account,
     required this.property,
     required this.consents,
     required this.version,
+    required this.crashReporterEnabled,
+    required this.mobileDataEnabled,
   });
 }
 

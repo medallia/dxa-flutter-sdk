@@ -24,6 +24,7 @@ import 'test_files/frame_tracking_test.dart' as frame_tracking_test;
 import 'test_files/initial_config_test.dart' as initial_config_test;
 import 'test_files/session_replay_test.dart' as session_replay_test;
 
+//Generated with Flutter 3.7.0
 @GenerateNiceMocks([
   MockSpec<MedalliaDxaNativeApi>(),
   MockSpec<MedalliaDxaConfig>(),

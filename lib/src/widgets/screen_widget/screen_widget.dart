@@ -99,7 +99,7 @@ class ScreenWidget extends StatelessWidget {
   static _ScreenWidgetManualTabBar? of(BuildContext context) =>
       _ScreenWidgetManualTabBar.of(context);
 
-  bool get isSdkInitialized => DependencyInjector.instance.config.initialized;
+  bool get isSdkRunning => DependencyInjector.instance.config.isSdkRunning;
   bool get isManualTrackingEnabled =>
       DependencyInjector.instance.manualTracking.enabled;
   bool get recordingAllowed =>
@@ -117,7 +117,7 @@ ScreenWidget is not supported when the DXA SDK is working in manual tracking mod
       return true;
     }());
 
-    if (!isSdkInitialized) {
+    if (!isSdkRunning) {
       return child ?? builder!(context);
     }
 

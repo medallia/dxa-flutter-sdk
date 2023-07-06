@@ -86,6 +86,8 @@ class SessionMessage {
     required this.property,
     required this.consents,
     required this.version,
+    required this.crashReporterEnabled,
+    required this.mobileDataEnabled,
   });
 
   int account;
@@ -96,12 +98,18 @@ class SessionMessage {
 
   String version;
 
+  bool crashReporterEnabled;
+
+  bool mobileDataEnabled;
+
   Object encode() {
     return <Object?>[
       account,
       property,
       consents,
       version,
+      crashReporterEnabled,
+      mobileDataEnabled,
     ];
   }
 
@@ -112,6 +120,8 @@ class SessionMessage {
       property: result[1]! as int,
       consents: result[2]! as int,
       version: result[3]! as String,
+      crashReporterEnabled: result[4]! as bool,
+      mobileDataEnabled: result[5]! as bool,
     );
   }
 }

@@ -120,10 +120,12 @@ THEN the method throws an assertion error
         const consents = DecibelCustomerConsentType.recordingAndTracking;
 
         await medalliaDxaConfig.initialize(
-          account,
-          property,
-          consents: consents,
-          manualScreenTrackingEnabled: false,
+          dxaConfig: DxaConfig(
+            property: property,
+            account: account,
+            consents: consents,
+            manualScreenTrackingEnabled: false,
+          ),
         );
 
         //get SessionMessage sent to the Api

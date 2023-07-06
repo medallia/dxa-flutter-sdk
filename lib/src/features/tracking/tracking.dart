@@ -104,10 +104,6 @@ class Tracking with TrackingCompleter {
     bool trackingAllowedMerge = trackingAllowed;
     bool recordingAllowedMerge = recordingAllowed;
 
-    if (!recordingAllowed) {
-      placeholderTypeEnum = PlaceholderTypeEnum.replayDisabled;
-    }
-
     String screenNameLiveConfig = name;
     //For TabBars we want the child name and not the parent name to check
     //for live config features
@@ -125,6 +121,10 @@ class Tracking with TrackingCompleter {
         .isThisScreenNameSetToBeMasked(screenNameLiveConfig)) {
       recordingAllowedMerge = false;
       placeholderTypeEnum = PlaceholderTypeEnum.liveConfig;
+    }
+    //this at the end to override because it has the higher priority
+    if (!recordingAllowed) {
+      placeholderTypeEnum = PlaceholderTypeEnum.replayDisabled;
     }
 
     final int timestamp = DateTime.now().millisecondsSinceEpoch;
