@@ -142,8 +142,8 @@ class PlaceholderImageConfig {
         (screenHeight - (textHeight + image.height + textHeightPadding)) / 2;
     final imageOffset = Offset((screenWidth - textWidth) / 2, yOffset);
 
-    canvas.drawColor(Colors.white, ui.BlendMode.color);
-    canvas.drawImage(image, imageOffset, Paint()..color = Colors.blue);
+    canvas.drawColor(Colors.white, ui.BlendMode.srcOver);
+    canvas.drawImage(image, imageOffset, Paint()..color = Colors.white);
     //Layout configuration
     final double textHeightOffset =
         yOffset + image.height.toDouble() + textHeightPadding;
