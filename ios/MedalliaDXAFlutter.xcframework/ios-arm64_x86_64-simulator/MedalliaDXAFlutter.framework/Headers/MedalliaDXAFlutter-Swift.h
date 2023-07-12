@@ -260,7 +260,6 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
-@import UIKit;
 #endif
 
 #endif
@@ -294,11 +293,6 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 
 
-
-@interface UIView (SWIFT_EXTENSION(MedalliaDXAFlutter))
-/// Mark a view as a form
-@property (nonatomic) BOOL dxaFormTrack;
-@end
 
 
 
@@ -575,7 +569,6 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
-@import UIKit;
 #endif
 
 #endif
@@ -609,11 +602,6 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 
 
-
-@interface UIView (SWIFT_EXTENSION(MedalliaDXAFlutter))
-/// Mark a view as a form
-@property (nonatomic) BOOL dxaFormTrack;
-@end
 
 
 
