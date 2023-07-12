@@ -3,7 +3,6 @@ import 'package:decibel_sdk/src/features/image_quality.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:flutter/material.dart';
 
 class LiveConfiguration implements EventChannelClass {
