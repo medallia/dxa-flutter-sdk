@@ -121,7 +121,7 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             return
         }
         
-        completion(nil,FlutterError(code: "getWebViewProperties", message: "Unexpect null value, session has not been initialized", details: nil));
+        completion(nil,FlutterError(code: "getWebViewProperties", message: "Unexpected null value, session has not been initialized", details: nil));
         
     }
     
@@ -132,7 +132,7 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             return
         }
         
-        completion(nil,FlutterError(code: "getSessionId", message: "Unexpect null value, session has not been initialized", details: nil));
+        completion(nil,FlutterError(code: "getSessionId", message: "Unexpected null value, session has not been initialized", details: nil));
     }
     
     public func getSessionUrl(completion: @escaping (String?, FlutterError?)->Void) {
@@ -141,7 +141,7 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
                 completion(sessionUrl,nil);
                 return
             }
-            completion(nil,FlutterError(code: "getSessionUrl", message: "Unexpect null value, session has not been initalized", details: nil));
+            completion(nil,FlutterError(code: "getSessionUrl", message: "Unexpected null value, session has not been initialized", details: nil));
         }
     }
     
