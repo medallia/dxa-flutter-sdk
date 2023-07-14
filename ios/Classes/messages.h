@@ -123,7 +123,8 @@ NS_ASSUME_NONNULL_BEGIN
     maxScreenshots:(nullable NSNumber *)maxScreenshots
     maxScreenDuration:(nullable NSNumber *)maxScreenDuration
     disableScreenTracking:(nullable NSArray<NSString *> *)disableScreenTracking
-    screensMasking:(nullable NSArray<NSString *> *)screensMasking;
+    screensMasking:(nullable NSArray<NSString *> *)screensMasking
+    appVersion:(nullable NSString *)appVersion;
 @property(nonatomic, strong, nullable) NSNumber * overrideUserConfig;
 @property(nonatomic, strong, nullable) NSArray<NSString *> * blockedFlutterSDKVersions;
 @property(nonatomic, strong, nullable) NSArray<NSString *> * blockedFlutterAppVersions;
@@ -135,6 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) NSNumber * maxScreenDuration;
 @property(nonatomic, strong, nullable) NSArray<NSString *> * disableScreenTracking;
 @property(nonatomic, strong, nullable) NSArray<NSString *> * screensMasking;
+@property(nonatomic, copy, nullable) NSString * appVersion;
 @end
 
 /// The codec used by FLTMedalliaDxaNativeApi.

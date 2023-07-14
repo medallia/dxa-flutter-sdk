@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
-import 'package:decibel_sdk/src/decibel_config.dart';
+import 'package:decibel_sdk/src/features/config/decibel_config.dart';
 import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart';
 import 'package:decibel_sdk/src/features/session_replay.dart';
 import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
@@ -224,7 +224,7 @@ class Tracking with TrackingCompleter {
     bool isTabBar = false,
     bool isBackground = false,
   }) async {
-    if (!medalliaDxaConfig.trackingAllowed) return;
+    if (!medalliaDxaConfig.isSdkRunning) return;
     late ScreenVisited screenVisited;
     late ScreenVisited? potentialScreenVisited;
     if (isTabBar) {
@@ -265,6 +265,13 @@ class Tracking with TrackingCompleter {
     );
     await _apiInstance.endScreen(endScreenMessage);
     endScreenToComplete.complete();
+  }
+
+  Future<void> closeCurrentScreen() async {
+    if (visitedUnfinishedScreen == null) return;
+    await endScreen(
+      visitedUnfinishedScreen!.id,
+    );
   }
 
   Future<void> wentToBackground() async {

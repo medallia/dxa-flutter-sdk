@@ -965,6 +965,16 @@ public class Messages {
       this.screensMasking = setterArg;
     }
 
+    private @Nullable String appVersion;
+
+    public @Nullable String getAppVersion() {
+      return appVersion;
+    }
+
+    public void setAppVersion(@Nullable String setterArg) {
+      this.appVersion = setterArg;
+    }
+
     public static final class Builder {
 
       private @Nullable Boolean overrideUserConfig;
@@ -1044,6 +1054,13 @@ public class Messages {
         return this;
       }
 
+      private @Nullable String appVersion;
+
+      public @NonNull Builder setAppVersion(@Nullable String setterArg) {
+        this.appVersion = setterArg;
+        return this;
+      }
+
       public @NonNull LiveConfigurationPigeon build() {
         LiveConfigurationPigeon pigeonReturn = new LiveConfigurationPigeon();
         pigeonReturn.setOverrideUserConfig(overrideUserConfig);
@@ -1057,13 +1074,14 @@ public class Messages {
         pigeonReturn.setMaxScreenDuration(maxScreenDuration);
         pigeonReturn.setDisableScreenTracking(disableScreenTracking);
         pigeonReturn.setScreensMasking(screensMasking);
+        pigeonReturn.setAppVersion(appVersion);
         return pigeonReturn;
       }
     }
 
     @NonNull
     ArrayList<Object> toList() {
-      ArrayList<Object> toListResult = new ArrayList<Object>(11);
+      ArrayList<Object> toListResult = new ArrayList<Object>(12);
       toListResult.add(overrideUserConfig);
       toListResult.add(blockedFlutterSDKVersions);
       toListResult.add(blockedFlutterAppVersions);
@@ -1075,6 +1093,7 @@ public class Messages {
       toListResult.add(maxScreenDuration);
       toListResult.add(disableScreenTracking);
       toListResult.add(screensMasking);
+      toListResult.add(appVersion);
       return toListResult;
     }
 
@@ -1102,6 +1121,8 @@ public class Messages {
       pigeonResult.setDisableScreenTracking((List<String>) disableScreenTracking);
       Object screensMasking = list.get(10);
       pigeonResult.setScreensMasking((List<String>) screensMasking);
+      Object appVersion = list.get(11);
+      pigeonResult.setAppVersion((String) appVersion);
       return pigeonResult;
     }
   }

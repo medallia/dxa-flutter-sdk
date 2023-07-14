@@ -1,17 +1,20 @@
 // ignore_for_file: avoid_positional_boolean_parameters
 
 import 'package:decibel_sdk/decibel_sdk.dart';
-import 'package:decibel_sdk/src/decibel_config.dart';
+import 'package:decibel_sdk/src/features/config/decibel_config.dart';
+import 'package:decibel_sdk/src/features/config/public_methods.dart';
 import 'package:decibel_sdk/src/features/consents.dart' as enums;
 import 'package:flutter/material.dart';
 
 class DecibelSdk {
+  static PublicMethodsMedalliaConfig get _publicMethods => config.publicMethods;
+  static MedalliaDxaConfig config = MedalliaDxaConfig();
   static void disableAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
-    return MedalliaDxaConfig().disableAutoMasking(widgetsToMask);
+    return _publicMethods.disableAutoMasking(widgetsToMask);
   }
 
   static void enableAllLogs() {
-    MedalliaDxaConfig().enableAllLogs();
+    _publicMethods.enableAllLogs();
   }
 
   static void enableSelectedLogs({
@@ -24,7 +27,7 @@ class DecibelSdk {
     bool maskWidget = false,
     bool manualAnalytics = false,
   }) {
-    return MedalliaDxaConfig().enableSelectedLogs(
+    return _publicMethods.enableSelectedLogs(
         tracking: tracking,
         sessionReplay: sessionReplay,
         frameTracking: frameTracking,
@@ -36,15 +39,15 @@ class DecibelSdk {
   }
 
   static Future<String?> getSessionId() async {
-    return MedalliaDxaConfig().getSessionId();
+    return _publicMethods.getSessionId();
   }
 
   static Future<String?> getSessionUrl() async {
-    return MedalliaDxaConfig().getSessionUrl();
+    return _publicMethods.getSessionUrl();
   }
 
   static Future<String?> getWebViewProperties() async {
-    return MedalliaDxaConfig().getWebViewProperties();
+    return _publicMethods.getWebViewProperties();
   }
 
   static Future<void> initialize({required DxaConfig dxaConfig}) async {
@@ -54,77 +57,76 @@ class DecibelSdk {
   }
 
   static List<NavigatorObserver> get routeObservers =>
-      MedalliaDxaConfig().currentRouteObservers;
+      _publicMethods.currentRouteObservers;
 
   static void sendDataOverWifiOnly() {
-    return MedalliaDxaConfig().sendDataOverWifiOnly();
+    return _publicMethods.sendDataOverWifiOnly();
   }
 
   static Future<void> sendGoal(String goalName, [double? value]) {
-    return MedalliaDxaConfig().sendGoal(goalName, value);
+    return _publicMethods.sendGoal(goalName, value);
   }
 
   static Future<void> sendHttpError(int statusCode) {
-    return MedalliaDxaConfig().sendHttpError(statusCode);
+    return _publicMethods.sendHttpError(statusCode);
   }
 
   static void setMaskColor(Color color) {
-    MedalliaDxaConfig().setMaskColor(color.withAlpha(255));
+    _publicMethods.setMaskColor(color.withAlpha(255));
   }
 
   static void setImageQuality(ImageQuality imageQuality) {
-    MedalliaDxaConfig().setImageQuality(imageQuality);
+    _publicMethods.setImageQuality(imageQuality);
   }
 
   static void setAutoMasking(Set<AutoMaskingTypeEnum> widgetsToMask) {
-    return MedalliaDxaConfig().setAutoMasking(widgetsToMask);
+    return _publicMethods.setAutoMasking(widgetsToMask);
   }
 
   static Future<void> setDimensionWithBool(
     String dimensionName, {
     required bool value,
   }) {
-    return MedalliaDxaConfig()
-        .setDimensionWithBool(dimensionName, value: value);
+    return _publicMethods.setDimensionWithBool(dimensionName, value: value);
   }
 
   static Future<void> setDimensionWithNumber(
     String dimensionName,
     double value,
   ) {
-    return MedalliaDxaConfig().setDimensionWithNumber(dimensionName, value);
+    return _publicMethods.setDimensionWithNumber(dimensionName, value);
   }
 
   static Future<void> setDimensionWithString(
     String dimensionName,
     String value,
   ) {
-    return MedalliaDxaConfig().setDimensionWithString(dimensionName, value);
+    return _publicMethods.setDimensionWithString(dimensionName, value);
   }
 
   static Future<void> setConsents(
     enums.DecibelCustomerConsentType consents,
   ) {
-    return MedalliaDxaConfig().setConsents(consents);
+    return _publicMethods.setConsents(consents);
   }
 
   static void startNewScreen(String name) =>
-      MedalliaDxaConfig().startNewScreen(name);
+      _publicMethods.startNewScreen(name);
 
   static Future<void> enableSessionForExperience(bool value) async {
-    return MedalliaDxaConfig().enableSessionForExperience(value);
+    return _publicMethods.enableSessionForExperience(value);
   }
 
   static Future<void> enableSessionForAnalysis(bool value) async {
-    return MedalliaDxaConfig().enableSessionForAnalysis(value);
+    return _publicMethods.enableSessionForAnalysis(value);
   }
 
   static Future<void> enableSessionForReplay(bool value) async {
-    return MedalliaDxaConfig().enableSessionForReplay(value);
+    return _publicMethods.enableSessionForReplay(value);
   }
 
   static Future<void> enableScreenForAnalysis(bool value) async {
-    return MedalliaDxaConfig().enableScreenForAnalysis(value);
+    return _publicMethods.enableScreenForAnalysis(value);
   }
 }
 
