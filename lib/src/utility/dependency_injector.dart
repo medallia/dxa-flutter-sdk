@@ -1,4 +1,4 @@
-import 'package:decibel_sdk/src/decibel_config.dart';
+import 'package:decibel_sdk/src/features/config/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
 import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
 import 'package:decibel_sdk/src/features/frame_tracking.dart';

@@ -1,4 +1,4 @@
-import 'package:decibel_sdk/src/decibel_config.dart';
+import 'package:decibel_sdk/src/features/config/decibel_config.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
 import 'package:decibel_sdk/src/utility/logger_sdk.dart';

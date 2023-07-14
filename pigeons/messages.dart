@@ -1,13 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:pigeon/pigeon.dart';
-
-// TODO: Enum supported on Pigeon, but not List<Enum>. Waiting to talk about consents change.
-// enum DecibelCustomerConsentType {
-//   all,
-//   recordingAndTracking,
-//   tracking,
-//   none,
-// }
+//Built using  Flutter 3.0.3
 
 class StartScreenMessage {
   final String screenName;
@@ -113,6 +106,7 @@ class LiveConfigurationPigeon {
   int? maxScreenDuration;
   List<String?>? disableScreenTracking;
   List<String?>? screensMasking;
+  String? appVersion;
   LiveConfigurationPigeon({
     this.overrideUserConfig,
     this.blockedFlutterSDKVersions,
@@ -125,6 +119,7 @@ class LiveConfigurationPigeon {
     this.maxScreenDuration,
     this.disableScreenTracking,
     this.screensMasking,
+    this.appVersion,
   });
 }
 
