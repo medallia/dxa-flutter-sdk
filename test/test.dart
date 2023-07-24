@@ -1,5 +1,7 @@
-import 'package:decibel_sdk/src/decibel_config.dart';
+import 'package:decibel_sdk/src/features/config/blocked_public_methods.dart';
+import 'package:decibel_sdk/src/features/config/decibel_config.dart';
 import 'package:decibel_sdk/src/features/autoMasking/auto_masking_class.dart';
+import 'package:decibel_sdk/src/features/config/public_methods.dart';
 import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart';
 import 'package:decibel_sdk/src/features/event_channel/classes/performance_metrics.dart';
 import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
@@ -24,7 +26,7 @@ import 'test_files/frame_tracking_test.dart' as frame_tracking_test;
 import 'test_files/initial_config_test.dart' as initial_config_test;
 import 'test_files/session_replay_test.dart' as session_replay_test;
 
-//Generated with Flutter 3.7.0
+//Generated with Flutter 3.3.10
 @GenerateNiceMocks([
   MockSpec<MedalliaDxaNativeApi>(),
   MockSpec<MedalliaDxaConfig>(),

@@ -1,6 +1,6 @@
 // swift-interface-format-version: 1.0
 // swift-compiler-version: Apple Swift version 5.8 (swiftlang-5.8.0.124.2 clang-1403.0.22.11.100)
-// swift-module-flags: -target arm64-apple-ios11.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name MedalliaDXAFlutter
+// swift-module-flags: -target arm64-apple-ios11.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Onone -module-name MedalliaDXAFlutter
 // swift-module-flags-ignorable: -enable-bare-slash-regex
 import AVFoundation
 import CommonCrypto
@@ -25,7 +25,7 @@ public enum ImageQualityType : Swift.Int, Swift.Codable {
   }
 }
 public struct PerformanceFlutter {
-  public let isStressed: MedalliaDXAFlutter.DeviceStressedTypeFlutter
+  public let isStressed: [MedalliaDXAFlutter.DeviceStressedTypeFlutter]
   public let cpu: Swift.Double
   public let memory: Swift.Double
   public let battery: Swift.Double
@@ -36,7 +36,6 @@ public enum DeviceStressedTypeFlutter : Swift.Int {
   case battery
   case memory
   case cpu
-  case none
   public init?(rawValue: Swift.Int)
   public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
@@ -48,9 +47,13 @@ extension UIKit.UIView {
     get
     set
   }
-  @objc @_Concurrency.MainActor(unsafe) dynamic public var dxaFormTrack: Swift.Bool {
-    @objc get
-    @objc set
+  @_Concurrency.MainActor(unsafe) public var dxaFormTrack: Swift.Bool {
+    get
+    set
+  }
+  @_Concurrency.MainActor(unsafe) public var dxaStringTag: Swift.String? {
+    get
+    set
   }
 }
 public enum Consent {
@@ -77,6 +80,16 @@ public enum PlatformType {
   case flutter
   case xamarin
   public static func == (a: MedalliaDXAFlutter.PlatformType, b: MedalliaDXAFlutter.PlatformType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum SessionReplayMode {
+  case hiFi
+  case loFi
+  case automatic
+  public static func == (a: MedalliaDXAFlutter.SessionReplayMode, b: MedalliaDXAFlutter.SessionReplayMode) -> Swift.Bool
   public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
@@ -117,8 +130,33 @@ public struct LiveConfigurationFlutter {
   public var blockedFlutterAppVersions: [Swift.String]?
 }
 public class Configuration {
-  public init(account: Swift.String, property: Swift.String, consent: MedalliaDXAFlutter.Consent = .recordingAndTracking, crashReporterEnabled: Swift.Bool = true, mobileDataEnable: Swift.Bool = true, manualScreenTracking: Swift.Bool = false)
+  public var sessionReplayMode: MedalliaDXAFlutter.SessionReplayMode
+  public var endpoint: MedalliaDXAFlutter.Endpoint
+  public var logLevel: MedalliaDXAFlutter.LogLevel
+  public init(account: Swift.String, property: Swift.String, consent: MedalliaDXAFlutter.Consent = .recordingAndTracking, crashReporterEnabled: Swift.Bool = true, mobileDataEnable: Swift.Bool = true, manualScreenTracking: Swift.Bool = false, enhancedLogsEnabled: Swift.Bool = false)
   @objc deinit
+}
+public enum Endpoint {
+  case production
+  case staging
+  case sigma
+  case omega
+  public static func == (a: MedalliaDXAFlutter.Endpoint, b: MedalliaDXAFlutter.Endpoint) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum LogLevel : Swift.Int {
+  case customer
+  case customerDebug
+  case tests
+  case developer
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
 }
 public enum MaskAutomatic {
   case labels
@@ -158,6 +196,7 @@ extension MedalliaDXAFlutter.DXA {
 @_hasMissingDesignatedInitializers public class DXA {
   public static func initialize(_ configuration: MedalliaDXAFlutter.Configuration)
   public static func startNewScreen(name: Swift.String)
+  public static func stopScreen()
   public static func setMaskingForCurrentScreen(mask: MedalliaDXAFlutter.MaskAutomatic)
   public static func send(goal: Swift.String, with value: Swift.Float? = nil)
   public static func send(dimension: Swift.String, value: Swift.String)
@@ -169,13 +208,15 @@ extension MedalliaDXAFlutter.DXA {
   public static func setImageQuality(_ quality: MedalliaDXAFlutter.ImageQualityType)
   public static func setMaskingColor(_ color: UIKit.UIColor)
   public static func sendHTTPError(statusCode: Swift.Int)
+  public static func sendError(_ error: Swift.String)
   public static func formSuccess()
   public static func formError(error: Swift.String, selector: UIKit.UIView?)
   public static var webViewProperties: Swift.String? {
     get
   }
-  public static var sessionURL: Swift.String? {
+  public static var sessionURL: ((Swift.String?) -> ())? {
     get
+    set
   }
   public static var sessionId: Swift.String? {
     get
@@ -216,6 +257,13 @@ extension MedalliaDXAFlutter.Consent : Swift.Equatable {}
 extension MedalliaDXAFlutter.Consent : Swift.Hashable {}
 extension MedalliaDXAFlutter.PlatformType : Swift.Equatable {}
 extension MedalliaDXAFlutter.PlatformType : Swift.Hashable {}
+extension MedalliaDXAFlutter.Endpoint : Swift.Equatable {}
+extension MedalliaDXAFlutter.Endpoint : Swift.Hashable {}
+extension MedalliaDXAFlutter.SessionReplayMode : Swift.Equatable {}
+extension MedalliaDXAFlutter.SessionReplayMode : Swift.Hashable {}
+extension MedalliaDXAFlutter.LogLevel : Swift.Equatable {}
+extension MedalliaDXAFlutter.LogLevel : Swift.Hashable {}
+extension MedalliaDXAFlutter.LogLevel : Swift.RawRepresentable {}
 extension MedalliaDXAFlutter.MaskAutomatic : Swift.Equatable {}
 extension MedalliaDXAFlutter.MaskAutomatic : Swift.Hashable {}
 extension MedalliaDXAFlutter.MaskView : Swift.Equatable {}

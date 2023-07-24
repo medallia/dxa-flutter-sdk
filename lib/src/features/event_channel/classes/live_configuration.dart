@@ -3,7 +3,6 @@ import 'package:decibel_sdk/src/features/image_quality.dart';
 import 'package:decibel_sdk/src/messages.dart';
 import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:decibel_sdk/src/utility/global_settings.dart';
 import 'package:flutter/material.dart';
 
 class LiveConfiguration implements EventChannelClass {
@@ -19,6 +18,7 @@ class LiveConfiguration implements EventChannelClass {
   List<String?>? _blockedFlutterSDKVersions;
   List<String?>? _blockedFlutterAppVersions;
   bool isCurrentSdkVersionBlocked = false;
+  bool isCurrentAppVersionBlocked = false;
   String? _maskingColorString;
   Color? _maskingColor;
   bool? _showLocalLogs;
@@ -31,10 +31,9 @@ class LiveConfiguration implements EventChannelClass {
   Duration? _maxScreenDuration;
   List<String?>? _disableScreenTracking;
   List<String?>? _screensMasking;
-
-  void runTasksAfterUpdate() {
+  String? _appVersion;
+  Future<void> runTasksAfterUpdate() async {
     convertNativeValuesToFlutterValues();
-
     if (_showLocalLogs == true) {
       localLogsEnablingLogic();
     }
@@ -47,7 +46,23 @@ class LiveConfiguration implements EventChannelClass {
       final String sdkVersion = DependencyInjector.instance.config.sdkVersion;
       if (_blockedFlutterSDKVersions!.contains(sdkVersion)) {
         isCurrentSdkVersionBlocked = true;
-        DependencyInjector.instance.config.blockSdk();
+        await DependencyInjector.instance.config.blockSdk();
+      } else {
+        isCurrentSdkVersionBlocked = false;
+      }
+    }
+    if (_blockedFlutterAppVersions != null &&
+        _blockedFlutterAppVersions!.isNotEmpty) {
+      if (_blockedFlutterAppVersions!.contains(_appVersion)) {
+        isCurrentAppVersionBlocked = true;
+        await DependencyInjector.instance.config.blockSdk();
+      } else {
+        isCurrentAppVersionBlocked = false;
+      }
+    }
+    if (DependencyInjector.instance.config.blocked) {
+      if (!isCurrentAppVersionBlocked && !isCurrentSdkVersionBlocked) {
+        await DependencyInjector.instance.config.unblockSdk();
       }
     }
   }
@@ -164,13 +179,13 @@ class LiveConfiguration implements EventChannelClass {
             ?.map((e) => e as String)
             .toList() ??
         _screensMasking;
-
+    _appVersion = json['appVersion'] as String? ?? _appVersion;
     runTasksAfterUpdate();
   }
 
-  void updateFromPigeonClass(
+  Future<void> updateFromPigeonClass(
     LiveConfigurationPigeon liveConfigurationFromPigeon,
-  ) {
+  ) async {
     _overrideUserConfig =
         liveConfigurationFromPigeon.overrideUserConfig ?? overrideUserConfig;
     _blockedFlutterSDKVersions =
@@ -196,6 +211,7 @@ class LiveConfiguration implements EventChannelClass {
             _disableScreenTracking;
     _screensMasking =
         liveConfigurationFromPigeon.screensMasking ?? _screensMasking;
-    runTasksAfterUpdate();
+    _appVersion = liveConfigurationFromPigeon.appVersion ?? _appVersion;
+    await runTasksAfterUpdate();
   }
 }

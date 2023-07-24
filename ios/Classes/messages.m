@@ -351,7 +351,8 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     maxScreenshots:(nullable NSNumber *)maxScreenshots
     maxScreenDuration:(nullable NSNumber *)maxScreenDuration
     disableScreenTracking:(nullable NSArray<NSString *> *)disableScreenTracking
-    screensMasking:(nullable NSArray<NSString *> *)screensMasking {
+    screensMasking:(nullable NSArray<NSString *> *)screensMasking
+    appVersion:(nullable NSString *)appVersion {
   FLTLiveConfigurationPigeon* pigeonResult = [[FLTLiveConfigurationPigeon alloc] init];
   pigeonResult.overrideUserConfig = overrideUserConfig;
   pigeonResult.blockedFlutterSDKVersions = blockedFlutterSDKVersions;
@@ -364,6 +365,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   pigeonResult.maxScreenDuration = maxScreenDuration;
   pigeonResult.disableScreenTracking = disableScreenTracking;
   pigeonResult.screensMasking = screensMasking;
+  pigeonResult.appVersion = appVersion;
   return pigeonResult;
 }
 + (FLTLiveConfigurationPigeon *)fromList:(NSArray *)list {
@@ -379,6 +381,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   pigeonResult.maxScreenDuration = GetNullableObjectAtIndex(list, 8);
   pigeonResult.disableScreenTracking = GetNullableObjectAtIndex(list, 9);
   pigeonResult.screensMasking = GetNullableObjectAtIndex(list, 10);
+  pigeonResult.appVersion = GetNullableObjectAtIndex(list, 11);
   return pigeonResult;
 }
 + (nullable FLTLiveConfigurationPigeon *)nullableFromList:(NSArray *)list {
@@ -397,6 +400,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     (self.maxScreenDuration ?: [NSNull null]),
     (self.disableScreenTracking ?: [NSNull null]),
     (self.screensMasking ?: [NSNull null]),
+    (self.appVersion ?: [NSNull null]),
   ];
 }
 @end

@@ -19,18 +19,21 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             print(nativeConsents)
             let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property),consent: nativeConsents, crashReporterEnabled: msg.crashReporterEnabled as! Bool, mobileDataEnable: msg.mobileDataEnabled as! Bool)
             
-            
+            configuration.endpoint = .production
+            configuration.logLevel = .developer
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
-
+            
             
         } else  {
             let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property))
-            
+            configuration.endpoint = .production
+            configuration.logLevel = .developer
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
 
         }
                 
         let fltLiveConfiguration = buildLiveConfigurationPigeonClass(liveConfiguration: liveConfiguration)
+        fltLiveConfiguration.appVersion = DXA.appVersion
         completion(fltLiveConfiguration, nil)
         
     }
@@ -118,7 +121,7 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             return
         }
         
-        completion(nil,FlutterError(code: "getWebViewProperties", message: "Unexpect null value, session has not been initalized", details: nil));
+        completion(nil,FlutterError(code: "getWebViewProperties", message: "Unexpected null value, session has not been initialized", details: nil));
         
     }
     
@@ -129,17 +132,17 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             return
         }
         
-        completion(nil,FlutterError(code: "getSessionId", message: "Unexpect null value, session has not been initalized", details: nil));
+        completion(nil,FlutterError(code: "getSessionId", message: "Unexpected null value, session has not been initialized", details: nil));
     }
     
-    public func getSessionUrl(completion: (String?, FlutterError?)->Void) {
-        let sessionUrl = DXA.sessionURL
-        if sessionUrl != nil {
-            completion(sessionUrl,nil);
-            return
+    public func getSessionUrl(completion: @escaping (String?, FlutterError?)->Void) {
+        DXA.sessionURL = {sessionUrl in
+            if sessionUrl != nil {
+                completion(sessionUrl,nil);
+                return
+            }
+            completion(nil,FlutterError(code: "getSessionUrl", message: "Unexpected null value, session has not been initialized", details: nil));
         }
-        
-        completion(nil,FlutterError(code: "getSessionUrl", message: "Unexpect null value, session has not been initalized", details: nil));
     }
     
     public func enableSession(forExperienceValue value: NSNumber, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
@@ -203,8 +206,6 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             nativeStresstedType = "cpu"
         case .memory:
             nativeStresstedType = "memory"
-        case .none:
-            nativeStresstedType = "none"
         default:
             nativeStresstedType = "none"
         }
@@ -238,7 +239,7 @@ public class SwiftDecibelSdkPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNativ
             maxScreenDuration = NSNumber(value:liveConfiguration.maxScreenDuration!)
         }
         
-        let fltLiveConfiguration = FLTLiveConfigurationPigeon.make(withOverrideUserConfig: NSNumber(value: liveConfiguration.useLiveConfiguration), blockedFlutterSDKVersions: liveConfiguration.blockedFlutterSDKVersions, blockedFlutterAppVersions: liveConfiguration.blockedFlutterAppVersions, maskingColor: liveConfiguration.maskingColor, showLocalLogs: showLocalLogs , imageQualityType: imageQualityType, videoQualityType: videoQualityType, maxScreenshots: maxScreenshots, maxScreenDuration: maxScreenDuration, disableScreenTracking: liveConfiguration.disableScreenTracking, screensMasking: liveConfiguration.screensMasking)
+        let fltLiveConfiguration = FLTLiveConfigurationPigeon.make(withOverrideUserConfig: NSNumber(value: liveConfiguration.useLiveConfiguration), blockedFlutterSDKVersions: liveConfiguration.blockedFlutterSDKVersions, blockedFlutterAppVersions: liveConfiguration.blockedFlutterAppVersions, maskingColor: liveConfiguration.maskingColor, showLocalLogs: showLocalLogs , imageQualityType: imageQualityType, videoQualityType: videoQualityType, maxScreenshots: maxScreenshots, maxScreenDuration: maxScreenDuration, disableScreenTracking: liveConfiguration.disableScreenTracking, screensMasking: liveConfiguration.screensMasking, appVersion: DXA.appVersion)
         return fltLiveConfiguration
     }
     
@@ -276,7 +277,10 @@ extension SwiftDecibelSdkPlugin : DXADelegate {
 
         if(SwiftDecibelSdkPlugin.flutterEventSink==nil) {return}
         do {
-            let isStressed: String = translateDeviceStressedTypeToString(nativeStresstedType: data.isStressed)
+            var isStressed = "none"
+            if let firstStressedValue = data.isStressed.first  {
+                isStressed = translateDeviceStressedTypeToString(nativeStresstedType: firstStressedValue)
+            }
             
             let dictData: [String: Any] = ["cpuUsage": NSNumber(value: data.cpu), "memoryUsage": NSNumber(value:data.memory), "batteryLevel": NSNumber(value:data.battery), "isStressed": isStressed]
             let dictId: [String: Any] = ["performance_metrics": dictData]

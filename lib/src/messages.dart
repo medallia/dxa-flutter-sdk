@@ -279,6 +279,7 @@ class LiveConfigurationPigeon {
     this.maxScreenDuration,
     this.disableScreenTracking,
     this.screensMasking,
+    this.appVersion,
   });
 
   bool? overrideUserConfig;
@@ -303,6 +304,8 @@ class LiveConfigurationPigeon {
 
   List<String?>? screensMasking;
 
+  String? appVersion;
+
   Object encode() {
     return <Object?>[
       overrideUserConfig,
@@ -316,6 +319,7 @@ class LiveConfigurationPigeon {
       maxScreenDuration,
       disableScreenTracking,
       screensMasking,
+      appVersion,
     ];
   }
 
@@ -333,6 +337,7 @@ class LiveConfigurationPigeon {
       maxScreenDuration: result[8] as int?,
       disableScreenTracking: (result[9] as List<Object?>?)?.cast<String?>(),
       screensMasking: (result[10] as List<Object?>?)?.cast<String?>(),
+      appVersion: result[11] as String?,
     );
   }
 }

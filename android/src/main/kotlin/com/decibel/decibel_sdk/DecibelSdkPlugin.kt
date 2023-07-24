@@ -9,6 +9,7 @@ import com.decibel.common.enums.DeviceUnderStress
 import com.decibel.common.enums.PlatformType
 import com.decibel.common.internal.logic.providers.ActivityProvider
 import com.decibel.common.internal.logic.providers.ActivityResumedListener
+import com.decibel.common.internal.logic.providers.AppVersionProvider
 import com.decibel.common.internal.models.*
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -38,7 +39,7 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
     private var performanceValues: PerformanceValues = PerformanceValues()
 
-    private var initalized = false
+    private var initialized = false
 
     private var lastConfig: SdkConfig? = null
 
@@ -74,18 +75,18 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         val consents = translateConsentsFlutterToAndroid(msg.consents)
         binderScope.launch {
             var config : SdkConfig?
-            if(initalized){
-                log(message="already initalized")
+            if(initialized){
+                log(message="already initialized")
                 config = lastConfig
             }else{
                 config = decibelSdk.standaloneInitialize(
                         dxaConfig = DxaConfig(customerConsent = consents, accountId = msg.account, propertyId = msg.property, mobileDataEnabled = msg.mobileDataEnabled),
                         platform = Multiplatform(type = PlatformType.FLUTTER, version = msg.version)
                 )
-                initalized = true
+                initialized = true
                 lastConfig = config
             }
-            
+
             log(message = "Initial config: $config")
             val endTime = Date().time
             log(message = "initialize SDK took: ${endTime - initTime}")
@@ -104,6 +105,7 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
             liveConfiguration.maxScreenDuration = config?.vsScreenMaxDuration?.toLong()
             liveConfiguration.disableScreenTracking = config?.dstDisableScreenTracking
             liveConfiguration.screensMasking = config?.dstScreenMasking
+            liveConfiguration.appVersion = AppVersionProvider.version
             result?.success(liveConfiguration)
         }
     }
@@ -378,6 +380,7 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
                 jsonObject.put("maxScreenDuration", newConfig?.vsScreenMaxDuration)
                 jsonObject.put("disableScreenTracking", JSONArray(newConfig?.dstDisableScreenTracking))
                 jsonObject.put("screensMasking", JSONArray(newConfig?.dstScreenMasking))
+                jsonObject.put("appVersion", AppVersionProvider.version)
                 val jsonName = JSONObject()
                 jsonName.put("live_configuration", jsonObject)
                 val json = jsonName.toString()
