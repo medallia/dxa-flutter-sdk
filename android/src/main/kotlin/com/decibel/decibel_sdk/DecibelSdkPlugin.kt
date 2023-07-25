@@ -2,21 +2,24 @@ package com.decibel.decibel_sdk
 
 import android.app.Activity
 import android.util.Log
-import com.decibel.common.enums.CustomerConsentType
-import com.decibel.builder.prod.Decibel
-import com.decibel.buildercommon.DecibelSdk
-import com.decibel.common.enums.DeviceUnderStress
-import com.decibel.common.enums.PlatformType
-import com.decibel.common.internal.logic.providers.ActivityProvider
-import com.decibel.common.internal.logic.providers.ActivityResumedListener
-import com.decibel.common.internal.logic.providers.AppVersionProvider
-import com.decibel.common.internal.models.*
+import com.medallia.dxa.builder.prod.DXA
+import com.medallia.dxa.buildercommon.MedalliaDXA
+import com.medallia.dxa.common.enums.CustomerConsentType
+import com.medallia.dxa.common.enums.DeviceUnderStress
+import com.medallia.dxa.common.enums.PlatformType
+import com.medallia.dxa.common.internal.logic.providers.ActivityProvider
+import com.medallia.dxa.common.internal.logic.providers.ActivityResumedListener
+import com.medallia.dxa.common.internal.logic.providers.AppVersionProvider
+import com.medallia.dxa.common.internal.models.DXAConfig
+import com.medallia.dxa.common.internal.models.ImageQualityLevel
+import com.medallia.dxa.common.internal.models.Multiplatform
+import com.medallia.dxa.common.internal.models.SdkConfig
+import com.medallia.dxa.common.internal.models.Session
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.last
 import java.lang.ref.WeakReference
 import java.util.Date
 import org.json.JSONObject
@@ -25,7 +28,7 @@ import org.json.JSONArray
 /** DecibelSdkPlugin */
 class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
-    private lateinit var decibelSdk: DecibelSdk
+    private lateinit var decibelSdk: MedalliaDXA
 
     private val logTag = "DXA-FLUTTER"
 
@@ -45,7 +48,7 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         log("Attaching to engine...")
-        decibelSdk = Decibel.getInstance(flutterPluginBinding.applicationContext)
+        decibelSdk = DXA.getInstance(flutterPluginBinding.applicationContext)
         startCollectSdkConfig()
         startCollectSessionsInfo()
         startCollectCpuUsageMetric()
@@ -55,7 +58,7 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         Messages.MedalliaDxaNativeApi.setup(flutterPluginBinding.binaryMessenger, this)
         ActivityProvider.addListen(onFlutterActivityResumedListener)
         EventChannel(flutterPluginBinding.binaryMessenger, "multiplatform.flutter.streamChannel")
-                .setStreamHandler(onFlutterStreamChannelListener)
+            .setStreamHandler(onFlutterStreamChannelListener)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -66,22 +69,33 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         binderScope.cancel()
     }
 
-    override fun initialize(msg: Messages.SessionMessage, result: Messages.Result<Messages.LiveConfigurationPigeon>?) {
+    override fun initialize(
+        msg: Messages.SessionMessage,
+        result: Messages.Result<Messages.LiveConfigurationPigeon>?
+    ) {
         val initTime = Date().time
         log(
-                message = "calling initialize: account=${msg.account} - property${msg.property} - " +
-                        "version=${msg.version} - consents=${msg.consents}"
+            message = "calling initialize: account=${msg.account} - property${msg.property} - " +
+                    "version=${msg.version} - consents=${msg.consents}"
         )
         val consents = translateConsentsFlutterToAndroid(msg.consents)
         binderScope.launch {
-            var config : SdkConfig?
-            if(initialized){
-                log(message="already initialized")
+            val config: SdkConfig?
+            if (initialized) {
+                log(message = "already initialized")
                 config = lastConfig
-            }else{
+            } else {
                 config = decibelSdk.standaloneInitialize(
-                        dxaConfig = DxaConfig(customerConsent = consents, accountId = msg.account, propertyId = msg.property, mobileDataEnabled = msg.mobileDataEnabled),
-                        platform = Multiplatform(type = PlatformType.FLUTTER, version = msg.version)
+                    dxaConfig = DXAConfig(
+                        customerConsent = consents,
+                        accountId = msg.account,
+                        propertyId = msg.property,
+                        mobileDataEnabled = msg.mobileDataEnabled
+                    ),
+                    platform = Multiplatform(
+                        type = PlatformType.FLUTTER,
+                        version = msg.version
+                    )
                 )
                 initialized = true
                 lastConfig = config
@@ -111,20 +125,21 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
     }
 
     override fun startScreen(
-            msg: Messages.StartScreenMessage,
-            result: Messages.Result<Void>?
+        msg: Messages.StartScreenMessage,
+        result: Messages.Result<Void>?
     ) {
         msg.run {
             val initTime = Date().time
             log(
-                    message = "calling startScreen: screenID=${screenId} - screenName${screenName} - " +
-                            "startTime=${startTime} - isBackground=${isBackground}"
+                message = "calling startScreen: screenID=${screenId} - screenName${screenName} - " +
+                        "startTime=${startTime} - isBackground=${isBackground}"
             )
             val currentActivity = latestFlutterActivity.get() ?: ActivityProvider.currentActivity
             ?: let {
                 return@run result?.success(null)
             }
-            val job = decibelSdk.startScreen(msg.screenId, msg.screenName, msg.startTime, currentActivity)
+            val job =
+                decibelSdk.startScreen(msg.screenId, msg.screenName, msg.startTime, currentActivity)
             binderScope.launch {
                 job.join()
                 val endTime = Date().time
@@ -135,21 +150,22 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
     }
 
     override fun endScreen(
-            msg: Messages.EndScreenMessage,
-            result: Messages.Result<Void>?
+        msg: Messages.EndScreenMessage,
+        result: Messages.Result<Void>?
     ) {
         msg.run {
             val initTime = Date().time
             log(
-                    message = "calling endScreen: screenID=${screenId} - screenName${screenName} - " +
-                            "endTime=${endTime} - isBackground=${isBackground}"
+                message = "calling endScreen: screenID=${screenId} - screenName${screenName} - " +
+                        "endTime=${endTime} - isBackground=${isBackground}"
             )
             val currentActivity = latestFlutterActivity.get() ?: ActivityProvider.currentActivity
             if (currentActivity == null) {
                 result?.success(null)
                 return
             }
-            val job = decibelSdk.endScreen(msg.screenId, msg.screenName, msg.endTime, currentActivity)
+            val job =
+                decibelSdk.endScreen(msg.screenId, msg.screenName, msg.endTime, currentActivity)
             binderScope.launch {
                 job.join()
                 val endTime = Date().time
@@ -161,22 +177,23 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
 
     override fun setConsents(consentLevel: Long) {
         decibelSdk.setConsent(
-                translateConsentsFlutterToAndroid(consentLevel)
+            translateConsentsFlutterToAndroid(consentLevel)
         )
     }
 
     override fun saveScreenshot(
-            msg: Messages.ScreenshotMessage,
-            result: Messages.Result<Void>?
+        msg: Messages.ScreenshotMessage,
+        result: Messages.Result<Void>?
     ) {
         msg.run {
             val initTime = Date().time
             log(
-                    message = "calling saveScreenshot: screenID=${screenId} - screenName${screenName} - " +
-                            "startFocusTime=${startFocusTime} - screenshotDataSize=${screenshotData.size}"
+                message = "calling saveScreenshot: screenID=${screenId} - screenName${screenName} - " +
+                        "startFocusTime=${startFocusTime} - screenshotDataSize=${screenshotData.size}"
             )
 
-            val job = decibelSdk.saveScreenShot(screenshotData, screenId, screenName, startFocusTime)
+            val job =
+                decibelSdk.saveScreenShot(screenshotData, screenId, screenName, startFocusTime)
             binderScope.launch {
                 job.join()
                 val endTime = Date().time
@@ -282,8 +299,8 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         binderScope.launch {
             decibelSdk.getSessionsInfoFlow().collect { newSessionInfo: Session ->
                 log(
-                        message = "new session data info from native: $newSessionInfo",
-                        level = Log.VERBOSE
+                    message = "new session data info from native: $newSessionInfo",
+                    level = Log.VERBOSE
                 )
 
                 val jsonObject = JSONObject()
@@ -307,10 +324,10 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
             decibelSdk.getCpuUsageFlow().collect { cpuUsage: Float ->
                 val coresCount = decibelSdk.getCoresCount()
                 log(
-                        message = "new cpu usage metric from native: $cpuUsage coresCount $coresCount",
-                        level = Log.VERBOSE
+                    message = "new cpu usage metric from native: $cpuUsage coresCount $coresCount",
+                    level = Log.VERBOSE
                 )
-                performanceValues.cpuUsage = (cpuUsage / coresCount)*100
+                performanceValues.cpuUsage = (cpuUsage / coresCount) * 100
 
 
             }
@@ -320,14 +337,14 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
     private fun startCollectBatteryLevelMetric() {
         binderScope.launch {
             decibelSdk.getBatteryLevelFlow().collect { batteryLevel: Float ->
-                
+
 
                 log(
-                        message = "new battery metric from native: $batteryLevel",
-                        level = Log.VERBOSE
+                    message = "new battery metric from native: $batteryLevel",
+                    level = Log.VERBOSE
                 )
 
-                performanceValues.batteryLevel = batteryLevel *100
+                performanceValues.batteryLevel = batteryLevel * 100
 
             }
         }
@@ -339,10 +356,10 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
             decibelSdk.getMemoryUsageFlow().collect { memoryUsage: Float ->
                 val maxMemory = decibelSdk.getMaxAvailableMemory()
                 log(
-                        message = "new memory metric from native: $memoryUsage total $maxMemory",
-                        level = Log.VERBOSE
+                    message = "new memory metric from native: $memoryUsage total $maxMemory",
+                    level = Log.VERBOSE
                 )
-                performanceValues.memoryUsage = (memoryUsage/maxMemory)*100
+                performanceValues.memoryUsage = (memoryUsage / maxMemory) * 100
             }
         }
     }
@@ -364,21 +381,32 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
         binderScope.launch {
             decibelSdk.getConfigFlow().collect { newConfig: SdkConfig? ->
                 log(
-                        message = "new SDK config from native. $newConfig",
-                        level = Log.VERBOSE
+                    message = "new SDK config from native. $newConfig",
+                    level = Log.VERBOSE
                 )
                 lastConfig = newConfig
                 val jsonObject = JSONObject()
                 jsonObject.put("overrideUserConfig", newConfig?.mscOverrideUserConfigs)
-                jsonObject.put("blockedFlutterSDKVersions", JSONArray(newConfig?.vcBlockedFlutterSDKVersions))
-                jsonObject.put("blockedFlutterAppVersions", JSONArray(newConfig?.vcBlockedFlutterAppVersions))
-                jsonObject.put("maskingColor", newConfig?.mMaskingColor?.let { Integer.toHexString(it) })
+                jsonObject.put(
+                    "blockedFlutterSDKVersions",
+                    JSONArray(newConfig?.vcBlockedFlutterSDKVersions)
+                )
+                jsonObject.put(
+                    "blockedFlutterAppVersions",
+                    JSONArray(newConfig?.vcBlockedFlutterAppVersions)
+                )
+                jsonObject.put(
+                    "maskingColor",
+                    newConfig?.mMaskingColor?.let { Integer.toHexString(it) })
                 jsonObject.put("imageQualityType", newConfig?.vsImageQuality?.level)
                 jsonObject.put("videoQualityType", newConfig?.vsVideoQuality?.level)
                 jsonObject.put("showLocalLogs", newConfig?.daShowLocalLogs)
                 jsonObject.put("maxScreenshots", newConfig?.vsScreenshotMaxCount)
                 jsonObject.put("maxScreenDuration", newConfig?.vsScreenMaxDuration)
-                jsonObject.put("disableScreenTracking", JSONArray(newConfig?.dstDisableScreenTracking))
+                jsonObject.put(
+                    "disableScreenTracking",
+                    JSONArray(newConfig?.dstDisableScreenTracking)
+                )
                 jsonObject.put("screensMasking", JSONArray(newConfig?.dstScreenMasking))
                 jsonObject.put("appVersion", AppVersionProvider.version)
                 val jsonName = JSONObject()
@@ -403,7 +431,8 @@ class DecibelSdkPlugin : FlutterPlugin, Messages.MedalliaDxaNativeApi {
     private val onFlutterStreamChannelListener = object : EventChannel.StreamHandler {
 
         override fun onListen(
-                arguments: Any?, eventSink: EventChannel.EventSink?) {
+            arguments: Any?, eventSink: EventChannel.EventSink?
+        ) {
             flutterEventSink = eventSink
             performanceValues.flutterEventSink = flutterEventSink
         }
@@ -454,7 +483,7 @@ class PerformanceValues() {
             sendDataToFlutter()
         }
     var deviceUnderStress: DeviceUnderStress = DeviceUnderStress.NOT_STRESSED
-        set(value){
+        set(value) {
             field = value
             sendDataToFlutter()
         }
@@ -479,7 +508,7 @@ class PerformanceValues() {
     }
 
     private fun translateDeviceStressedTypeToString(nativeStressedType: DeviceUnderStress): String {
-        return when (nativeStressedType){
+        return when (nativeStressedType) {
             DeviceUnderStress.NOT_STRESSED -> "none"
             DeviceUnderStress.HIGH_CPU_USAGE -> "cpu"
             DeviceUnderStress.HIGH_MEMORY_USAGE -> "memory"
