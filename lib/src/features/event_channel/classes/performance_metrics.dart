@@ -1,12 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:async';
-import 'dart:convert';
 
-import 'package:decibel_sdk/src/utility/extensions.dart';
-import 'package:decibel_sdk/src/utility/placeholder_image.dart';
-import 'package:flutter/services.dart';
-
-import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
+import 'package:medallia_dxa/src/features/event_channel/event_channel_manager.dart';
+import 'package:medallia_dxa/src/utility/placeholder_image.dart';
 
 class PerformanceMetrics implements EventChannelClass {
   double? _cpuUsage;

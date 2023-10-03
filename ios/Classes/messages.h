@@ -39,10 +39,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)makeWithScreenName:(NSString *)screenName
     screenId:(NSNumber *)screenId
     endTime:(NSNumber *)endTime
+    screenRecordingEndTime:(NSNumber *)screenRecordingEndTime
     isBackground:(NSNumber *)isBackground;
 @property(nonatomic, copy) NSString * screenName;
 @property(nonatomic, strong) NSNumber * screenId;
 @property(nonatomic, strong) NSNumber * endTime;
+@property(nonatomic, strong) NSNumber * screenRecordingEndTime;
 @property(nonatomic, strong) NSNumber * isBackground;
 @end
 

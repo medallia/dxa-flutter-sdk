@@ -1,14 +1,24 @@
-import 'package:decibel_sdk/decibel_sdk.dart';
-import 'package:decibel_sdk/src/features/config/public_methods.dart';
 import 'package:flutter/widgets.dart';
+import 'package:medallia_dxa/medallia_dxa.dart';
+import 'package:medallia_dxa/src/features/config/public_methods.dart';
 
 class BlockedPublicMethodsMedalliaConfig
     implements PublicMethodsMedalliaConfig {
   BlockedPublicMethodsMedalliaConfig({
-    required this.getCurrentRouteObservers,
-  });
-  final List<NavigatorObserver> Function() getCurrentRouteObservers;
-
+    required NavigatorObserver Function() getCurrentRouteObserver,
+    required Function(RouterDelegate, String Function())
+        setRouterDelegateNameCallback,
+    required Function(List<String>) setTrackingDisabledScreenList,
+    required Function(List<String>) setRecordingDisabledScreenList,
+  })  : _getCurrentRouteObserver = getCurrentRouteObserver,
+        _setRouterDelegateNameCallback = setRouterDelegateNameCallback,
+        _setTrackingDisabledScreenList = setTrackingDisabledScreenList,
+        _setRecordingDisabledScreenList = setRecordingDisabledScreenList;
+  final NavigatorObserver Function() _getCurrentRouteObserver;
+  final Function(RouterDelegate, String Function())
+      _setRouterDelegateNameCallback;
+  final Function(List<String>) _setTrackingDisabledScreenList;
+  final Function(List<String>) _setRecordingDisabledScreenList;
   void debugPrintSdkBlockedMessage() {
     assert(() {
       debugPrint('DXA SDK is blocked by liveconfig');
@@ -20,8 +30,39 @@ class BlockedPublicMethodsMedalliaConfig
   //This call should not be blocked because otherwise the SDK cannot unblock
   //itself and track correctly
   @override
-  List<NavigatorObserver> get currentRouteObservers =>
-      getCurrentRouteObservers();
+  NavigatorObserver get currentRouteObserver => _getCurrentRouteObserver();
+
+  //This call should not be blocked because otherwise the SDK cannot unblock
+  //itself and track correctly
+  @override
+  void setRouterDelegateNameCallback(
+    RouterDelegate routerDelegate,
+    String Function() routerDelegateNameCallback,
+  ) {
+    _setRouterDelegateNameCallback(
+      routerDelegate,
+      routerDelegateNameCallback,
+    );
+  }
+
+  //This call should not be blocked because otherwise the SDK cannot unblock
+  //itself and track correctly
+  @override
+  void setRecordingDisabledScreenList(List<String> recordingDisabledScreens) {
+    _setRecordingDisabledScreenList(recordingDisabledScreens);
+  }
+
+  //This call should not be blocked because otherwise the SDK cannot unblock
+  //itself and track correctly
+  @override
+  void setTrackingDisabledScreenList(List<String> trackingDisabledScreens) {
+    _setTrackingDisabledScreenList(trackingDisabledScreens);
+  }
+
+  @override
+  void setHomeScreenName(String screenName) {
+    debugPrintSdkBlockedMessage();
+  }
 
   @override
   void disableAutoMasking(Set<AutoMaskingTypeEnum> widgetsToUnmask) {
@@ -112,14 +153,16 @@ class BlockedPublicMethodsMedalliaConfig
   }
 
   @override
-  Future<void> setConsents(DecibelCustomerConsentType consents) {
+  Future<void> setConsents(MedalliaDxaCustomerConsentType consents) {
     debugPrintSdkBlockedMessage();
     return Future.value();
   }
 
   @override
-  Future<void> setDimensionWithBool(String dimensionName,
-      {required bool value}) {
+  Future<void> setDimensionWithBool(
+    String dimensionName, {
+    required bool value,
+  }) {
     debugPrintSdkBlockedMessage();
     return Future.value();
   }
@@ -144,11 +187,6 @@ class BlockedPublicMethodsMedalliaConfig
 
   @override
   void setMaskColor(Color color) {
-    debugPrintSdkBlockedMessage();
-  }
-
-  @override
-  void startNewScreen(String name) {
     debugPrintSdkBlockedMessage();
   }
 }

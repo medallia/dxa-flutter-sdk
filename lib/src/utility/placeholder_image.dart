@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:medallia_dxa/src/utility/extensions.dart';
 
 enum PlaceholderTypeEnum {
   replayDisabled,
@@ -59,24 +60,20 @@ class PlaceholderImageConfig {
       HashMap();
 
   ByteData? placeHolderIcon;
-  static final Size _fallbackSize = Size(200, 500);
+  static const Size _fallbackSize = Size(200, 500);
   Size lastSize = _fallbackSize;
 
   FutureOr<ByteData> getPlaceholderImage(
-    BuildContext? context,
     PlaceholderType placeholderType,
   ) async {
     late Size size;
-    if (context == null) {
-      size = lastSize;
+    final Size maybeSize = WidgetsBindingNullSafe.instance!.renderView.size;
+    if (maybeSize.width <= 0 || maybeSize.height <= 0) {
+      size = _fallbackSize;
     } else {
-      final Size? maybeSize = MediaQuery.maybeOf(context)?.size;
-      if (maybeSize == null || maybeSize.width <= 0 || maybeSize.height <= 0) {
-        size = _fallbackSize;
-      } else {
-        size = maybeSize;
-      }
+      size = maybeSize;
     }
+
     lastSize = size;
     final placeholderImageId = PlaceholderImageId(
       size: size,
@@ -105,31 +102,37 @@ class PlaceholderImageConfig {
     );
     //Texxt configuration
     final double textWidthWithMargin = screenWidth * 0.9;
-    const textStyle = TextStyle(
-      color: Colors.black,
-      fontSize: 24,
-    );
-    final textSpan = TextSpan(
-      text: placeholderType.getPlaceholderText(),
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
+
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: placeholderType.getPlaceholderText(),
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 40,
+        ),
+      ),
       textDirection: TextDirection.ltr,
       textAlign: TextAlign.center,
-    );
-    textPainter.layout(
-      maxWidth: textWidthWithMargin,
-    );
+    )..layout(
+        maxWidth: textWidthWithMargin,
+      );
+
     const double textHeightPadding = 16;
     final double textHeight = textPainter.height;
     final double textWidth = textPainter.width;
+    final double maximumAllowedImageHeight =
+        screenHeight - textHeight - textHeightPadding;
     //SCVG configuration
     final ByteData byteData = await _getPlaceholderIcon();
     final DrawableRoot svgRoot =
         await svg.fromSvgBytes(byteData.buffer.asUint8List(), 'rawSvg');
-    final int imageHeight = textWidth ~/ svgRoot.viewport.size.aspectRatio;
-    final double imageWidth = textWidth;
+    int imageHeight = textWidth ~/ svgRoot.viewport.size.aspectRatio;
+    double imageWidth = textWidth;
+    if (imageHeight > maximumAllowedImageHeight) {
+      imageHeight = maximumAllowedImageHeight.toInt();
+      imageWidth = imageHeight * svgRoot.viewport.size.aspectRatio;
+    }
+
     final ui.Image image = await svgRoot
         .toPicture(
           size: Size(imageWidth, imageHeight.toDouble()),
@@ -143,7 +146,15 @@ class PlaceholderImageConfig {
     final imageOffset = Offset((screenWidth - textWidth) / 2, yOffset);
 
     canvas.drawColor(Colors.white, ui.BlendMode.srcOver);
-    canvas.drawImage(image, imageOffset, Paint()..color = Colors.white);
+    canvas.drawImage(
+      image,
+      imageOffset,
+      Paint()
+        ..color = Colors.red
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.square
+        ..style = PaintingStyle.fill,
+    );
     //Layout configuration
     final double textHeightOffset =
         yOffset + image.height.toDouble() + textHeightPadding;
@@ -161,7 +172,7 @@ class PlaceholderImageConfig {
 
   FutureOr<ByteData> _getPlaceholderIcon() async =>
       placeHolderIcon ??= await rootBundle
-          .load('packages/decibel_sdk/assets/placeholder_image.svg');
+          .load('packages/medallia_dxa/assets/placeholder_image.svg');
 }
 
 ///used to cache placeholder images by size and text, so they can be reused

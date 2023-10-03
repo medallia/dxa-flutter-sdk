@@ -116,11 +116,13 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 + (instancetype)makeWithScreenName:(NSString *)screenName
     screenId:(NSNumber *)screenId
     endTime:(NSNumber *)endTime
+    screenRecordingEndTime:(NSNumber *)screenRecordingEndTime
     isBackground:(NSNumber *)isBackground {
   FLTEndScreenMessage* pigeonResult = [[FLTEndScreenMessage alloc] init];
   pigeonResult.screenName = screenName;
   pigeonResult.screenId = screenId;
   pigeonResult.endTime = endTime;
+  pigeonResult.screenRecordingEndTime = screenRecordingEndTime;
   pigeonResult.isBackground = isBackground;
   return pigeonResult;
 }
@@ -132,7 +134,9 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   NSAssert(pigeonResult.screenId != nil, @"");
   pigeonResult.endTime = GetNullableObjectAtIndex(list, 2);
   NSAssert(pigeonResult.endTime != nil, @"");
-  pigeonResult.isBackground = GetNullableObjectAtIndex(list, 3);
+  pigeonResult.screenRecordingEndTime = GetNullableObjectAtIndex(list, 3);
+  NSAssert(pigeonResult.screenRecordingEndTime != nil, @"");
+  pigeonResult.isBackground = GetNullableObjectAtIndex(list, 4);
   NSAssert(pigeonResult.isBackground != nil, @"");
   return pigeonResult;
 }
@@ -144,6 +148,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     (self.screenName ?: [NSNull null]),
     (self.screenId ?: [NSNull null]),
     (self.endTime ?: [NSNull null]),
+    (self.screenRecordingEndTime ?: [NSNull null]),
     (self.isBackground ?: [NSNull null]),
   ];
 }

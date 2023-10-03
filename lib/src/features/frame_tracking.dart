@@ -1,11 +1,12 @@
 import 'dart:async';
-import 'package:decibel_sdk/src/utility/logger_sdk.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
+import 'package:medallia_dxa/src/utility/logger_sdk.dart';
 
 class FrameTracking {
-  FrameTracking({required this.postFrameCallback})
-      : _logger = LoggerSDK.instance;
+  FrameTracking({required this.postFrameCallback, required LoggerSDK loggerSDK})
+      : _logger = loggerSDK;
   final void Function(void Function(Duration)) postFrameCallback;
   final StreamController<Duration> newFrameStreamController =
       StreamController();

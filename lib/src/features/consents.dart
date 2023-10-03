@@ -1,19 +1,19 @@
-enum DecibelCustomerConsentType {
+enum MedalliaDxaCustomerConsentType {
   recordingAndTracking,
   tracking,
   none,
 }
 
-extension ConsentConversion on DecibelCustomerConsentType {
+extension ConsentConversion on MedalliaDxaCustomerConsentType {
   int integerValue() {
     switch (this) {
-      case DecibelCustomerConsentType.none:
+      case MedalliaDxaCustomerConsentType.none:
         return 0;
 
-      case DecibelCustomerConsentType.tracking:
+      case MedalliaDxaCustomerConsentType.tracking:
         return 1;
 
-      case DecibelCustomerConsentType.recordingAndTracking:
+      case MedalliaDxaCustomerConsentType.recordingAndTracking:
         return 2;
 
       default:
