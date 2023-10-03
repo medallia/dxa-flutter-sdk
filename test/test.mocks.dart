@@ -2239,7 +2239,7 @@ class MockPlaceholderImageConfig extends _i1.Mock
             ),
           ) as _i11.HashMap<_i28.PlaceholderImageId, _i22.ByteData>);
   @override
-  set placeHolderIcon(_i22.ByteData? _placeHolderIcon) => super.noSuchMethod(
+  set placeHolderIcon(_i23.ByteData? _placeHolderIcon) => super.noSuchMethod(
         Invocation.setter(
           #placeHolderIcon,
           _placeHolderIcon,
@@ -2972,6 +2972,139 @@ class MockEventChannelManager extends _i1.Mock
         ),
         returnValueForMissingStub: null,
       );
+}
+
+/// A class which mocks [CustomRouteObserver].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCustomRouteObserver extends _i1.Mock
+    implements _i13.CustomRouteObserver {
+  @override
+  Map<_i4.Route<dynamic>, Set<_i4.RouteAware>>
+      get routesAScreenWidgetHasSubscribedTo => (super.noSuchMethod(
+            Invocation.getter(#routesAScreenWidgetHasSubscribedTo),
+            returnValue: <_i4.Route<dynamic>, Set<_i4.RouteAware>>{},
+            returnValueForMissingStub: <_i4.Route<dynamic>,
+                Set<_i4.RouteAware>>{},
+          ) as Map<_i4.Route<dynamic>, Set<_i4.RouteAware>>);
+  @override
+  _i13.RouteObserverOtherNavigators get routeObserverOtherNavigators =>
+      (super.noSuchMethod(
+        Invocation.getter(#routeObserverOtherNavigators),
+        returnValue: _FakeRouteObserverOtherNavigators_14(
+          this,
+          Invocation.getter(#routeObserverOtherNavigators),
+        ),
+        returnValueForMissingStub: _FakeRouteObserverOtherNavigators_14(
+          this,
+          Invocation.getter(#routeObserverOtherNavigators),
+        ),
+      ) as _i13.RouteObserverOtherNavigators);
+  @override
+  set rootRoute(_i4.Route<dynamic>? _rootRoute) => super.noSuchMethod(
+        Invocation.setter(
+          #rootRoute,
+          _rootRoute,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  bool get rootNotFound => (super.noSuchMethod(
+        Invocation.getter(#rootNotFound),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  set rootNotFound(bool? _rootNotFound) => super.noSuchMethod(
+        Invocation.setter(
+          #rootNotFound,
+          _rootNotFound,
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  List<_i4.RouteObserver<_i4.Route<dynamic>>> getNewObservers() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getNewObservers,
+          [],
+        ),
+        returnValue: <_i4.RouteObserver<_i4.Route<dynamic>>>[],
+        returnValueForMissingStub: <_i4.RouteObserver<_i4.Route<dynamic>>>[],
+      ) as List<_i4.RouteObserver<_i4.Route<dynamic>>>);
+  @override
+  _i4.RouteObserver<_i4.Route<dynamic>>? observerToSubscribeFromWidget(
+    _i4.NavigatorState? widgetNavigator, {
+    bool? isScreenWidget = false,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #observerToSubscribeFromWidget,
+          [widgetNavigator],
+          {#isScreenWidget: isScreenWidget},
+        ),
+        returnValueForMissingStub: null,
+      ) as _i4.RouteObserver<_i4.Route<dynamic>>?);
+  @override
+  bool isThisObserverUsedInAWidget(_i4.NavigatorObserver? observer) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #isThisObserverUsedInAWidget,
+          [observer],
+        ),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+  @override
+  void removeObserverFromObserversForWidgetDispatchList(
+          _i4.RouteObserver<_i4.Route<dynamic>>? observer) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #removeObserverFromObserversForWidgetDispatchList,
+          [observer],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void thisWidgetHasSubscribedToThisRoute(
+    _i4.RouteAware? widget,
+    _i4.Route<dynamic>? route,
+  ) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #thisWidgetHasSubscribedToThisRoute,
+          [
+            widget,
+            route,
+          ],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void thisWidgetHasUnsubscribedToThisRoute(
+    _i4.RouteAware? widget,
+    _i4.Route<dynamic>? route,
+  ) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #thisWidgetHasUnsubscribedToThisRoute,
+          [
+            widget,
+            route,
+          ],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  bool hasAWidgetSubscribedToThisRoute(_i4.Route<dynamic>? route) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #hasAWidgetSubscribedToThisRoute,
+          [route],
+        ),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
 }
 
 /// A class which mocks [ScreenVisited].
