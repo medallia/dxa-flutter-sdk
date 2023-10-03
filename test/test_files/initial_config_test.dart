@@ -1,13 +1,12 @@
 library initial_config_test;
 
-import 'package:decibel_sdk/decibel_sdk.dart';
-import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
-import 'package:decibel_sdk/src/features/config/blocked_public_methods.dart';
-import 'package:decibel_sdk/src/features/config/decibel_config.dart';
-import 'package:decibel_sdk/src/features/consents.dart';
-import 'package:decibel_sdk/src/messages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medallia_dxa/medallia_dxa.dart';
+import 'package:medallia_dxa/src/features/autoMasking/auto_masking_enums.dart';
+import 'package:medallia_dxa/src/features/config/medallia_dxa_config.dart';
+import 'package:medallia_dxa/src/features/consents.dart';
+import 'package:medallia_dxa/src/messages.dart';
 import 'package:mockito/mockito.dart';
 import 'package:yaml/yaml.dart';
 
@@ -25,11 +24,10 @@ void main() {
   late MockFrameTracking mockFrameTracking;
   late MockPlaceholderImageConfig mockPlaceholderImageConfig;
   late MockTracking mockTracking;
-  late MockManualTracking mockManualTracking;
   late MockLiveConfiguration mockLiveConfiguration;
   late MockEventChannelManager mockEventChannelManager;
   late MockGlobalSettings mockGlobalSettings;
-  late MockCustomRouteObserver mockCustomRouteObserver;
+  late MockRouteTreeConstructor mockRouteTreeConstructor;
 
   late dynamic Function(
     String yaml,
@@ -38,9 +36,9 @@ void main() {
   const String version = '1';
   const int account = 0;
   const int property = 0;
-  late DecibelCustomerConsentType consents;
+  late MedalliaDxaCustomerConsentType consents;
   setUpAll(() {
-    consents = DecibelCustomerConsentType.recordingAndTracking;
+    consents = MedalliaDxaCustomerConsentType.recordingAndTracking;
     WidgetsFlutterBinding.ensureInitialized();
     mockApi = MockMedalliaDxaNativeApi();
     mockGoalsAndDimensions = MockGoalsAndDimensions();
@@ -53,27 +51,26 @@ void main() {
     mockFrameTracking = MockFrameTracking();
     mockPlaceholderImageConfig = MockPlaceholderImageConfig();
     mockTracking = MockTracking();
-    mockManualTracking = MockManualTracking();
     mockLiveConfiguration = MockLiveConfiguration();
     mockEventChannelManager = MockEventChannelManager();
     mockGlobalSettings = MockGlobalSettings();
-    mockCustomRouteObserver = MockCustomRouteObserver();
+    mockRouteTreeConstructor = MockRouteTreeConstructor();
     medalliaDxaConfig = MedalliaDxaConfig.testing(
-        mockApi,
-        loadYaml,
-        mockGoalsAndDimensions,
-        assetBundleMock,
-        mockSessionReplay,
-        mockHttpErrors,
-        mockLoggerSDK,
-        mockManualTracking,
-        mockEventChannelManager,
-        mockCustomRouteObserver,
-        mockTracking,
-        mockAutoMasking,
-        mockFrameTracking,
-        mockPlaceholderImageConfig,
-        mockGlobalSettings);
+      autoMasking: mockAutoMasking,
+      eventChannelManager: mockEventChannelManager,
+      frameTracking: mockFrameTracking,
+      globalSettings: mockGlobalSettings,
+      goalsAndDimensions: mockGoalsAndDimensions,
+      httpErrors: mockHttpErrors,
+      loadYaml: loadYaml,
+      loggerSDK: mockLoggerSDK,
+      nativeApi: mockApi,
+      placeholderImageConfig: mockPlaceholderImageConfig,
+      rootBundle: assetBundleMock,
+      routeTreeConstructor: mockRouteTreeConstructor,
+      sessionReplay: mockSessionReplay,
+      tracking: mockTracking,
+    );
     when(mockSessionReplay.autoMasking).thenReturn(mockAutoMasking);
     when(mockEventChannelManager.liveConfiguration)
         .thenReturn(mockLiveConfiguration);
@@ -122,7 +119,6 @@ THEN the method throws an assertion error
             property: property,
             account: account,
             consents: consents,
-            manualScreenTrackingEnabled: false,
           ),
         );
 
@@ -144,8 +140,10 @@ AND the initialize method has been called before
 THEN the _api method is called
 AND it returns a Future of type nullable string 
     ''', () async {
-      expect(medalliaDxaConfig.publicMethods.getSessionId(),
-          isA<Future<String>>());
+      expect(
+        medalliaDxaConfig.publicMethods.getSessionId(),
+        isA<Future<String>>(),
+      );
       verify(mockApi.getSessionId());
     });
     test('''
@@ -154,8 +152,10 @@ AND the initialize method has been called before
 THEN the _api method is called
 AND it returns a Future of type string 
     ''', () async {
-      expect(medalliaDxaConfig.publicMethods.getWebViewProperties(),
-          isA<Future<String?>>());
+      expect(
+        medalliaDxaConfig.publicMethods.getWebViewProperties(),
+        isA<Future<String?>>(),
+      );
       verify(mockApi.getWebViewProperties());
     });
   });
@@ -169,7 +169,7 @@ AND tracking allowed is false
 AND the method start from sessionReplay is NOT called
 AND the method stop from sessionReplay is called
 AND tracking allowed is false''', () async {
-      const consents = DecibelCustomerConsentType.none;
+      const consents = MedalliaDxaCustomerConsentType.none;
       await medalliaDxaConfig.publicMethods.setConsents(consents);
       final consentSentToNative = verify(
         mockApi.setConsents(captureAny),
@@ -189,7 +189,7 @@ THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is NOT called
 AND the method stop from sessionReplay is called
 AND tracking allowed is true''', () async {
-      const consents = DecibelCustomerConsentType.tracking;
+      const consents = MedalliaDxaCustomerConsentType.tracking;
       await medalliaDxaConfig.publicMethods.setConsents(consents);
       final consentSentToNative = verify(
         mockApi.setConsents(captureAny),
@@ -207,7 +207,7 @@ AND the consent is .recordAndTracking
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
 AND the method start from sessionReplay is called
 AND tracking allowed is true''', () async {
-      const consents = DecibelCustomerConsentType.recordingAndTracking;
+      const consents = MedalliaDxaCustomerConsentType.recordingAndTracking;
       await medalliaDxaConfig.publicMethods.setConsents(consents);
 
       final consentSentToNative = verify(
@@ -410,11 +410,9 @@ AND all the blocked flag is correctly set
       verifyNever(mockHttpErrors.sendStatusCode(statusCode));
 
       //only exception for public method calls
-      medalliaDxaConfig.publicMethods.currentRouteObservers;
+      medalliaDxaConfig.publicMethods.currentRouteObserver;
       verify(
-        mockCustomRouteObserver.getNewObservers(
-          automaticTracking: anyNamed('automaticTracking'),
-        ),
+        mockRouteTreeConstructor.getNewObservers(),
       );
     });
     test('''
@@ -426,10 +424,10 @@ AND public methods are not blocked
       await medalliaDxaConfig.unblockSdk();
       expect(medalliaDxaConfig.blocked, false);
       expect(medalliaDxaConfig.isSdkRunning, true);
-      if (consents == DecibelCustomerConsentType.recordingAndTracking) {
+      if (consents == MedalliaDxaCustomerConsentType.recordingAndTracking) {
         expect(medalliaDxaConfig.trackingAllowed, true);
         expect(medalliaDxaConfig.recordingAllowed, true);
-      } else if (consents == DecibelCustomerConsentType.tracking) {
+      } else if (consents == MedalliaDxaCustomerConsentType.tracking) {
         expect(medalliaDxaConfig.trackingAllowed, true);
         expect(medalliaDxaConfig.recordingAllowed, false);
       } else {
@@ -443,11 +441,9 @@ AND public methods are not blocked
       verify(mockHttpErrors.sendStatusCode(statusCode));
 
       //only exception for public method calls
-      medalliaDxaConfig.publicMethods.currentRouteObservers;
+      medalliaDxaConfig.publicMethods.currentRouteObserver;
       verify(
-        mockCustomRouteObserver.getNewObservers(
-          automaticTracking: anyNamed('automaticTracking'),
-        ),
+        mockRouteTreeConstructor.getNewObservers(),
       );
     });
   });

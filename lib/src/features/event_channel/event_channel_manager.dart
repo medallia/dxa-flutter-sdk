@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart';
-import 'package:decibel_sdk/src/features/event_channel/classes/performance_metrics.dart';
-import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:medallia_dxa/src/features/event_channel/classes/live_configuration.dart';
+import 'package:medallia_dxa/src/features/event_channel/classes/performance_metrics.dart';
+import 'package:medallia_dxa/src/utility/dependency_injector.dart';
 
 class EventChannelManager {
   EventChannelManager({

@@ -1,8 +1,11 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 
-import 'package:decibel_sdk/src/features/tracking/tracking.dart';
-import 'package:decibel_sdk/src/utility/dependency_injector.dart';
 import 'package:flutter/material.dart';
+
+import 'package:medallia_dxa/src/features/tracking/tracking.dart';
+import 'package:medallia_dxa/src/utility/dependency_injector.dart';
+import 'package:medallia_dxa/src/utility/extensions.dart';
 
 class TrackingCompleter {
   late final Tracking tracking = DependencyInjector.instance.tracking;
@@ -26,6 +29,48 @@ class TrackingCompleter {
     completer.complete();
   }
 
+  Future<void> overridePendingStartScreen(
+    Future<void> Function(Completer) function,
+    Completer cancelToken,
+  ) async {
+    tracking.startScreenEnquedCompleterList
+        .removeWhere((completer) => completer.isCompleted);
+    for (final startScreenCompleter
+        in tracking.startScreenEnquedCompleterList) {
+      startScreenCompleter.complete();
+    }
+    tracking.startScreenEnquedCompleterList.clear();
+
+    tracking.startScreenEnquedCompleterList.add(cancelToken);
+    //Wait for all non future tasks to end
+    await Future.value();
+    if (cancelToken.isCompleted ||
+        !tracking.startScreenEnquedCompleterList.contains(cancelToken)) {
+      return;
+    }
+
+    await function.call(cancelToken);
+    if (!cancelToken.isCompleted) {
+      cancelToken.complete();
+    }
+  }
+
+  Future<void> waitForNextFrameIfScheduled() async {
+    if (!WidgetsBindingNullSafe.instance!.hasScheduledFrame) {
+      return;
+    }
+    return waitForNextFrame();
+  }
+
+  Future<void> waitForNextFrame() async {
+    final Completer completer = Completer();
+
+    WidgetsBindingNullSafe.instance!.addPostFrameCallback((timeStamp) {
+      completer.complete();
+    });
+    await completer.future;
+  }
+
   Completer createEndScreenCompleter() {
     final Completer endScreenToComplete = Completer();
     tracking.endScreenEnquedCompleterList.add(endScreenToComplete);
@@ -43,12 +88,18 @@ class TrackingCompleter {
 
   ///Wrapper for tasks that need completion before sending the endScreen to
   ///native
-  Future<T> endScreenTasksCompleterWrapper<T>(
-    Future<T> Function() function,
-  ) async {
+  Future<T> endScreenTasksCompleterWrapper<T>({
+    required Future<T> Function() taskToComplete,
+    bool isScreenshotTask = false,
+  }) async {
     final Completer completer = Completer();
-    tracking.tasksBeforeEndScreenCompleterList.add(completer);
-    final T returnValue = await function.call();
+    tracking.tasksBeforeEndScreenCompleterList.add(
+      CompleterOfPotentialHeavyTask(
+        completer: completer,
+        isScreenshotTask: isScreenshotTask,
+      ),
+    );
+    final T returnValue = await taskToComplete.call();
     completer.complete();
     return returnValue;
   }
@@ -57,11 +108,30 @@ class TrackingCompleter {
   Future<void> waitForEndScreenTasksCompleter() async {
     await Future.wait(
       tracking.tasksBeforeEndScreenCompleterList.map((e) {
-        return e.future;
+        return e.completer.future;
       }),
     );
 
     tracking.tasksBeforeEndScreenCompleterList.clear();
+  }
+
+  int get screenshotPending {
+    return tracking.tasksBeforeEndScreenCompleterList
+        .where(
+          (element) =>
+              element.completer.isCompleted == false &&
+              element.isScreenshotTask,
+        )
+        .length;
+  }
+
+  bool get newScreenIsEnqued {
+    for (final completer in tracking.startScreenEnquedCompleterList) {
+      if (!completer.isCompleted) {
+        return true;
+      }
+    }
+    return false;
   }
 
   FutureOr<void> waitForNewScreenIfThereNoneActive() async {
@@ -122,4 +192,13 @@ class TaskCompleter {
     // ignore: unawaited_futures
     completerMap.remove(hashCode);
   }
+}
+
+class CompleterOfPotentialHeavyTask {
+  final Completer completer;
+  final bool isScreenshotTask;
+  CompleterOfPotentialHeavyTask({
+    required this.completer,
+    required this.isScreenshotTask,
+  });
 }

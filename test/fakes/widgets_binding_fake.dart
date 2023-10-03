@@ -29,7 +29,8 @@ class FakeWidgetsBinding extends Fake implements WidgetsBinding {
     for (final element in localPostFrameCallbacks) {
       if (element is Future<void> Function(Duration)) {
         await element.call(
-            Duration(milliseconds: DateTime.now().millisecondsSinceEpoch));
+          Duration(milliseconds: DateTime.now().millisecondsSinceEpoch),
+        );
         continue;
       }
       element

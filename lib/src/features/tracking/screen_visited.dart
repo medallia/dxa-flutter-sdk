@@ -1,6 +1,8 @@
-import 'package:decibel_sdk/src/messages.dart';
-import 'package:decibel_sdk/src/utility/placeholder_image.dart';
 import 'package:flutter/material.dart';
+import 'package:medallia_dxa/src/features/tracking/route_tree_constructor.dart';
+import 'package:medallia_dxa/src/messages.dart';
+import 'package:medallia_dxa/src/utility/extensions.dart';
+import 'package:medallia_dxa/src/utility/placeholder_image.dart';
 
 @immutable
 class ScreenVisited {
@@ -9,27 +11,29 @@ class ScreenVisited {
   final int timestamp;
   final int? endTimestamp;
   final bool isTabBar;
-  final GlobalKey captureKey;
-  final List<GlobalKey> listOfMasks;
+  final List<DxaRoute> dxaRoutePath;
+  final List<DxaRoute> allDetectedDxaRoutes;
   final bool isDialog;
-  final BuildContext? dialogContext;
-  final bool enableAutomaticPopupRecording;
-  final bool enableAutomaticPopupTracking;
+
   final bool recordingAllowed;
   final bool trackingAllowed;
   final PlaceholderTypeEnum? placeholderTypeEnum;
   final List<ScreenShotTaken> screenshotTakenList;
-  final bool enableAutomaticMasking;
-  BuildContext? get getCurrentContext {
-    if (!isDialog) return captureKey.currentContext;
-    return dialogContext!;
+
+  //Dxa Routes that should not be masked
+  List<DxaRoute> get forbiddenDxaRoutes {
+    return allDetectedDxaRoutes
+        .where((e) => !dxaRoutePath.contains(e))
+        .toList();
   }
 
-  bool get widgetInTheTree {
-    return getCurrentContext != null;
-  }
+  bool get isElementTreeDirty => dxaRoutePath.last.isRouteSubtreeContextDirty;
 
-  Element get rootElementForAutomasking => getCurrentContext! as Element;
+  Element get rootElementForAutomasking =>
+      WidgetsBindingNullSafe.instance!.renderViewElement!;
+
+  bool get areAllModalRoutes =>
+      dxaRoutePath.every((element) => element.route is ModalRoute);
 
   final bool finished;
   int get uniqueId => id.hashCode ^ timestamp.hashCode;
@@ -38,16 +42,12 @@ class ScreenVisited {
     required this.id,
     required this.name,
     required this.timestamp,
-    required this.listOfMasks,
-    required this.captureKey,
+    required this.dxaRoutePath,
+    required this.allDetectedDxaRoutes,
     required this.endTimestamp,
     required this.finished,
     required this.isDialog,
     required this.isTabBar,
-    required this.dialogContext,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
-    required this.enableAutomaticMasking,
     required this.recordingAllowed,
     required this.trackingAllowed,
     required this.placeholderTypeEnum,
@@ -57,11 +57,8 @@ class ScreenVisited {
     required this.id,
     required this.name,
     required this.timestamp,
-    required this.listOfMasks,
-    required this.captureKey,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
-    required this.enableAutomaticMasking,
+    required this.dxaRoutePath,
+    required this.allDetectedDxaRoutes,
     required this.recordingAllowed,
     required this.trackingAllowed,
     required this.placeholderTypeEnum,
@@ -69,7 +66,6 @@ class ScreenVisited {
   })  : finished = false,
         isDialog = false,
         isTabBar = false,
-        dialogContext = null,
         screenshotTakenList = [];
 
   ///Used by [getScreenVisitedAsFinished] to get a finished version
@@ -79,74 +75,30 @@ class ScreenVisited {
     required this.timestamp,
     required this.name,
     required this.endTimestamp,
-    required this.listOfMasks,
-    required this.captureKey,
+    required this.dxaRoutePath,
+    required this.allDetectedDxaRoutes,
     required this.isDialog,
     required this.isTabBar,
-    required this.dialogContext,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
     required this.recordingAllowed,
     required this.trackingAllowed,
     required this.screenshotTakenList,
-    required this.enableAutomaticMasking,
     required this.placeholderTypeEnum,
   }) : finished = true;
-  ScreenVisited.tabBarChild({
-    required this.id,
-    required this.name,
-    required this.timestamp,
-    required this.captureKey,
-    required this.enableAutomaticPopupRecording,
-    required this.enableAutomaticPopupTracking,
-    required this.enableAutomaticMasking,
-    required this.recordingAllowed,
-    required this.trackingAllowed,
-    required this.placeholderTypeEnum,
-    this.listOfMasks = const [],
-    this.endTimestamp,
-  })  : finished = false,
-        isDialog = false,
-        isTabBar = true,
-        dialogContext = null,
-        screenshotTakenList = [];
-  ScreenVisited.automaticPopup({
-    required this.id,
-    required this.timestamp,
-    required this.name,
-    required this.listOfMasks,
-    required this.captureKey,
-    required this.dialogContext,
-    required this.recordingAllowed,
-    required this.trackingAllowed,
-    required this.enableAutomaticMasking,
-    required this.placeholderTypeEnum,
-    this.endTimestamp,
-  })  : finished = false,
-        isDialog = true,
-        isTabBar = false,
-        enableAutomaticPopupRecording = false,
-        enableAutomaticPopupTracking = false,
-        screenshotTakenList = [];
 
-  ScreenVisited getScreenVisitedAsFinished(int endTimestamp) {
-    return ScreenVisited.finished(
+  ScreenVisitedFinished getScreenVisitedAsFinished(int endTimestamp) {
+    return ScreenVisitedFinished(
       id: id,
       name: name,
-      listOfMasks: listOfMasks,
-      captureKey: captureKey,
+      dxaRoutePath: dxaRoutePath,
+      allDetectedDxaRoutes: allDetectedDxaRoutes,
       timestamp: timestamp,
       endTimestamp: endTimestamp,
       isDialog: isDialog,
       isTabBar: isTabBar,
-      dialogContext: dialogContext,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
       recordingAllowed: recordingAllowed,
       trackingAllowed: trackingAllowed,
       placeholderTypeEnum: placeholderTypeEnum,
       screenshotTakenList: screenshotTakenList,
-      enableAutomaticMasking: enableAutomaticMasking,
     );
   }
 
@@ -157,170 +109,21 @@ class ScreenVisited {
       id: id,
       name: name,
       timestamp: startTimeStamp,
-      listOfMasks: listOfMasks,
-      captureKey: captureKey,
+      dxaRoutePath: dxaRoutePath,
+      allDetectedDxaRoutes: allDetectedDxaRoutes,
       endTimestamp: endTimestamp,
       finished: finished,
       isDialog: isDialog,
       isTabBar: isTabBar,
-      dialogContext: dialogContext,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
       recordingAllowed: recordingAllowed,
       trackingAllowed: trackingAllowed,
       placeholderTypeEnum: placeholderTypeEnum,
-      enableAutomaticMasking: enableAutomaticMasking,
     );
-  }
-
-  ScreenVisited getAutomaticPopupScreenVisited(
-    String routeId,
-    BuildContext dialogContext,
-  ) {
-    final int timestamp = DateTime.now().millisecondsSinceEpoch;
-    return ScreenVisited.automaticPopup(
-      id: routeId,
-      name: '$name-dialog',
-      timestamp: timestamp,
-      listOfMasks: [],
-      captureKey: captureKey,
-      dialogContext: dialogContext,
-      recordingAllowed:
-          recordingAllowed ? enableAutomaticPopupRecording : recordingAllowed,
-      trackingAllowed:
-          trackingAllowed ? enableAutomaticPopupTracking : trackingAllowed,
-      placeholderTypeEnum: placeholderTypeEnum,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-
-  Size getSize(RenderObject renderObject) {
-    return MediaQuery.of(getCurrentContext!).size;
   }
 
   @override
   String toString() {
     return 'ScreenVisited(id: $id, uniqueid $uniqueId, name: $name, timestamp: $timestamp, endTimestamp: $endTimestamp, isTabBar: $isTabBar, finished: $finished)';
-  }
-}
-
-///ScreenVisited version for screens that are tabBars.
-///Used only when the TabBar Screen is still unfinished, when the finished version
-///is used by calling [getScreenVisitedAsFinished] or [ScreenVisited.finished]
-///it's then converted back to a ScreenVisited object.
-@immutable
-class ScreenVisitedTabBar extends ScreenVisited {
-  final List<ScreenVisited> tabBarScreens;
-  final String tabBarId;
-  final String tabBarname;
-  final int tabIndex;
-  @override
-  bool get isTabBar => true;
-  factory ScreenVisitedTabBar({
-    required String id,
-    required int timestamp,
-    required String name,
-    required List<GlobalKey> listOfMasks,
-    required GlobalKey captureKey,
-    required List<String> tabBarNames,
-    required int tabIndex,
-    required bool recordingAllowed,
-    required bool trackingAllowed,
-    required PlaceholderTypeEnum? placeholderTypeEnum,
-    required bool enableAutomaticPopupRecording,
-    required bool enableAutomaticPopupTracking,
-    required bool enableAutomaticMasking,
-  }) {
-    final String tabName = tabBarNames[tabIndex];
-    final String idWithTabName = '$id-$tabName';
-    final List<ScreenVisited> tabBarScreens =
-        tabBarNames.map<ScreenVisited>((name) {
-      return ScreenVisited.tabBarChild(
-        id: '$id-$name',
-        timestamp: timestamp,
-        name: name,
-        captureKey: captureKey,
-        recordingAllowed: recordingAllowed,
-        trackingAllowed: trackingAllowed,
-        enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-        enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-        placeholderTypeEnum: placeholderTypeEnum,
-        enableAutomaticMasking: enableAutomaticMasking,
-      );
-    }).toList();
-
-    return ScreenVisitedTabBar.internal(
-      id: idWithTabName,
-      tabBarId: id,
-      timestamp: timestamp,
-      captureKey: captureKey,
-      name: tabName,
-      tabBarScreens: tabBarScreens,
-      tabIndex: tabIndex,
-      tabBarname: name,
-      listOfMasks: listOfMasks,
-      recordingAllowed: recordingAllowed,
-      trackingAllowed: trackingAllowed,
-      placeholderTypeEnum: placeholderTypeEnum,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-  ScreenVisitedTabBar.internal({
-    required String id,
-    required String name,
-    required int timestamp,
-    required GlobalKey<State<StatefulWidget>> captureKey,
-    required this.tabBarScreens,
-    required this.tabIndex,
-    required this.tabBarId,
-    required this.tabBarname,
-    required bool recordingAllowed,
-    required bool trackingAllowed,
-    required PlaceholderTypeEnum? placeholderTypeEnum,
-    required bool enableAutomaticPopupRecording,
-    required bool enableAutomaticPopupTracking,
-    required List<GlobalKey<State<StatefulWidget>>> listOfMasks,
-    required bool enableAutomaticMasking,
-  }) : super.tabBarChild(
-          id: id,
-          name: name,
-          timestamp: timestamp,
-          captureKey: captureKey,
-          recordingAllowed: recordingAllowed,
-          trackingAllowed: trackingAllowed,
-          enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-          enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-          placeholderTypeEnum: placeholderTypeEnum,
-          listOfMasks: listOfMasks,
-          enableAutomaticMasking: enableAutomaticMasking,
-        );
-
-  @override
-  ScreenVisited getScreenVisitedWithNewStartTimeStamp(int startTimeStamp) {
-    return ScreenVisitedTabBar.internal(
-      id: id,
-      name: name,
-      timestamp: startTimeStamp,
-      captureKey: captureKey,
-      tabBarScreens: tabBarScreens,
-      tabIndex: tabIndex,
-      tabBarId: tabBarId,
-      tabBarname: tabBarname,
-      listOfMasks: listOfMasks,
-      recordingAllowed: recordingAllowed,
-      trackingAllowed: trackingAllowed,
-      placeholderTypeEnum: placeholderTypeEnum,
-      enableAutomaticPopupRecording: enableAutomaticPopupRecording,
-      enableAutomaticPopupTracking: enableAutomaticPopupTracking,
-      enableAutomaticMasking: enableAutomaticMasking,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'ScreenVisitedTabBar(id: $id, uniqueid $uniqueId, name: $name, tabBarId: $tabBarId, tabBarname: $tabBarname, tabIndex: $tabIndex)';
   }
 }
 
@@ -332,4 +135,37 @@ class ScreenShotTaken {
     required this.isPlaceholder,
     required this.screenshotMessage,
   });
+}
+
+@immutable
+class ScreenVisitedFinished extends ScreenVisited {
+  @override
+  int get endTimestamp => super.endTimestamp!;
+  const ScreenVisitedFinished({
+    required String id,
+    required int timestamp,
+    required String name,
+    required int endTimestamp,
+    required List<DxaRoute> dxaRoutePath,
+    required List<DxaRoute> allDetectedDxaRoutes,
+    required bool isDialog,
+    required bool isTabBar,
+    required bool recordingAllowed,
+    required bool trackingAllowed,
+    required List<ScreenShotTaken> screenshotTakenList,
+    required PlaceholderTypeEnum? placeholderTypeEnum,
+  }) : super.finished(
+          id: id,
+          timestamp: timestamp,
+          name: name,
+          endTimestamp: endTimestamp,
+          dxaRoutePath: dxaRoutePath,
+          allDetectedDxaRoutes: allDetectedDxaRoutes,
+          isDialog: isDialog,
+          isTabBar: isTabBar,
+          recordingAllowed: recordingAllowed,
+          trackingAllowed: trackingAllowed,
+          screenshotTakenList: screenshotTakenList,
+          placeholderTypeEnum: placeholderTypeEnum,
+        );
 }

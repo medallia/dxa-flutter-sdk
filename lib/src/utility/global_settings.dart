@@ -1,6 +1,6 @@
-import 'package:decibel_sdk/src/features/event_channel/classes/live_configuration.dart';
-import 'package:decibel_sdk/src/features/image_quality.dart';
 import 'package:flutter/material.dart';
+import 'package:medallia_dxa/src/features/event_channel/classes/live_configuration.dart';
+import 'package:medallia_dxa/src/features/image_quality.dart';
 
 class GlobalSettings {
   GlobalSettings({

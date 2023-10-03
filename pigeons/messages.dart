@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, avoid_positional_boolean_parameters
 import 'package:pigeon/pigeon.dart';
 //Built using  Flutter 3.0.3
 
@@ -19,11 +19,13 @@ class EndScreenMessage {
   final String screenName;
   final int screenId;
   final int endTime;
+  final int screenRecordingEndTime;
   final bool isBackground;
   EndScreenMessage({
     required this.screenName,
     required this.screenId,
     required this.endTime,
+    required this.screenRecordingEndTime,
     required this.isBackground,
   });
 }

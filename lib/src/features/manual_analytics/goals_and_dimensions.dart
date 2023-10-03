@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:decibel_sdk/src/features/config/decibel_config.dart';
-import 'package:decibel_sdk/src/messages.dart';
-import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
-import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:logger/logger.dart';
+import 'package:medallia_dxa/src/features/config/medallia_dxa_config.dart';
+import 'package:medallia_dxa/src/messages.dart';
+import 'package:medallia_dxa/src/utility/completer_wrappers.dart';
+import 'package:medallia_dxa/src/utility/logger_sdk.dart';
 
 class GoalsAndDimensions with TrackingCompleter {
   GoalsAndDimensions(this._medalliaDxaConfig, this._api, this._logger);
@@ -20,15 +20,17 @@ class GoalsAndDimensions with TrackingCompleter {
     String value,
   ) async {
     if (!_medalliaDxaConfig.trackingAllowed) return;
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final dimension =
-          DimensionStringMessage(dimensionName: dimensionName, value: value);
+        final dimension =
+            DimensionStringMessage(dimensionName: dimensionName, value: value);
 
-      logger.d('🟠 sendDimensionWithString - $dimension');
-      await _api.sendDimensionWithString(dimension);
-    });
+        logger.d('🟠 sendDimensionWithString - $dimension');
+        await _api.sendDimensionWithString(dimension);
+      },
+    );
   }
 
   ///Set custom dimension with number
@@ -37,15 +39,17 @@ class GoalsAndDimensions with TrackingCompleter {
     double value,
   ) async {
     if (!_medalliaDxaConfig.trackingAllowed) return;
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final dimension =
-          DimensionNumberMessage(dimensionName: dimensionName, value: value);
+        final dimension =
+            DimensionNumberMessage(dimensionName: dimensionName, value: value);
 
-      logger.d('🟠 sendDimensionWithNumber - $dimension');
-      await _api.sendDimensionWithNumber(dimension);
-    });
+        logger.d('🟠 sendDimensionWithNumber - $dimension');
+        await _api.sendDimensionWithNumber(dimension);
+      },
+    );
   }
 
   ///Set custom dimension with bool
@@ -54,15 +58,17 @@ class GoalsAndDimensions with TrackingCompleter {
     required bool value,
   }) async {
     if (!_medalliaDxaConfig.trackingAllowed) return;
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final dimension =
-          DimensionBoolMessage(dimensionName: dimensionName, value: value);
+        final dimension =
+            DimensionBoolMessage(dimensionName: dimensionName, value: value);
 
-      logger.d('🟠 sendDimensionWithBool - $dimension');
-      await _api.sendDimensionWithBool(dimension);
-    });
+        logger.d('🟠 sendDimensionWithBool - $dimension');
+        await _api.sendDimensionWithBool(dimension);
+      },
+    );
   }
 
   ///Send goals
@@ -71,13 +77,15 @@ class GoalsAndDimensions with TrackingCompleter {
     double? value,
   ]) async {
     if (!_medalliaDxaConfig.trackingAllowed) return;
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final goal = GoalMessage(goal: goalName, value: value);
+        final goal = GoalMessage(goal: goalName, value: value);
 
-      logger.d('🟠 sendGoal - $goal');
-      await _api.sendGoal(goal);
-    });
+        logger.d('🟠 sendGoal - $goal');
+        await _api.sendGoal(goal);
+      },
+    );
   }
 }

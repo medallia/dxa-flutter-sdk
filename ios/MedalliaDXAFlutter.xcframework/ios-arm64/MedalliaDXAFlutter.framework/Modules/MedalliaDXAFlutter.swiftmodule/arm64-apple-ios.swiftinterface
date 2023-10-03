@@ -1,5 +1,5 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.8 (swiftlang-5.8.0.124.2 clang-1403.0.22.11.100)
+// swift-compiler-version: Apple Swift version 5.7.1 (swiftlang-5.7.1.135.3 clang-1400.0.29.51)
 // swift-module-flags: -target arm64-apple-ios11.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Onone -module-name MedalliaDXAFlutter
 // swift-module-flags-ignorable: -enable-bare-slash-regex
 import AVFoundation
@@ -185,7 +185,7 @@ public enum MaskView {
   }
 }
 extension MedalliaDXAFlutter.DXA {
-  public static func initialize(configuration: MedalliaDXAFlutter.Configuration, multiplatform: MedalliaDXAFlutter.Platform, dxaDelegate: (any MedalliaDXAFlutter.DXADelegate)? = nil) -> MedalliaDXAFlutter.LiveConfigurationFlutter
+  public static func initialize(configuration: MedalliaDXAFlutter.Configuration, multiplatform: MedalliaDXAFlutter.Platform, dxaDelegate: MedalliaDXAFlutter.DXADelegate? = nil) -> MedalliaDXAFlutter.LiveConfigurationFlutter
   public static func endScreen()
   public static func startNewScreen(name: Swift.String, id: Swift.Int)
   public static func saveScreenShot(screenshot: Foundation.Data, id: Swift.Int, screenName: Swift.String, screenShotTime: Foundation.TimeInterval)
@@ -195,7 +195,7 @@ extension MedalliaDXAFlutter.DXA {
 }
 @_hasMissingDesignatedInitializers public class DXA {
   public static func initialize(_ configuration: MedalliaDXAFlutter.Configuration)
-  public static func startNewScreen(name: Swift.String)
+  public static func startNewScreen(name: Swift.String, disableRecordingOnThisScreen: Swift.Bool = false)
   public static func stopScreen()
   public static func setMaskingForCurrentScreen(mask: MedalliaDXAFlutter.MaskAutomatic)
   public static func send(goal: Swift.String, with value: Swift.Float? = nil)

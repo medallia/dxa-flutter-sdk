@@ -1,6 +1,6 @@
-# decibel_sdk
+# Medallia DXA
 
-Decibel SDK flutter binding
+Medallia DXA flutter SDK binding
 
 ## Getting Started
 

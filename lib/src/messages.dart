@@ -49,6 +49,7 @@ class EndScreenMessage {
     required this.screenName,
     required this.screenId,
     required this.endTime,
+    required this.screenRecordingEndTime,
     required this.isBackground,
   });
 
@@ -58,6 +59,8 @@ class EndScreenMessage {
 
   int endTime;
 
+  int screenRecordingEndTime;
+
   bool isBackground;
 
   Object encode() {
@@ -65,6 +68,7 @@ class EndScreenMessage {
       screenName,
       screenId,
       endTime,
+      screenRecordingEndTime,
       isBackground,
     ];
   }
@@ -75,7 +79,8 @@ class EndScreenMessage {
       screenName: result[0]! as String,
       screenId: result[1]! as int,
       endTime: result[2]! as int,
-      isBackground: result[3]! as bool,
+      screenRecordingEndTime: result[3]! as int,
+      isBackground: result[4]! as bool,
     );
   }
 }

@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:decibel_sdk/src/features/autoMasking/auto_masking_widgets.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:medallia_dxa/src/features/autoMasking/auto_masking_widgets.dart';
 
 enum AutoMaskingTypeEnum {
   button,
@@ -10,7 +10,7 @@ enum AutoMaskingTypeEnum {
   text,
   icons,
   webView,
-
+  _manual,
   all,
   none
 }
@@ -28,6 +28,9 @@ class AutoMaskingType {
         break;
       case AutoMaskingTypeEnum.none:
         automaskWidgetType = const NoAutomaskWidgets();
+        break;
+      case AutoMaskingTypeEnum._manual:
+        automaskWidgetType = AutomaskMaskWidget();
         break;
       case AutoMaskingTypeEnum.button:
         automaskWidgetType = const ButtonAutomaskWidgets();
@@ -53,6 +56,9 @@ class AutoMaskingType {
       default:
         throw UnimplementedError();
     }
+  }
+  AutoMaskingType.maskWidget() : enumType = AutoMaskingTypeEnum._manual {
+    automaskWidgetType = AutomaskMaskWidget();
   }
 
   @override

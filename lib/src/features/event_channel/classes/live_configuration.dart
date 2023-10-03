@@ -1,9 +1,9 @@
-import 'package:decibel_sdk/src/features/event_channel/event_channel_manager.dart';
-import 'package:decibel_sdk/src/features/image_quality.dart';
-import 'package:decibel_sdk/src/messages.dart';
-import 'package:decibel_sdk/src/utility/dependency_injector.dart';
-import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:medallia_dxa/src/features/event_channel/event_channel_manager.dart';
+import 'package:medallia_dxa/src/features/image_quality.dart';
+import 'package:medallia_dxa/src/messages.dart';
+import 'package:medallia_dxa/src/utility/dependency_injector.dart';
+import 'package:medallia_dxa/src/utility/extensions.dart';
 
 class LiveConfiguration implements EventChannelClass {
   static const String jsonKey = 'live_configuration';
@@ -41,14 +41,15 @@ class LiveConfiguration implements EventChannelClass {
     if (videoQualityType != null) {
       DependencyInjector.instance.sessionReplay.updateFrameRate();
     }
+
+    isCurrentSdkVersionBlocked = false;
+    isCurrentAppVersionBlocked = false;
     if (_blockedFlutterSDKVersions != null &&
         _blockedFlutterSDKVersions!.isNotEmpty) {
       final String sdkVersion = DependencyInjector.instance.config.sdkVersion;
       if (_blockedFlutterSDKVersions!.contains(sdkVersion)) {
         isCurrentSdkVersionBlocked = true;
         await DependencyInjector.instance.config.blockSdk();
-      } else {
-        isCurrentSdkVersionBlocked = false;
       }
     }
     if (_blockedFlutterAppVersions != null &&
@@ -56,10 +57,9 @@ class LiveConfiguration implements EventChannelClass {
       if (_blockedFlutterAppVersions!.contains(_appVersion)) {
         isCurrentAppVersionBlocked = true;
         await DependencyInjector.instance.config.blockSdk();
-      } else {
-        isCurrentAppVersionBlocked = false;
       }
     }
+
     if (DependencyInjector.instance.config.blocked) {
       if (!isCurrentAppVersionBlocked && !isCurrentSdkVersionBlocked) {
         await DependencyInjector.instance.config.unblockSdk();
@@ -213,5 +213,10 @@ class LiveConfiguration implements EventChannelClass {
         liveConfigurationFromPigeon.screensMasking ?? _screensMasking;
     _appVersion = liveConfigurationFromPigeon.appVersion ?? _appVersion;
     await runTasksAfterUpdate();
+  }
+
+  @override
+  String toString() {
+    return 'LiveConfiguration(_overrideUserConfig: $_overrideUserConfig, _blockedFlutterSDKVersions: $_blockedFlutterSDKVersions, _blockedFlutterAppVersions: $_blockedFlutterAppVersions, isCurrentSdkVersionBlocked: $isCurrentSdkVersionBlocked, isCurrentAppVersionBlocked: $isCurrentAppVersionBlocked, _maskingColorString: $_maskingColorString, _maskingColor: $_maskingColor, _showLocalLogs: $_showLocalLogs, _imageQualityTypeInt: $_imageQualityTypeInt, _imageQualityType: $_imageQualityType, _videoQualityTypeInt: $_videoQualityTypeInt, _videoQualityType: $_videoQualityType, _maxScreenshots: $_maxScreenshots, _maxScreenDurationInt: $_maxScreenDurationInt, _maxScreenDuration: $_maxScreenDuration, _disableScreenTracking: $_disableScreenTracking, _screensMasking: $_screensMasking, _appVersion: $_appVersion)';
   }
 }

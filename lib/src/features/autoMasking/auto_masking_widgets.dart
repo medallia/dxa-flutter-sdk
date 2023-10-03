@@ -1,8 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:decibel_sdk/decibel_sdk.dart';
-import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:medallia_dxa/medallia_dxa.dart';
+import 'package:medallia_dxa/src/features/autoMasking/auto_masking_enums.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 abstract class AutoMaskWidgets<T> {
@@ -37,15 +36,21 @@ class AllAutomaskWidgets extends AutoMaskWidgets {
   }
 }
 
+class AutomaskMaskWidget extends AutoMaskWidgets<AutoMaskWidgetWithoutFamily> {
+  AutomaskMaskWidget() : super(widgetTypeSet: {MaskWidget});
+}
+
 class ButtonAutomaskWidgets extends AutoMaskWidgets<ButtonStyleButton> {
   const ButtonAutomaskWidgets()
-      : super(widgetTypeSet: const {
-          IconButton,
-          BackButton,
-          CloseButton,
-          FloatingActionButton,
-          CupertinoButton,
-        });
+      : super(
+          widgetTypeSet: const {
+            IconButton,
+            BackButton,
+            CloseButton,
+            FloatingActionButton,
+            CupertinoButton,
+          },
+        );
 }
 
 class TextAutomaskWidgets extends AutoMaskWidgets<AutoMaskWidgetWithoutFamily> {
