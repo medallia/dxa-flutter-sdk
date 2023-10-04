@@ -1,1 +1,1 @@
-For release notes see [Gitbook](https://decibel-documentation.gitbook.io/decibelsdk/flutter/changelog).
+For release notes see [Medallia documentation](https://developer.medallia.com/medallia-dxa/docs/changelog-1).
