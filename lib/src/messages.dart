@@ -49,6 +49,7 @@ class EndScreenMessage {
     required this.screenName,
     required this.screenId,
     required this.endTime,
+    required this.screenRecordingEndTime,
     required this.isBackground,
   });
 
@@ -58,6 +59,8 @@ class EndScreenMessage {
 
   int endTime;
 
+  int screenRecordingEndTime;
+
   bool isBackground;
 
   Object encode() {
@@ -65,6 +68,7 @@ class EndScreenMessage {
       screenName,
       screenId,
       endTime,
+      screenRecordingEndTime,
       isBackground,
     ];
   }
@@ -75,7 +79,8 @@ class EndScreenMessage {
       screenName: result[0]! as String,
       screenId: result[1]! as int,
       endTime: result[2]! as int,
-      isBackground: result[3]! as bool,
+      screenRecordingEndTime: result[3]! as int,
+      isBackground: result[4]! as bool,
     );
   }
 }
@@ -86,15 +91,21 @@ class SessionMessage {
     required this.property,
     required this.consents,
     required this.version,
+    required this.crashReporterEnabled,
+    required this.mobileDataEnabled,
   });
 
   int account;
 
   int property;
 
-  List<int?> consents;
+  int consents;
 
   String version;
+
+  bool crashReporterEnabled;
+
+  bool mobileDataEnabled;
 
   Object encode() {
     return <Object?>[
@@ -102,6 +113,8 @@ class SessionMessage {
       property,
       consents,
       version,
+      crashReporterEnabled,
+      mobileDataEnabled,
     ];
   }
 
@@ -110,29 +123,10 @@ class SessionMessage {
     return SessionMessage(
       account: result[0]! as int,
       property: result[1]! as int,
-      consents: (result[2] as List<Object?>?)!.cast<int?>(),
+      consents: result[2]! as int,
       version: result[3]! as String,
-    );
-  }
-}
-
-class ConsentsMessage {
-  ConsentsMessage({
-    required this.consents,
-  });
-
-  List<int?> consents;
-
-  Object encode() {
-    return <Object?>[
-      consents,
-    ];
-  }
-
-  static ConsentsMessage decode(Object result) {
-    result as List<Object?>;
-    return ConsentsMessage(
-      consents: (result[0] as List<Object?>?)!.cast<int?>(),
+      crashReporterEnabled: result[4]! as bool,
+      mobileDataEnabled: result[5]! as bool,
     );
   }
 }
@@ -277,26 +271,102 @@ class GoalMessage {
   }
 }
 
+class LiveConfigurationPigeon {
+  LiveConfigurationPigeon({
+    this.overrideUserConfig,
+    this.blockedFlutterSDKVersions,
+    this.blockedFlutterAppVersions,
+    this.maskingColor,
+    this.showLocalLogs,
+    this.imageQualityType,
+    this.videoQualityType,
+    this.maxScreenshots,
+    this.maxScreenDuration,
+    this.disableScreenTracking,
+    this.screensMasking,
+    this.appVersion,
+  });
+
+  bool? overrideUserConfig;
+
+  List<String?>? blockedFlutterSDKVersions;
+
+  List<String?>? blockedFlutterAppVersions;
+
+  String? maskingColor;
+
+  bool? showLocalLogs;
+
+  int? imageQualityType;
+
+  int? videoQualityType;
+
+  int? maxScreenshots;
+
+  int? maxScreenDuration;
+
+  List<String?>? disableScreenTracking;
+
+  List<String?>? screensMasking;
+
+  String? appVersion;
+
+  Object encode() {
+    return <Object?>[
+      overrideUserConfig,
+      blockedFlutterSDKVersions,
+      blockedFlutterAppVersions,
+      maskingColor,
+      showLocalLogs,
+      imageQualityType,
+      videoQualityType,
+      maxScreenshots,
+      maxScreenDuration,
+      disableScreenTracking,
+      screensMasking,
+      appVersion,
+    ];
+  }
+
+  static LiveConfigurationPigeon decode(Object result) {
+    result as List<Object?>;
+    return LiveConfigurationPigeon(
+      overrideUserConfig: result[0] as bool?,
+      blockedFlutterSDKVersions: (result[1] as List<Object?>?)?.cast<String?>(),
+      blockedFlutterAppVersions: (result[2] as List<Object?>?)?.cast<String?>(),
+      maskingColor: result[3] as String?,
+      showLocalLogs: result[4] as bool?,
+      imageQualityType: result[5] as int?,
+      videoQualityType: result[6] as int?,
+      maxScreenshots: result[7] as int?,
+      maxScreenDuration: result[8] as int?,
+      disableScreenTracking: (result[9] as List<Object?>?)?.cast<String?>(),
+      screensMasking: (result[10] as List<Object?>?)?.cast<String?>(),
+      appVersion: result[11] as String?,
+    );
+  }
+}
+
 class _MedalliaDxaNativeApiCodec extends StandardMessageCodec {
   const _MedalliaDxaNativeApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is ConsentsMessage) {
+    if (value is DimensionBoolMessage) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is DimensionBoolMessage) {
+    } else if (value is DimensionNumberMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is DimensionNumberMessage) {
+    } else if (value is DimensionStringMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is DimensionStringMessage) {
+    } else if (value is EndScreenMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is EndScreenMessage) {
+    } else if (value is GoalMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is GoalMessage) {
+    } else if (value is LiveConfigurationPigeon) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else if (value is ScreenshotMessage) {
@@ -317,17 +387,17 @@ class _MedalliaDxaNativeApiCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128: 
-        return ConsentsMessage.decode(readValue(buffer)!);
-      case 129: 
         return DimensionBoolMessage.decode(readValue(buffer)!);
-      case 130: 
+      case 129: 
         return DimensionNumberMessage.decode(readValue(buffer)!);
-      case 131: 
+      case 130: 
         return DimensionStringMessage.decode(readValue(buffer)!);
-      case 132: 
+      case 131: 
         return EndScreenMessage.decode(readValue(buffer)!);
-      case 133: 
+      case 132: 
         return GoalMessage.decode(readValue(buffer)!);
+      case 133: 
+        return LiveConfigurationPigeon.decode(readValue(buffer)!);
       case 134: 
         return ScreenshotMessage.decode(readValue(buffer)!);
       case 135: 
@@ -350,7 +420,7 @@ class MedalliaDxaNativeApi {
 
   static const MessageCodec<Object?> codec = _MedalliaDxaNativeApiCodec();
 
-  Future<void> initialize(SessionMessage arg_msg) async {
+  Future<LiveConfigurationPigeon> initialize(SessionMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.initialize', codec,
         binaryMessenger: _binaryMessenger);
@@ -367,8 +437,13 @@ class MedalliaDxaNativeApi {
         message: replyList[1] as String?,
         details: replyList[2],
       );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
     } else {
-      return;
+      return (replyList[0] as LiveConfigurationPigeon?)!;
     }
   }
 
@@ -416,34 +491,12 @@ class MedalliaDxaNativeApi {
     }
   }
 
-  Future<void> setEnableConsents(ConsentsMessage arg_msg) async {
+  Future<void> setConsents(int arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.MedalliaDxaNativeApi.setEnableConsents', codec,
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.setConsents', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_msg]) as List<Object?>?;
-    if (replyList == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-      );
-    } else if (replyList.length > 1) {
-      throw PlatformException(
-        code: replyList[0]! as String,
-        message: replyList[1] as String?,
-        details: replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
-  Future<void> setDisableConsents(ConsentsMessage arg_msg) async {
-    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.MedalliaDxaNativeApi.setDisableConsents', codec,
-        binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_msg]) as List<Object?>?;
+        await channel.send(<Object?>[arg_value]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -614,6 +667,28 @@ class MedalliaDxaNativeApi {
     }
   }
 
+  Future<void> sendImageQuality(int arg_imageQuality) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.sendImageQuality', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_imageQuality]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
   Future<void> enableSessionForExperience(bool arg_value) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.enableSessionForExperience', codec,
@@ -732,6 +807,33 @@ class MedalliaDxaNativeApi {
   Future<String> getSessionId() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionId', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (replyList[0] as String?)!;
+    }
+  }
+
+  Future<String> getSessionUrl() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.MedalliaDxaNativeApi.getSessionUrl', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;

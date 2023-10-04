@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:decibel_sdk/src/features/autoMasking/auto_masking_widgets.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:medallia_dxa/src/features/autoMasking/auto_masking_widgets.dart';
 
 enum AutoMaskingTypeEnum {
   button,
@@ -9,53 +10,67 @@ enum AutoMaskingTypeEnum {
   text,
   icons,
   webView,
-
+  _manual,
   all,
   none
 }
 
+@immutable
 class AutoMaskingType {
-  final AutoMaskingTypeEnum autoMaskingTypeEnum;
-  const AutoMaskingType({
-    required this.autoMaskingTypeEnum,
-  });
-
-  AutoMaskWidgets get getAutoMaskingType {
-    switch (autoMaskingTypeEnum) {
+  final AutoMaskingTypeEnum enumType;
+  late final AutoMaskWidgets automaskWidgetType;
+  AutoMaskingType({
+    required this.enumType,
+  }) {
+    switch (enumType) {
       case AutoMaskingTypeEnum.all:
-        return const AllAutomaskWidgets();
+        automaskWidgetType = const AllAutomaskWidgets();
+        break;
       case AutoMaskingTypeEnum.none:
-        return const NoAutomaskWidgets();
+        automaskWidgetType = const NoAutomaskWidgets();
+        break;
+      case AutoMaskingTypeEnum._manual:
+        automaskWidgetType = AutomaskMaskWidget();
+        break;
       case AutoMaskingTypeEnum.button:
-        return const ButtonAutomaskWidgets();
+        automaskWidgetType = const ButtonAutomaskWidgets();
+        break;
       case AutoMaskingTypeEnum.dialog:
-        return const DialogAutomaskWidgets();
+        automaskWidgetType = const DialogAutomaskWidgets();
+        break;
       case AutoMaskingTypeEnum.image:
-        return const ImageAutomaskWidgets();
+        automaskWidgetType = const ImageAutomaskWidgets();
+        break;
       case AutoMaskingTypeEnum.inputText:
-        return const InputTextAutomaskWidgets();
+        automaskWidgetType = const InputTextAutomaskWidgets();
+        break;
       case AutoMaskingTypeEnum.text:
-        return const TextAutomaskWidgets();
+        automaskWidgetType = const TextAutomaskWidgets();
+        break;
       case AutoMaskingTypeEnum.icons:
-        return const IconAutomaskWidgets();
+        automaskWidgetType = const IconAutomaskWidgets();
+        break;
       case AutoMaskingTypeEnum.webView:
-        return const WebviewAutomaskWidgets();
+        automaskWidgetType = const WebviewAutomaskWidgets();
+        break;
       default:
         throw UnimplementedError();
     }
+  }
+  AutoMaskingType.maskWidget() : enumType = AutoMaskingTypeEnum._manual {
+    automaskWidgetType = AutomaskMaskWidget();
   }
 
   @override
   bool operator ==(covariant AutoMaskingType other) {
     if (identical(this, other)) return true;
 
-    return other.autoMaskingTypeEnum == autoMaskingTypeEnum;
+    return other.enumType == enumType;
   }
 
   @override
-  int get hashCode => autoMaskingTypeEnum.hashCode;
+  int get hashCode => enumType.hashCode;
 
   @override
-  String toString() =>
-      'AutoMaskingType(autoMaskingTypeEnum: $autoMaskingTypeEnum)';
+  String toString() => 'AutoMaskingType(autoMaskingTypeEnum: $enumType)';
 }

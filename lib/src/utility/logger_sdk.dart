@@ -1,51 +1,43 @@
 import 'package:logger/logger.dart';
 
 class LoggerSDK {
-  static final LoggerSDK _instance = LoggerSDK._internal();
-  static LoggerSDK get instance => _instance;
-  void all({
-    bool enabled = true,
-    bool tracking = true,
-    bool sessionReplay = true,
-    bool frameTracking = true,
-    bool routeObserver = true,
-    bool autoMasking = true,
-    bool screenWidget = true,
-    bool maskWidget = true,
-  }) {
-    _instance.enabled = enabled;
-    _instance.tracking = tracking;
-    _instance.sessionReplay = sessionReplay;
-    _instance.frameTracking = frameTracking;
-    _instance.routeObserver = routeObserver;
-    _instance.autoMasking = autoMasking;
-    _instance.screenWidget = screenWidget;
-    _instance.maskWidget = maskWidget;
+  LoggerSDK({required this.isSdkRunning});
+  final bool Function() isSdkRunning;
+  void all() {
+    enabled = true;
+    tracking = true;
+    sessionReplay = true;
+    frameTracking = true;
+    routeObserver = true;
+    autoMasking = true;
+    screenWidget = true;
+    maskWidget = true;
+    manualAnalytics = true;
     cleanLoggers();
   }
 
   void selected({
-    required bool enabled,
-    required bool tracking,
-    required bool sessionReplay,
-    required bool frameTracking,
-    required bool routeObserver,
-    required bool autoMasking,
-    required bool screenWidget,
-    required bool maskWidget,
+    bool enabled = false,
+    bool tracking = false,
+    bool sessionReplay = false,
+    bool frameTracking = false,
+    bool routeObserver = false,
+    bool autoMasking = false,
+    bool screenWidget = false,
+    bool maskWidget = false,
+    bool manualAnalytics = false,
   }) {
-    _instance.enabled = enabled;
-    _instance.tracking = tracking;
-    _instance.sessionReplay = sessionReplay;
-    _instance.frameTracking = frameTracking;
-    _instance.routeObserver = routeObserver;
-    _instance.autoMasking = autoMasking;
-    _instance.screenWidget = screenWidget;
-    _instance.maskWidget = maskWidget;
+    this.enabled = enabled;
+    this.tracking = tracking;
+    this.sessionReplay = sessionReplay;
+    this.frameTracking = frameTracking;
+    this.routeObserver = routeObserver;
+    this.autoMasking = autoMasking;
+    this.screenWidget = screenWidget;
+    this.maskWidget = maskWidget;
+    this.manualAnalytics = manualAnalytics;
     cleanLoggers();
   }
-
-  LoggerSDK._internal();
 
   bool enabled = false;
   bool tracking = false;
@@ -55,6 +47,7 @@ class LoggerSDK {
   bool autoMasking = false;
   bool screenWidget = false;
   bool maskWidget = false;
+  bool manualAnalytics = false;
   Logger? _screenWidgetLogger;
   Logger? _maskWidgetLogger;
   Logger? _trackingLogger;
@@ -62,6 +55,7 @@ class LoggerSDK {
   Logger? _frameTrackingLogger;
   Logger? _routeObserverLogger;
   Logger? _autoMaskingLogger;
+  Logger? _manualAnalyticsLogger;
 
   void cleanLoggers() {
     _screenWidgetLogger = null;
@@ -71,6 +65,7 @@ class LoggerSDK {
     _frameTrackingLogger = null;
     _routeObserverLogger = null;
     _autoMaskingLogger = null;
+    _manualAnalyticsLogger = null;
   }
 
   Logger get screenWidgetLogger =>
@@ -96,23 +91,36 @@ class LoggerSDK {
     return _autoMaskingLogger ??= _plainLogger(autoMasking);
   }
 
+  Logger get manualAnalyticsLogger {
+    return _manualAnalyticsLogger ??= _plainLogger(manualAnalytics);
+  }
+
   Logger _plainLogger(bool moduleEnabled) {
     return Logger(
       printer: CustomPrinter(),
       filter: ModuleLogFilter(
         enabled: enabled,
         moduleEnabled: moduleEnabled,
+        isSdkRunning: () {
+          return isSdkRunning();
+        },
       ),
     );
   }
 }
 
 class ModuleLogFilter extends DevelopmentFilter {
-  ModuleLogFilter({required this.enabled, required this.moduleEnabled});
+  ModuleLogFilter({
+    required this.enabled,
+    required this.moduleEnabled,
+    required this.isSdkRunning,
+  });
   final bool enabled;
   final bool moduleEnabled;
+  final bool Function() isSdkRunning;
   @override
   bool shouldLog(LogEvent event) {
+    if (!isSdkRunning()) return false;
     if (!super.shouldLog(event)) return false;
     if (!enabled) return false;
     if (!moduleEnabled) return false;

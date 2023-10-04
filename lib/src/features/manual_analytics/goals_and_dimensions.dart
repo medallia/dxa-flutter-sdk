@@ -1,28 +1,36 @@
 import 'dart:async';
 
-import 'package:decibel_sdk/src/features/tracking/tracking.dart';
-import 'package:decibel_sdk/src/messages.dart';
-import 'package:decibel_sdk/src/utility/completer_wrappers.dart';
-import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:medallia_dxa/src/features/config/medallia_dxa_config.dart';
+import 'package:medallia_dxa/src/messages.dart';
+import 'package:medallia_dxa/src/utility/completer_wrappers.dart';
+import 'package:medallia_dxa/src/utility/logger_sdk.dart';
 
 class GoalsAndDimensions with TrackingCompleter {
-  GoalsAndDimensions(this._api);
+  GoalsAndDimensions(this._medalliaDxaConfig, this._api, this._logger);
 
+  final MedalliaDxaConfig _medalliaDxaConfig;
   final MedalliaDxaNativeApi _api;
+  final LoggerSDK _logger;
+  Logger get logger => _logger.manualAnalyticsLogger;
 
   ///Set custom dimension with string
   Future<void> setDimensionWithString(
     String dimensionName,
     String value,
   ) async {
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    if (!_medalliaDxaConfig.trackingAllowed) return;
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final dimension =
-          DimensionStringMessage(dimensionName: dimensionName, value: value);
+        final dimension =
+            DimensionStringMessage(dimensionName: dimensionName, value: value);
 
-      await _api.sendDimensionWithString(dimension);
-    });
+        logger.d('🟠 sendDimensionWithString - $dimension');
+        await _api.sendDimensionWithString(dimension);
+      },
+    );
   }
 
   ///Set custom dimension with number
@@ -30,14 +38,18 @@ class GoalsAndDimensions with TrackingCompleter {
     String dimensionName,
     double value,
   ) async {
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    if (!_medalliaDxaConfig.trackingAllowed) return;
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final dimension =
-          DimensionNumberMessage(dimensionName: dimensionName, value: value);
+        final dimension =
+            DimensionNumberMessage(dimensionName: dimensionName, value: value);
 
-      await _api.sendDimensionWithNumber(dimension);
-    });
+        logger.d('🟠 sendDimensionWithNumber - $dimension');
+        await _api.sendDimensionWithNumber(dimension);
+      },
+    );
   }
 
   ///Set custom dimension with bool
@@ -45,14 +57,18 @@ class GoalsAndDimensions with TrackingCompleter {
     String dimensionName, {
     required bool value,
   }) async {
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    if (!_medalliaDxaConfig.trackingAllowed) return;
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final dimension =
-          DimensionBoolMessage(dimensionName: dimensionName, value: value);
+        final dimension =
+            DimensionBoolMessage(dimensionName: dimensionName, value: value);
 
-      await _api.sendDimensionWithBool(dimension);
-    });
+        logger.d('🟠 sendDimensionWithBool - $dimension');
+        await _api.sendDimensionWithBool(dimension);
+      },
+    );
   }
 
   ///Send goals
@@ -60,11 +76,16 @@ class GoalsAndDimensions with TrackingCompleter {
     String goalName, [
     double? value,
   ]) async {
-    await endScreenTasksCompleterWrapper(() async {
-      await waitForNewScreenIfThereNoneActive();
+    if (!_medalliaDxaConfig.trackingAllowed) return;
+    await endScreenTasksCompleterWrapper(
+      taskToComplete: () async {
+        await waitForNewScreenIfThereNoneActive();
 
-      final goal = GoalMessage(goal: goalName, value: value);
-      await _api.sendGoal(goal);
-    });
+        final goal = GoalMessage(goal: goalName, value: value);
+
+        logger.d('🟠 sendGoal - $goal');
+        await _api.sendGoal(goal);
+      },
+    );
   }
 }

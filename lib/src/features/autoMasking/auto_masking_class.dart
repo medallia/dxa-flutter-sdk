@@ -1,18 +1,18 @@
-import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
-import 'package:decibel_sdk/src/features/autoMasking/auto_masking_widgets.dart';
-import 'package:decibel_sdk/src/utility/logger_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:medallia_dxa/src/features/autoMasking/auto_masking_enums.dart';
+import 'package:medallia_dxa/src/features/autoMasking/auto_masking_widgets.dart';
+import 'package:medallia_dxa/src/utility/logger_sdk.dart';
 
 class AutoMasking with RenderObjectAutoMaskGetter {
-  AutoMasking() : _logger = LoggerSDK.instance;
+  AutoMasking({required LoggerSDK loggerSDK}) : _logger = loggerSDK;
   final LoggerSDK _logger;
   Logger get logger => _logger.autoMaskingLogger;
   final Set<RenderObject> renderObjectsToMask = Set.of({});
   //Webbview and input text masking by default
   static final Set<AutoMaskingType> _defaultAutoMaskingTypeSet = {
-    const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.webView),
-    const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.inputText)
+    AutoMaskingType(enumType: AutoMaskingTypeEnum.webView),
+    AutoMaskingType(enumType: AutoMaskingTypeEnum.inputText)
   };
   Set<AutoMaskingType> _autoMaskingTypeSet = Set.from(
     _defaultAutoMaskingTypeSet,
@@ -20,7 +20,7 @@ class AutoMasking with RenderObjectAutoMaskGetter {
   Set<AutoMaskingType> get autoMaskingTypeSet => _autoMaskingTypeSet;
   set autoMaskingTypeSet(Set<AutoMaskingType> value) {
     if (value.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.all),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.all),
     )) {
       if (value.length > 1) {
         throw ArgumentError('''
@@ -29,13 +29,13 @@ along with other AutoMaskingType enums
 ''');
       }
       final Set<AutoMaskingType> allEnumsSet =
-          (value.first.getAutoMaskingType as AllAutomaskWidgets).getAllTypes();
+          (value.first.automaskWidgetType as AllAutomaskWidgets).getAllTypes();
       _autoMaskingTypeSet = allEnumsSet;
       return;
     }
 
     if (value.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.none),
     )) {
       if (value.length > 1) {
         throw ArgumentError('''
@@ -44,7 +44,7 @@ along with other AutoMaskingType enums
 ''');
       }
       _autoMaskingTypeSet = {
-        const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none)
+        AutoMaskingType(enumType: AutoMaskingTypeEnum.none)
       };
       return;
     }
@@ -54,12 +54,12 @@ along with other AutoMaskingType enums
 
   void removeUnmaskedTypesFromAutoMaskingTypeSet(Set<AutoMaskingType> set) {
     if (set.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.none),
     )) {
       return;
     }
     if (set.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.all),
+      AutoMaskingType(enumType: AutoMaskingTypeEnum.all),
     )) {
       _autoMaskingTypeSet = {};
       return;
@@ -69,16 +69,26 @@ along with other AutoMaskingType enums
     logger.d('After  Unmasking ${autoMaskingTypeSet.toString()}');
   }
 
-  void setAutoMasking(BuildContext context) {
+  Set<RenderObject> getMaskedRenderObjectsWithinContexts({
+    required BuildContext startContext,
+    required List<BuildContext> stopContexts,
+  }) {
     logger.d('set AutoMasking ${autoMaskingTypeSet.toString()}');
-    if (autoMaskingTypeSet.contains(
-      const AutoMaskingType(autoMaskingTypeEnum: AutoMaskingTypeEnum.none),
-    )) {
-      return;
-    }
-    renderObjectsToMask
-        .addAll(getRenderObjectsByAutoMaskingType(context, autoMaskingTypeSet));
+
+    final Set<AutoMaskingType> setWithMaskWidgets = Set.from(autoMaskingTypeSet)
+      ..remove(AutoMaskingType(enumType: AutoMaskingTypeEnum.none));
+
+    //always add the mask widgets
+    setWithMaskWidgets.add(AutoMaskingType.maskWidget());
+    renderObjectsToMask.addAll(
+      getRenderObjectsByAutoMaskingType(
+        startContext: startContext,
+        autoMaskingTypeSet: setWithMaskWidgets,
+        stopContexts: stopContexts,
+      ),
+    );
     logger.d('renderObjectsToMask ${renderObjectsToMask.toString()}');
+    return renderObjectsToMask;
   }
 
   void clear() {
@@ -88,23 +98,29 @@ along with other AutoMaskingType enums
 }
 
 mixin RenderObjectAutoMaskGetter {
-  Set<RenderObject> getRenderObjectsByAutoMaskingType(
-      BuildContext context, Set<AutoMaskingType> widgetTypes) {
+  Set<RenderObject> getRenderObjectsByAutoMaskingType({
+    required BuildContext startContext,
+    required Set<AutoMaskingType> autoMaskingTypeSet,
+    required List<BuildContext> stopContexts,
+  }) {
     final Set<RenderObject> renderObjectList = Set.of({});
 
     void findChild(Element parentElement) {
       parentElement.visitChildElements((element) {
+        //Context of the forbidden routes
+        if (stopContexts.contains(element)) {
+          return;
+        }
         //check if the element has a widget of the same type we
         //want to mask
-        final bool typeCheck = widgetTypes.any((type) {
-          if (type.getAutoMaskingType.widgets
-              .contains(element.widget.runtimeType)) {
+        final bool typeCheck = autoMaskingTypeSet.any((type) {
+          if (type.automaskWidgetType.matchesWidgetType(element.widget)) {
             return true;
           }
           //check if the widget that matches a subtype
           //of a family of widgets we want to mask. e.g. a custom
           //button
-          return type.getAutoMaskingType.isSubtype(element.widget);
+          return type.automaskWidgetType.isSubtype(element.widget);
         });
         if (typeCheck) {
           if (element.renderObject != null) {
@@ -117,7 +133,7 @@ mixin RenderObjectAutoMaskGetter {
       });
     }
 
-    findChild(context as Element);
+    findChild(startContext as Element);
     return renderObjectList;
   }
 }

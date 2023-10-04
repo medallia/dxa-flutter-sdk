@@ -1,7 +1,9 @@
 library frame_tracking_test;
 
-import 'package:decibel_sdk/src/features/frame_tracking.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medallia_dxa/src/features/frame_tracking.dart';
+import 'package:medallia_dxa/src/utility/logger_sdk.dart';
+
 import '../custom_mocks/flutter_sdk_mock.dart';
 
 void main() {
@@ -9,15 +11,19 @@ void main() {
     late FrameTracking frameTracking;
     late FlutterSdkMock flutterSdkMock;
     late bool callbackCalled;
-
+    late LoggerSDK loggerSDK;
     setUpAll(() {
       flutterSdkMock = FlutterSdkMock();
       callbackCalled = false;
-      frameTracking =
-          FrameTracking(postFrameCallback: flutterSdkMock.addPostFrameCallback)
-            ..newFrameStreamController.stream.listen((timeStamp) {
-              callbackCalled = true;
-            });
+      loggerSDK = LoggerSDK(isSdkRunning: () {
+        return true;
+      });
+      frameTracking = FrameTracking(
+        postFrameCallback: flutterSdkMock.addPostFrameCallback,
+        loggerSDK: loggerSDK,
+      )..newFrameStreamController.stream.listen((timeStamp) {
+          callbackCalled = true;
+        });
     });
 
     test(

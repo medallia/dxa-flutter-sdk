@@ -1,47 +1,15 @@
-import 'dart:math';
-
-import 'package:decibel_sdk/src/features/tracking/screen_visited.dart';
-import 'package:decibel_sdk/src/features/tracking/tracking.dart';
-import 'package:decibel_sdk/src/utility/constants.dart';
-import 'package:decibel_sdk/src/utility/enums.dart';
-import 'package:decibel_sdk/src/widgets/screen_widget/screen_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:medallia_dxa/src/features/tracking/screen_visited.dart';
+import 'package:medallia_dxa/src/utility/dependency_injector.dart';
 
 extension ElementExt on Element {
   List<Element> get children {
-    final List<Element> _children = <Element>[];
-    visitChildElements((Element element) => _children.add(element));
-    return _children;
-  }
-
-  bool containsScreenWidget() {
-    bool flag = false;
-    int depth = 1000;
-    void findChild(Element parentElement) {
-      parentElement.visitChildElements((element) {
-        if (element.widget.runtimeType == ScreenWidget) {
-          flag = true;
-          return;
-        } else {
-          //TODO: Commented out because there may be two Scaffolds.
-          //Room for improvement.
-          // if (element.widget.runtimeType == Scaffold) {
-          //   return;
-          // }
-          if (depth > 0) {
-            depth--;
-            findChild(element);
-          } else {
-            return;
-          }
-        }
-      });
-    }
-
-    findChild(this);
-    return flag;
+    final List<Element> children = <Element>[];
+    visitChildElements((Element element) => children.add(element));
+    return children;
   }
 }
 
@@ -77,6 +45,29 @@ extension RenderObjectPaintBounds on RenderObject {
       sineZ,
     );
   }
+
+  bool get isLayerAttached {
+    return layer != null && layer!.attached;
+  }
+
+  bool get areAllAncestorsPainted {
+    final AbstractNode? parent = this.parent;
+    if (parent != null) {
+      RenderObject ancestor = parent as RenderObject;
+
+      RenderObject child = this;
+      while (ancestor.parent != null) {
+        if (!ancestor.paintsChild(child)) {
+          return false;
+        }
+        child = ancestor;
+        ancestor = ancestor.parent! as RenderObject;
+      }
+
+      return true;
+    }
+    return false;
+  }
 }
 
 class RectAndRotation {
@@ -87,10 +78,14 @@ class RectAndRotation {
   RectAndRotation(this.rect, this.cosine, this.sine);
 }
 
-extension ListMedalliaDxaCustomerConsentTypeExt
-    on List<DecibelCustomerConsentType> {
-  List<int> toIndexList() {
-    return map((consent) => consent.index).toList();
+extension RectScaling on Rect {
+  Rect scale(double scaleFactor) {
+    return Rect.fromLTRB(
+      left * scaleFactor,
+      top * scaleFactor,
+      right * scaleFactor,
+      bottom * scaleFactor,
+    );
   }
 }
 
@@ -107,7 +102,8 @@ extension WidgetsBindingNullSafe on WidgetsBinding {
 extension SchedulerBindingNullSafe on SchedulerBinding {
   static T? _ambiguate<T>(T? value) => value;
 
-  static SchedulerBinding? get instance => _ambiguate(WidgetsBinding.instance)!;
+  static SchedulerBinding? get instance =>
+      _ambiguate(SchedulerBinding.instance)!;
 }
 
 extension ScreenVisitedFinder on List<ScreenVisited> {
@@ -122,56 +118,37 @@ extension ScreenVisitedFinder on List<ScreenVisited> {
 
   int getIndex(String screenId) =>
       indexWhere((element) => element.id == screenId);
-
-  ScreenVisitedTabBar? findTabBarWithId(String screenId) {
-    final int index = getTabBarIndex(screenId);
-    if (index != -1) {
-      return this[index] as ScreenVisitedTabBar;
-    } else {
-      return null;
-    }
-  }
-
-  int getTabBarIndex(String screenId) => indexWhere((element) {
-        if (element.isTabBar) {
-          //first conditional for when we have the screenId of the tab
-          //second one for when we have only the id for the parent TabBar
-          return (element as ScreenVisitedTabBar).id == screenId ||
-              element.tabBarId == screenId;
-        }
-        return false;
-      });
 }
 
 extension ScreenVisitedExt on ScreenVisited {
   bool get isCurrentScreenOverMaxDuration {
     return DateTime.now().millisecondsSinceEpoch - timestamp >
-        SDKConstants.maxReplayDurationPerScreen.inMilliseconds;
+        DependencyInjector
+            .instance.globalSettings.maxReplayDurationPerScreen.inMilliseconds;
+  }
+
+  bool get isCurrentScreenOverMaxScreenshotCount {
+    return screenshotTakenList.length >=
+        DependencyInjector.instance.globalSettings.maxScreenshotCount;
   }
 
   int get maximumDurationForLastScreenshot =>
-      timestamp + SDKConstants.maxReplayDurationPerScreen.inMilliseconds;
+      timestamp +
+      DependencyInjector
+          .instance.globalSettings.maxReplayDurationPerScreen.inMilliseconds;
+}
 
-  ///Checks if this screenVisited is the tab with the given a id or the parent
-  ///TabBar of this screen has the same id
-  bool isTabBarWithId(String screenId) {
-    if (isTabBar) {
-      //first conditional for when we have the screenId of the tab
-      //second one for when we have only the id for the parent TabBar
-      return (this as ScreenVisitedTabBar).id == screenId ||
-          (this as ScreenVisitedTabBar).tabBarId == screenId;
-    }
-    return false;
-  }
+extension StringToHex on String {
+  String get sanitizeStringToHex {
+    final RegExp hexRegex = RegExp('[0-9A-Fa-f]+');
+    final Iterable<Match> matches = hexRegex.allMatches(this);
 
-  ///If this screenVisited is a tabBar, it returns the screenVisited as a
-  ///ScreenVisitedTabBar type
-  ScreenVisitedTabBar? maybeScreenVisitedTabBar(String screenId) {
-    final bool isTabBarWithId = this.isTabBarWithId(screenId);
-    if (isTabBarWithId) {
-      return this as ScreenVisitedTabBar;
-    } else {
-      return null;
+    final sanitizedStringBuffer = StringBuffer();
+
+    for (final Match match in matches) {
+      sanitizedStringBuffer.write(match.group(0));
     }
+
+    return sanitizedStringBuffer.toString();
   }
 }

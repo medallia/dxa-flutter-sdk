@@ -6,8 +6,17 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:medallia_dxa/src/utility/extensions.dart';
 
-enum PlaceholderTypeEnum { replayDisabled, noPreviewAvailable }
+enum PlaceholderTypeEnum {
+  replayDisabled,
+  noPreviewAvailable,
+  performanceStressCpu,
+  performanceStressBattery,
+  performanceStressMemory,
+  liveConfig,
+  noPermission,
+}
 
 class PlaceholderType {
   final PlaceholderTypeEnum placeholderTypeEnum;
@@ -17,10 +26,25 @@ class PlaceholderType {
   String getPlaceholderText() {
     switch (placeholderTypeEnum) {
       case PlaceholderTypeEnum.replayDisabled:
-        return 'Replay Disabled';
+        return 'Video disabled on this screen';
 
       case PlaceholderTypeEnum.noPreviewAvailable:
-        return 'No preview available';
+        return 'No video could be recorded for this screen';
+
+      case PlaceholderTypeEnum.performanceStressMemory:
+        return 'Screen not recorded due to high memory usage';
+
+      case PlaceholderTypeEnum.performanceStressCpu:
+        return 'Screen not recorded due to high CPU usage';
+
+      case PlaceholderTypeEnum.performanceStressBattery:
+        return 'Screen not recorded due to low battery';
+
+      case PlaceholderTypeEnum.liveConfig:
+        return 'Video recording masked for this screen';
+
+      case PlaceholderTypeEnum.noPermission:
+        return 'No permissions to record this screen';
 
       default:
         return 'No preview available';
@@ -32,28 +56,43 @@ class PlaceholderImageConfig {
   PlaceholderImageConfig._internal();
   static final _instance = PlaceholderImageConfig._internal();
   static PlaceholderImageConfig get instance => _instance;
-  final HashMap<Size, ByteData> placeholderImageByteDataMap = HashMap();
+  final HashMap<PlaceholderImageId, ByteData> placeholderImageByteDataMap =
+      HashMap();
+
   ByteData? placeHolderIcon;
+  static const Size _fallbackSize = Size(200, 500);
+  Size lastSize = _fallbackSize;
 
   FutureOr<ByteData> getPlaceholderImage(
-    BuildContext context,
     PlaceholderType placeholderType,
   ) async {
-    final Size size = MediaQuery.of(context).size;
-    if (placeholderImageByteDataMap.containsKey(size)) {
-      return placeholderImageByteDataMap[size]!;
+    late Size size;
+    final Size maybeSize = WidgetsBindingNullSafe.instance!.renderView.size;
+    if (maybeSize.width <= 0 || maybeSize.height <= 0) {
+      size = _fallbackSize;
+    } else {
+      size = maybeSize;
+    }
+
+    lastSize = size;
+    final placeholderImageId = PlaceholderImageId(
+      size: size,
+      type: placeholderType.placeholderTypeEnum,
+    );
+
+    if (placeholderImageByteDataMap.containsKey(placeholderImageId)) {
+      return placeholderImageByteDataMap[placeholderImageId]!;
     }
     final ByteData placeholderImage =
-        await _createPlaceHolderImage(context, placeholderType);
-    placeholderImageByteDataMap[size] = placeholderImage;
+        await _createPlaceHolderImage(size, placeholderType);
+    placeholderImageByteDataMap[placeholderImageId] = placeholderImage;
     return placeholderImage;
   }
 
   Future<ByteData> _createPlaceHolderImage(
-    BuildContext context,
+    Size size,
     PlaceholderType placeholderType,
   ) async {
-    final Size size = MediaQuery.of(context).size;
     final double screenWidth = size.width;
     final double screenHeight = size.height;
     final recorder = ui.PictureRecorder();
@@ -62,46 +101,63 @@ class PlaceholderImageConfig {
       Rect.fromLTWH(0, 0, screenWidth, screenHeight),
     );
     //Texxt configuration
-    final textStyle = TextStyle(
-      color: Colors.black,
-      fontSize: screenWidth * 0.1,
-    );
-    final textSpan = TextSpan(
-      text: placeholderType.getPlaceholderText(),
-      style: textStyle,
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
+    final double textWidthWithMargin = screenWidth * 0.9;
+
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: placeholderType.getPlaceholderText(),
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 40,
+        ),
+      ),
       textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-      maxWidth: size.width,
-    );
+      textAlign: TextAlign.center,
+    )..layout(
+        maxWidth: textWidthWithMargin,
+      );
+
     const double textHeightPadding = 16;
     final double textHeight = textPainter.height;
     final double textWidth = textPainter.width;
+    final double maximumAllowedImageHeight =
+        screenHeight - textHeight - textHeightPadding;
     //SCVG configuration
     final ByteData byteData = await _getPlaceholderIcon();
     final DrawableRoot svgRoot =
         await svg.fromSvgBytes(byteData.buffer.asUint8List(), 'rawSvg');
+    int imageHeight = textWidth ~/ svgRoot.viewport.size.aspectRatio;
+    double imageWidth = textWidth;
+    if (imageHeight > maximumAllowedImageHeight) {
+      imageHeight = maximumAllowedImageHeight.toInt();
+      imageWidth = imageHeight * svgRoot.viewport.size.aspectRatio;
+    }
+
     final ui.Image image = await svgRoot
         .toPicture(
-            size: Size(
-                screenWidth, screenHeight - textHeight - textHeightPadding))
+          size: Size(imageWidth, imageHeight.toDouble()),
+        )
         .toImage(
-          screenWidth.toInt(),
-          (screenHeight - textHeight - textHeightPadding).toInt(),
+          imageWidth.toInt(),
+          imageHeight,
         );
-    canvas.drawColor(Colors.white, ui.BlendMode.color);
-    canvas.drawImage(image, Offset.zero, Paint()..color = Colors.blue);
+    final double yOffset =
+        (screenHeight - (textHeight + image.height + textHeightPadding)) / 2;
+    final imageOffset = Offset((screenWidth - textWidth) / 2, yOffset);
+
+    canvas.drawColor(Colors.white, ui.BlendMode.srcOver);
+    canvas.drawImage(
+      image,
+      imageOffset,
+      Paint()
+        ..color = Colors.red
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.square
+        ..style = PaintingStyle.fill,
+    );
     //Layout configuration
-    late final double textHeightOffset;
-    if (screenHeight > screenWidth) {
-      textHeightOffset = (screenHeight / 2) +
-          (screenWidth / svgRoot.viewport.size.aspectRatio) / 2;
-    } else {
-      textHeightOffset = image.height.toDouble() + textHeightPadding / 2;
-    }
+    final double textHeightOffset =
+        yOffset + image.height.toDouble() + textHeightPadding;
 
     final double xCenter = (screenWidth - textWidth) / 2;
     final double yCenter = textHeightOffset;
@@ -116,5 +172,26 @@ class PlaceholderImageConfig {
 
   FutureOr<ByteData> _getPlaceholderIcon() async =>
       placeHolderIcon ??= await rootBundle
-          .load('packages/decibel_sdk/assets/placeholder_image.svg');
+          .load('packages/medallia_dxa/assets/placeholder_image.svg');
+}
+
+///used to cache placeholder images by size and text, so they can be reused
+///instead of creating a new one each time
+class PlaceholderImageId {
+  final Size size;
+  final PlaceholderTypeEnum type;
+  PlaceholderImageId({
+    required this.size,
+    required this.type,
+  });
+
+  @override
+  bool operator ==(covariant PlaceholderImageId other) {
+    if (identical(this, other)) return true;
+
+    return other.size == size && other.type == type;
+  }
+
+  @override
+  int get hashCode => size.hashCode ^ type.hashCode;
 }

@@ -1,12 +1,12 @@
 library initial_config_test;
 
-import 'package:decibel_sdk/decibel_sdk.dart';
-import 'package:decibel_sdk/src/decibel_config.dart';
-import 'package:decibel_sdk/src/features/autoMasking/auto_masking_enums.dart';
-import 'package:decibel_sdk/src/messages.dart';
-import 'package:decibel_sdk/src/utility/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medallia_dxa/medallia_dxa.dart';
+import 'package:medallia_dxa/src/features/autoMasking/auto_masking_enums.dart';
+import 'package:medallia_dxa/src/features/config/medallia_dxa_config.dart';
+import 'package:medallia_dxa/src/features/consents.dart';
+import 'package:medallia_dxa/src/messages.dart';
 import 'package:mockito/mockito.dart';
 import 'package:yaml/yaml.dart';
 
@@ -24,7 +24,10 @@ void main() {
   late MockFrameTracking mockFrameTracking;
   late MockPlaceholderImageConfig mockPlaceholderImageConfig;
   late MockTracking mockTracking;
-  late MockCustomRouteObserver mockCustomRouteObserver;
+  late MockLiveConfiguration mockLiveConfiguration;
+  late MockEventChannelManager mockEventChannelManager;
+  late MockGlobalSettings mockGlobalSettings;
+  late MockRouteTreeConstructor mockRouteTreeConstructor;
 
   late dynamic Function(
     String yaml,
@@ -33,10 +36,10 @@ void main() {
   const String version = '1';
   const int account = 0;
   const int property = 0;
-
+  late MedalliaDxaCustomerConsentType consents;
   setUpAll(() {
+    consents = MedalliaDxaCustomerConsentType.recordingAndTracking;
     WidgetsFlutterBinding.ensureInitialized();
-
     mockApi = MockMedalliaDxaNativeApi();
     mockGoalsAndDimensions = MockGoalsAndDimensions();
     mockSessionReplay = MockSessionReplay();
@@ -48,47 +51,54 @@ void main() {
     mockFrameTracking = MockFrameTracking();
     mockPlaceholderImageConfig = MockPlaceholderImageConfig();
     mockTracking = MockTracking();
-    mockCustomRouteObserver = MockCustomRouteObserver();
+    mockLiveConfiguration = MockLiveConfiguration();
+    mockEventChannelManager = MockEventChannelManager();
+    mockGlobalSettings = MockGlobalSettings();
+    mockRouteTreeConstructor = MockRouteTreeConstructor();
     medalliaDxaConfig = MedalliaDxaConfig.testing(
-      mockApi,
-      loadYaml,
-      mockGoalsAndDimensions,
-      assetBundleMock,
-      mockSessionReplay,
-      mockHttpErrors,
-      mockLoggerSDK,
-      mockCustomRouteObserver,
-      mockAutoMasking,
-      mockFrameTracking,
-      mockPlaceholderImageConfig,
-      mockTracking,
+      autoMasking: mockAutoMasking,
+      eventChannelManager: mockEventChannelManager,
+      frameTracking: mockFrameTracking,
+      globalSettings: mockGlobalSettings,
+      goalsAndDimensions: mockGoalsAndDimensions,
+      httpErrors: mockHttpErrors,
+      loadYaml: loadYaml,
+      loggerSDK: mockLoggerSDK,
+      nativeApi: mockApi,
+      placeholderImageConfig: mockPlaceholderImageConfig,
+      rootBundle: assetBundleMock,
+      routeTreeConstructor: mockRouteTreeConstructor,
+      sessionReplay: mockSessionReplay,
+      tracking: mockTracking,
     );
     when(mockSessionReplay.autoMasking).thenReturn(mockAutoMasking);
+    when(mockEventChannelManager.liveConfiguration)
+        .thenReturn(mockLiveConfiguration);
   });
 
-  group('initalize method', () {
+  group('initialize method', () {
     // setUpAll(() {});
 
     test('''
 WHEN getSessionId is called 
-AND the medalliaDxaConfig.initalize method has not been called
+AND the medalliaDxaConfig.initialize method has not been called
 THEN the method throws an assertion error
     ''', () async {
       expect(
         () async {
-          await medalliaDxaConfig.getSessionId();
+          await medalliaDxaConfig.publicMethods.getSessionId();
         },
         throwsAssertionError,
       );
     });
     test('''
 WHEN getWebViewProperties is called 
-AND the medalliaDxaConfig.initalize method has not been called
+AND the medalliaDxaConfig.initialize method has not been called
 THEN the method throws an assertion error
     ''', () async {
       expect(
         () async {
-          await medalliaDxaConfig.getWebViewProperties();
+          await medalliaDxaConfig.publicMethods.getWebViewProperties();
         },
         throwsAssertionError,
       );
@@ -96,16 +106,21 @@ THEN the method throws an assertion error
 
     test(
       '''
-      WHEN the initalize method is called with the corresponding parameters
-      AND consent is all
+      WHEN the initialize method is called with the corresponding parameters
+      AND consent is recordingAndTracking
       AND the version in the pubspec is '1'
       THEN the properties in the sessionMessage should match these
       AND the the initialize method from MedalliaDxaNativeApi should be called with
       the sessionMessage
       AND the method start() should be called''',
       () async {
-        final consents = [DecibelCustomerConsentType.all];
-        await medalliaDxaConfig.initialize(account, property, consents);
+        await medalliaDxaConfig.initialize(
+          dxaConfig: DxaConfig(
+            property: property,
+            account: account,
+            consents: consents,
+          ),
+        );
 
         //get SessionMessage sent to the Api
         final SessionMessage sessionMessage =
@@ -115,7 +130,7 @@ THEN the method throws an assertion error
         expect(sessionMessage.account, 0);
         expect(sessionMessage.property, 0);
         expect(sessionMessage.version, '1');
-        expect(sessionMessage.consents, consents.toIndexList());
+        expect(sessionMessage.consents, consents.integerValue());
         verify(mockSessionReplay.startPeriodicTimer());
       },
     );
@@ -125,7 +140,10 @@ AND the initialize method has been called before
 THEN the _api method is called
 AND it returns a Future of type nullable string 
     ''', () async {
-      expect(medalliaDxaConfig.getSessionId(), isA<Future<String>>());
+      expect(
+        medalliaDxaConfig.publicMethods.getSessionId(),
+        isA<Future<String>>(),
+      );
       verify(mockApi.getSessionId());
     });
     test('''
@@ -134,7 +152,10 @@ AND the initialize method has been called before
 THEN the _api method is called
 AND it returns a Future of type string 
     ''', () async {
-      expect(medalliaDxaConfig.getWebViewProperties(), isA<Future<String?>>());
+      expect(
+        medalliaDxaConfig.publicMethods.getWebViewProperties(),
+        isA<Future<String?>>(),
+      );
       verify(mockApi.getWebViewProperties());
     });
   });
@@ -142,76 +163,62 @@ AND it returns a Future of type string
   group('enable consents', () {
     test('''
 WHEN set enable consents is called
-AND the consent parameters list includes .none
+AND the consent is .none
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
+AND tracking allowed is false
 AND the method start from sessionReplay is NOT called
-AND the method stop from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.all,
-        DecibelCustomerConsentType.none
-      ];
-      await medalliaDxaConfig.setEnableConsents(consents);
+AND the method stop from sessionReplay is called
+AND tracking allowed is false''', () async {
+      const consents = MedalliaDxaCustomerConsentType.none;
+      await medalliaDxaConfig.publicMethods.setConsents(consents);
+      final consentSentToNative = verify(
+        mockApi.setConsents(captureAny),
+      ).captured.single as int;
+      expect(
+        consentSentToNative,
+        consents.integerValue(),
+      );
       verifyNever(mockSessionReplay.startPeriodicTimer());
       verify(mockSessionReplay.stopPeriodicTimer());
+      expect(medalliaDxaConfig.trackingAllowed, false);
     });
     test('''
 WHEN set enable consents is called
-AND the consent parameters list includes .all
-AND it doens't include .none
+AND the consent is .tracking
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
-AND the method start from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.all,
-        DecibelCustomerConsentType.tracking
-      ];
-      await medalliaDxaConfig.setEnableConsents(consents);
-      verify(mockSessionReplay.startPeriodicTimer());
+AND the method start from sessionReplay is NOT called
+AND the method stop from sessionReplay is called
+AND tracking allowed is true''', () async {
+      const consents = MedalliaDxaCustomerConsentType.tracking;
+      await medalliaDxaConfig.publicMethods.setConsents(consents);
+      final consentSentToNative = verify(
+        mockApi.setConsents(captureAny),
+      ).captured.single as int;
+      expect(
+        consentSentToNative,
+        consents.integerValue(),
+      );
+      verify(mockSessionReplay.stopPeriodicTimer());
+      expect(medalliaDxaConfig.trackingAllowed, true);
     });
     test('''
 WHEN set enable consents is called
-AND the consent parameters list includes .recordAndTracking
+AND the consent is .recordAndTracking
 THEN the MedalliaDxaNativeApi method setEnableConsents is called
-AND the method start from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.recordingAndTracking,
-      ];
-      await medalliaDxaConfig.setEnableConsents(consents);
-      verify(mockSessionReplay.startPeriodicTimer());
-    });
-  });
-  group('disable consents', () {
-    test('''
-WHEN set disable consents is called
-AND the consent parameters list includes .none
-AND it doens't include .all
-THEN the MedalliaDxaNativeApi method setDisableConsents is called
-AND the method stop from sessionReplay is not called''', () async {
-      final consents = [DecibelCustomerConsentType.none];
-      await medalliaDxaConfig.setDisableConsents(consents);
-      verifyNever(mockSessionReplay.stopPeriodicTimer());
-    });
-    test('''
-WHEN set disable consents is called
-AND the consent parameters list includes .all
-THEN the MedalliaDxaNativeApi method setDisableConsents is called
-AND the method stop from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.none,
-        DecibelCustomerConsentType.all
-      ];
-      await medalliaDxaConfig.setDisableConsents(consents);
-      verify(mockSessionReplay.stopPeriodicTimer());
-    });
-    test('''
-WHEN set disable consents is called
-AND the consent parameters list includes .recordAndTracking
-THEN the MedalliaDxaNativeApi method setEnableConsents is called
-AND the method stop from sessionReplay is called''', () async {
-      final consents = [
-        DecibelCustomerConsentType.recordingAndTracking,
-      ];
-      await medalliaDxaConfig.setDisableConsents(consents);
-      verify(mockSessionReplay.stopPeriodicTimer());
+AND the method start from sessionReplay is called
+AND tracking allowed is true''', () async {
+      const consents = MedalliaDxaCustomerConsentType.recordingAndTracking;
+      await medalliaDxaConfig.publicMethods.setConsents(consents);
+
+      final consentSentToNative = verify(
+        mockApi.setConsents(captureAny),
+      ).captured.single as int;
+      expect(
+        consentSentToNative,
+        consents.integerValue(),
+      );
+      verify(mockSessionReplay.startPeriodicTimer()).called(1);
+      expect(medalliaDxaConfig.trackingAllowed, true);
     });
   });
 
@@ -222,8 +229,10 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String dimensionName = 'dimensionName';
       const String dimensionValue = 'dimensionValue';
-      await medalliaDxaConfig.setDimensionWithString(
-          dimensionName, dimensionValue);
+      await medalliaDxaConfig.publicMethods.setDimensionWithString(
+        dimensionName,
+        dimensionValue,
+      );
       verify(
         mockGoalsAndDimensions.setDimensionWithString(
           dimensionName,
@@ -237,8 +246,10 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String dimensionName = 'dimensionName';
       const double dimensionValue = 1;
-      await medalliaDxaConfig.setDimensionWithNumber(
-          dimensionName, dimensionValue);
+      await medalliaDxaConfig.publicMethods.setDimensionWithNumber(
+        dimensionName,
+        dimensionValue,
+      );
       verify(
         mockGoalsAndDimensions.setDimensionWithNumber(
           dimensionName,
@@ -252,8 +263,10 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String dimensionName = 'dimensionName';
       const bool dimensionValue = true;
-      await medalliaDxaConfig.setDimensionWithBool(dimensionName,
-          value: dimensionValue);
+      await medalliaDxaConfig.publicMethods.setDimensionWithBool(
+        dimensionName,
+        value: dimensionValue,
+      );
       verify(
         mockGoalsAndDimensions.setDimensionWithBool(
           dimensionName,
@@ -267,7 +280,7 @@ THEN the _goalsAndDimensions method is called
     ''', () async {
       const String goalName = 'goalName';
       const double goalValue = 2;
-      await medalliaDxaConfig.sendGoal(goalName, goalValue);
+      await medalliaDxaConfig.publicMethods.sendGoal(goalName, goalValue);
       verify(mockGoalsAndDimensions.sendGoal(goalName, goalValue));
     });
   });
@@ -289,35 +302,35 @@ AND has honored every enum passed
         AutoMaskingTypeEnum.all,
         AutoMaskingTypeEnum.none
       };
-      medalliaDxaConfig.setAutoMasking(setOfEnums);
+      medalliaDxaConfig.publicMethods.setAutoMasking(setOfEnums);
       verify(
         mockAutoMasking.autoMaskingTypeSet = {
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.button,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.button,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.dialog,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.dialog,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.image,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.image,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.inputText,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.inputText,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.text,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.text,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.icons,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.icons,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.webView,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.webView,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.all,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.all,
           ),
-          const AutoMaskingType(
-            autoMaskingTypeEnum: AutoMaskingTypeEnum.none,
+          AutoMaskingType(
+            enumType: AutoMaskingTypeEnum.none,
           )
         },
       ).called(1);
@@ -330,7 +343,7 @@ WHEN enableAllLogs is called
 THEN the loggerSDK all() method is called
 
     ''', () async {
-      medalliaDxaConfig.enableAllLogs();
+      medalliaDxaConfig.publicMethods.enableAllLogs();
       verify(mockLoggerSDK.all());
     });
     test('''
@@ -338,7 +351,8 @@ WHEN enableSelectedLogs is called
 THEN the loggerSDK selected() method is called with the appropiate arguments
 
     ''', () async {
-      medalliaDxaConfig.enableSelectedLogs(tracking: true, autoMasking: true);
+      medalliaDxaConfig.publicMethods
+          .enableSelectedLogs(tracking: true, autoMasking: true);
       verify(
         mockLoggerSDK.selected(
           enabled: true,
@@ -349,6 +363,7 @@ THEN the loggerSDK selected() method is called with the appropiate arguments
           routeObserver: false,
           screenWidget: false,
           maskWidget: false,
+          manualAnalytics: false,
         ),
       );
     });
@@ -359,7 +374,7 @@ WHEN sendHttpError is called
 THEN the _api method  is called
 
     ''', () async {
-      medalliaDxaConfig.sendDataOverWifiOnly();
+      medalliaDxaConfig.publicMethods.sendDataOverWifiOnly();
       verify(mockApi.sendDataOverWifiOnly());
     });
   });
@@ -370,8 +385,66 @@ THEN the _httpErrors method sendStatusCode is called
 AND has the statusCode passed as an argument
     ''', () async {
       const int statusCode = 500;
-      await medalliaDxaConfig.sendHttpError(statusCode);
+      await medalliaDxaConfig.publicMethods.sendHttpError(statusCode);
       verify(mockHttpErrors.sendStatusCode(statusCode));
+    });
+  });
+
+  group('SDK block', () {
+    test('''
+WHEN the SDK is blocked
+THEN the tracking and session replay are not allowed
+AND all public method calls are blocks except for currentRouteObservers
+AND all the blocked flag is correctly set
+
+    ''', () async {
+      await medalliaDxaConfig.blockSdk();
+      expect(medalliaDxaConfig.blocked, true);
+      expect(medalliaDxaConfig.isSdkRunning, false);
+      expect(medalliaDxaConfig.trackingAllowed, false);
+      expect(medalliaDxaConfig.recordingAllowed, false);
+
+      //bloced public method call
+      const int statusCode = 500;
+      await medalliaDxaConfig.publicMethods.sendHttpError(statusCode);
+      verifyNever(mockHttpErrors.sendStatusCode(statusCode));
+
+      //only exception for public method calls
+      medalliaDxaConfig.publicMethods.currentRouteObserver;
+      verify(
+        mockRouteTreeConstructor.getNewObservers(),
+      );
+    });
+    test('''
+WHEN the SDK is unblocked
+THEN the tracking and session replay values are the ones set on initialize
+AND public methods are not blocked
+
+    ''', () async {
+      await medalliaDxaConfig.unblockSdk();
+      expect(medalliaDxaConfig.blocked, false);
+      expect(medalliaDxaConfig.isSdkRunning, true);
+      if (consents == MedalliaDxaCustomerConsentType.recordingAndTracking) {
+        expect(medalliaDxaConfig.trackingAllowed, true);
+        expect(medalliaDxaConfig.recordingAllowed, true);
+      } else if (consents == MedalliaDxaCustomerConsentType.tracking) {
+        expect(medalliaDxaConfig.trackingAllowed, true);
+        expect(medalliaDxaConfig.recordingAllowed, false);
+      } else {
+        expect(medalliaDxaConfig.trackingAllowed, false);
+        expect(medalliaDxaConfig.recordingAllowed, false);
+      }
+
+      //bloced public method call
+      const int statusCode = 500;
+      await medalliaDxaConfig.publicMethods.sendHttpError(statusCode);
+      verify(mockHttpErrors.sendStatusCode(statusCode));
+
+      //only exception for public method calls
+      medalliaDxaConfig.publicMethods.currentRouteObserver;
+      verify(
+        mockRouteTreeConstructor.getNewObservers(),
+      );
     });
   });
 }
