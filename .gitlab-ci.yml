@@ -1,0 +1,48 @@
+image: cirrusci/flutter:stable
+
+cache:
+  paths:
+    - .pub-cache/global_packages
+
+stages:
+  - test
+  - deploy
+  
+
+flutter_test:
+  stage: test 
+  before_script:
+    - export PATH="$PATH":"$HOME/.flutter-sdk/.pub-cache/bin"
+    - flutter pub get
+  script:
+    - flutter test --machine
+  only:
+    - merge_requests
+
+
+git_deploy:
+  stage: deploy
+  before_script:
+    - git branch -D master || true
+    - git tag | xargs git tag -d || true
+  image:
+    name: alpine/git
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+
+  script:
+    - apk add --no-cache openssh-client git
+    - eval $(ssh-agent -s)
+    - echo "${USER_SDK_MEDALLIA_PRIVATE_KEY}" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan github.com >> ~/.ssh/known_hosts
+    - git remote add github git@github.com:medallia/dxa-flutter-sdk.git || true
+    - git checkout -b master
+    - git push -u github main
+    - VERSION=$(cat pubspec.yaml | grep "^version:" | awk '{print $2}')
+    - git tag ${VERSION}
+    - git push -u github --tags
+  only:
+    - master
