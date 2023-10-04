@@ -1,7 +1,7 @@
 name: medallia_dxa
 description: Medallia DXA flutter SDK
 version: 2.0.0
-homepage: 'https://decibel-documentation.gitbook.io/decibelsdk/flutter/getstarted'
+homepage: 'https://developer.medallia.com/medallia-dxa/docs/getting-started-3'
 
 environment:
   sdk: ">=2.15.1 <3.0.0"
