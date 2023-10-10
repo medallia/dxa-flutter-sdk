@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'medallia_dxa'
-  s.version          = '2.0.0'
+  s.version          = '2.0.1'
   s.summary          = 'The MedalliaDXA SDK for Flutter.'
   s.description         = "The MedalliaDXA SDK for Flutter. The SDK supports iOS 11.0 and above."
   s.homepage         = 'https://developer.medallia.com/medallia-dxa/docs/getting-started-3'

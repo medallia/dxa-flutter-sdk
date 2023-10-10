@@ -39,7 +39,7 @@ git_deploy:
     - chmod 700 ~/.ssh
     - ssh-keyscan github.com >> ~/.ssh/known_hosts
     - git remote add github git@github.com:medallia/dxa-flutter-sdk.git || true
-    - git checkout -b master
+    - git checkout -b main
     - git push -u github main
     - VERSION=$(cat pubspec.yaml | grep "^version:" | awk '{print $2}')
     - git tag ${VERSION}
