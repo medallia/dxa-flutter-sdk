@@ -26,8 +26,7 @@ class RouteTreeConstructor {
       required String name,
       required List<DxaRoute> dxaRoutePath,
       required List<DxaRoute> allDetectedDxaRoutes,
-    })
-        createScreenVisited,
+    }) createScreenVisited,
     required LoggerSDK loggerSDK,
   })  : _config = config,
         _widgetsBindingInstance = widgetsBindingInstance,
@@ -389,7 +388,7 @@ class RouteTreeConstructor {
     }
 
     final DxaRoute newDxaRoute = DxaRoute(
-      route: newRoute as ModalRoute,
+      route: newRoute,
       nestedNavigatorsHashcode: [],
     );
     trackedRoutesForThisNavigator.insert(oldRouteIndex, newDxaRoute);
@@ -425,7 +424,7 @@ class RouteTreeConstructor {
     final List<DxaRoute>? trackedRoutesForThisNavigator =
         _mapOfNavigatorsWithTheirListOfRoutes[navigatorHashCode];
     final DxaRoute dxaRoute = DxaRoute(
-      route: route as ModalRoute,
+      route: route,
       nestedNavigatorsHashcode: [],
     );
     //remove the dxaRoute from the tracked routes

@@ -51,7 +51,7 @@ extension RenderObjectPaintBounds on RenderObject {
   }
 
   bool get areAllAncestorsPainted {
-    final AbstractNode? parent = this.parent;
+    final Object? parent = this.parent;
     if (parent != null) {
       RenderObject ancestor = parent as RenderObject;
 
