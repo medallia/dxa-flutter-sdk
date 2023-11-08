@@ -19,15 +19,11 @@ public class SwiftMedalliaDxaPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNati
             print(nativeConsents)
             let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property),consent: nativeConsents, crashReporterEnabled: msg.crashReporterEnabled as! Bool, mobileDataEnable: msg.mobileDataEnabled as! Bool)
             
-            configuration.endpoint = .production
-            configuration.logLevel = .developer
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
             
             
         } else  {
             let configuration = Configuration(account: String(describing: msg.account), property: String(describing: msg.property))
-            configuration.endpoint = .production
-            configuration.logLevel = .developer
             liveConfiguration = DXA.initialize(configuration: configuration, multiplatform: Platform(type: .flutter, version: String(describing: msg.version), language: "Dart"), dxaDelegate: self)
 
         }
@@ -47,7 +43,10 @@ public class SwiftMedalliaDxaPlugin: NSObject, FlutterPlugin, FLTMedalliaDxaNati
     }
     
     public func endScreenMsg(_ msg: FLTEndScreenMessage, completion: @escaping (FlutterError?) -> Void) {
-        DXA.endScreen()
+        if let screenRecordingEndTime = msg.screenRecordingEndTime as? TimeInterval {
+            DXA.endScreen(endFocusTime: screenRecordingEndTime/1000)
+        }
+        
         completion(nil)
     }
     
