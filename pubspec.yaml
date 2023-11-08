@@ -1,6 +1,6 @@
 name: medallia_dxa
 description: Medallia DXA flutter SDK
-version: 2.0.1
+version: 2.0.2
 homepage: 'https://developer.medallia.com/medallia-dxa/docs/getting-started-3'
 
 environment:
