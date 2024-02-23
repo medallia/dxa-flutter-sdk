@@ -1,0 +1,39 @@
+enum ImageQuality { poor, low, average, high, ultra }
+
+class Qmw720223306 {
+  static ImageQuality jrp844448009(int b84461035) {
+    switch (b84461035) {
+      case 0:
+        return ImageQuality.poor;
+      case 1:
+        return ImageQuality.low;
+      case 2:
+        return ImageQuality.average;
+      case 3:
+        return ImageQuality.high;
+      case 4:
+        return ImageQuality.ultra;
+      default:
+        return ImageQuality.average;
+    }
+  }
+}
+
+extension Lo475565383 on ImageQuality {
+  int pt273667464() {
+    switch (this) {
+      case ImageQuality.poor:
+        return 0;
+      case ImageQuality.low:
+        return 1;
+      case ImageQuality.average:
+        return 2;
+      case ImageQuality.high:
+        return 3;
+      case ImageQuality.ultra:
+        return 4;
+      default:
+        return 2;
+    }
+  }
+}
