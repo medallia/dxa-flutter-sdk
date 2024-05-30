@@ -1,0 +1,233 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.8.1 (swiftlang-5.8.0.124.5 clang-1403.0.22.11.100)
+// swift-module-flags: -target arm64-apple-ios11.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name MedalliaDXAFlutter
+// swift-module-flags-ignorable: -enable-bare-slash-regex
+import AVFoundation
+import CommonCrypto
+import Foundation
+import MapKit
+import Swift
+import SystemConfiguration
+import UIKit
+import WebKit
+import _Concurrency
+import _StringProcessing
+public enum ImageQualityType : Swift.Int, Swift.Codable {
+  case poor
+  case low
+  case average
+  case high
+  case ultra
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct PerformanceMultiplatform {
+  public let isStressed: [MedalliaDXAFlutter.DeviceStressedTypeFlutter]
+  public let cpu: Swift.Double
+  public let memory: Swift.Double
+  public let battery: Swift.Double
+  public let threads: Swift.Int
+  public let maxMemory: Swift.Double
+}
+public enum DeviceStressedTypeFlutter : Swift.Int {
+  case battery
+  case memory
+  case cpu
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+extension UIKit.UIView {
+  @_Concurrency.MainActor(unsafe) public var dxaMasking: MedalliaDXAFlutter.MaskView {
+    get
+    set
+  }
+  @_Concurrency.MainActor(unsafe) public var dxaFormTrack: Swift.Bool {
+    get
+    set
+  }
+  @_Concurrency.MainActor(unsafe) public var dxaStringTag: Swift.String? {
+    get
+    set
+  }
+}
+extension MedalliaDXAFlutter.DXA {
+  public static func initialize(configuration: MedalliaDXAFlutter.Configuration, multiplatform: MedalliaDXAFlutter.Platform, dxaDelegate: (any MedalliaDXAFlutter.DXADelegate)? = nil) -> MedalliaDXAFlutter.LiveConfigurationMultiplatform
+  public static func saveLog(message: Swift.String)
+  public static var appVersion: Swift.String? {
+    get
+  }
+}
+public enum Consent {
+  case analyticsAndRecording
+  case analytics
+  case none
+  public static func == (a: MedalliaDXAFlutter.Consent, b: MedalliaDXAFlutter.Consent) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct SamplingMultiplatform {
+  public var stopTrackingDueToSampling: Swift.Bool
+  public var stopRecordingDueToSampling: Swift.Bool
+}
+public protocol DXADelegate {
+  func performance(_ data: MedalliaDXAFlutter.PerformanceMultiplatform)
+  func liveConfig(_ configuration: MedalliaDXAFlutter.LiveConfigurationMultiplatform)
+  func sampling(_ sampling: MedalliaDXAFlutter.SamplingMultiplatform)
+}
+public class Platform {
+  public init(type: MedalliaDXAFlutter.PlatformType, version: Swift.String, language: Swift.String)
+  public static var native: MedalliaDXAFlutter.Platform
+  @objc deinit
+}
+public enum PlatformType {
+  case native
+  case flutter
+  case xamarin
+  case reactNative
+  public static func == (a: MedalliaDXAFlutter.PlatformType, b: MedalliaDXAFlutter.PlatformType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct LiveConfigurationMultiplatform {
+  public var ipHandling: Swift.Int?
+  public var useLiveConfiguration: Swift.Bool
+  public var experienceDataSampleMethod: Swift.Int?
+  public var sessionCookieFlags: Swift.Int?
+  public var leadCookieFlags: Swift.Int?
+  public var analysisDataSampleMethod: Swift.Int?
+  public var analysisSessFlags: Swift.Int?
+  public var analysisLeadFlags: Swift.Int?
+  public var replayDataSampleMethod: Swift.Int?
+  public var replaySessFlags: Swift.Int?
+  public var replayLeadFlags: Swift.Int?
+  public var disableScreenTracking: [Swift.String]?
+  public var screensMasking: [Swift.String]?
+  public var forceHiFi: [Swift.String]?
+  public var forceLoFi: [Swift.String]?
+  public var imageQualityType: Swift.Int?
+  public var videoQualityType: Swift.Int?
+  public var maxScreenDuration: Swift.Int?
+  public var maxScreenshots: Swift.Int?
+  public var recordVideoInForeground: Swift.Bool?
+  public var sessionTimeout: Swift.Int?
+  public var maskingColor: Swift.String?
+  public var showLocalLogs: Swift.Bool?
+  public var allowLogs: Swift.Bool?
+  public var sdkVersionsBlocked: [Swift.String]?
+  public var appVersionsBlocked: [Swift.String]?
+  public var keepVideoData: Swift.Bool?
+  public var maxMemoryUsage: Swift.Int?
+  public var maxCPUUsage: Swift.Int?
+  public var enableAnalytics: Swift.Bool?
+  public var blockedFlutterSDKVersions: [Swift.String]?
+  public var blockedFlutterAppVersions: [Swift.String]?
+  public var blockedRNSDKVersions: [Swift.String]?
+  public var blockedRNAppVersions: [Swift.String]?
+}
+public class Configuration {
+  public init(account: Swift.String, property: Swift.String, consent: MedalliaDXAFlutter.Consent = .analyticsAndRecording, crashReporterEnabled: Swift.Bool = true, mobileDataEnable: Swift.Bool = true, manualScreenTracking: Swift.Bool = false, enhancedLogsEnabled: Swift.Bool = false, networkAnalyticsEnable: Swift.Bool = true)
+  @objc deinit
+}
+public enum MaskAutomatic {
+  case labels
+  case inputs
+  case images
+  case webViews
+  case all
+  public static func == (a: MedalliaDXAFlutter.MaskAutomatic, b: MedalliaDXAFlutter.MaskAutomatic) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum MaskView {
+  case automatic
+  case mask
+  case unmask
+  public static func == (a: MedalliaDXAFlutter.MaskView, b: MedalliaDXAFlutter.MaskView) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension MedalliaDXAFlutter.DXA {
+  public static func endScreen(endRecordingTime: Foundation.TimeInterval)
+  public static func startNewScreen(name: Swift.String, id: Swift.Int)
+  public static func saveScreenShot(screenshot: Foundation.Data, id: Swift.Int, screenName: Swift.String, screenShotTime: Foundation.TimeInterval)
+}
+@_hasMissingDesignatedInitializers public class DXA {
+  public static func initialize(_ configuration: MedalliaDXAFlutter.Configuration)
+  public static func startNewScreen(name: Swift.String, disableRecordingOnThisScreen: Swift.Bool = false)
+  public static func stopScreen()
+  public static func setMaskingForCurrentScreen(_ types: [MedalliaDXAFlutter.MaskAutomatic])
+  public static func send(goal: Swift.String, with value: Swift.Float? = nil)
+  public static func send(dimension: Swift.String, value: Swift.String)
+  public static func send(dimension: Swift.String, value: Swift.Bool)
+  public static func send(dimension: Swift.String, value: Swift.Double)
+  public static func enableAutoMasking(_ types: [MedalliaDXAFlutter.MaskAutomatic])
+  public static func disableAutoMasking(_ types: [MedalliaDXAFlutter.MaskAutomatic])
+  public static func setConsent(_ consent: MedalliaDXAFlutter.Consent)
+  public static func setImageQuality(_ quality: MedalliaDXAFlutter.ImageQualityType)
+  public static func setMaskingColor(_ color: UIKit.UIColor)
+  public static func sendHTTPError(statusCode: Swift.Int)
+  public static func sendError(_ error: Swift.String)
+  public static func formSuccess()
+  public static func formError(error: Swift.String, selector: UIKit.UIView?)
+  public static var webViewProperties: Swift.String? {
+    get
+  }
+  public static var sessionURL: ((Swift.String?) -> ())? {
+    get
+    set
+  }
+  public static var sessionId: Swift.String? {
+    get
+  }
+  public static var mobileDataEnable: Swift.Bool {
+    get
+    set
+  }
+  public static func captureURLParameters(_ capture: Swift.Bool)
+  @objc deinit
+}
+extension MedalliaDXAFlutter.DXA {
+  public static func setRetention(_ enabled: Swift.Bool)
+}
+extension UIKit.UIViewController {
+  @_Concurrency.MainActor(unsafe) public var dxaScreenName: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor(unsafe) public var dxaDisableRecordingOnThisScreen: Swift.Bool {
+    get
+    set
+  }
+  @_Concurrency.MainActor(unsafe) public var dxaDisableAnalyticsAndRecordingOnThisScreen: Swift.Bool {
+    get
+    set
+  }
+}
+extension MedalliaDXAFlutter.ImageQualityType : Swift.Equatable {}
+extension MedalliaDXAFlutter.ImageQualityType : Swift.Hashable {}
+extension MedalliaDXAFlutter.ImageQualityType : Swift.RawRepresentable {}
+extension MedalliaDXAFlutter.DeviceStressedTypeFlutter : Swift.Equatable {}
+extension MedalliaDXAFlutter.DeviceStressedTypeFlutter : Swift.Hashable {}
+extension MedalliaDXAFlutter.DeviceStressedTypeFlutter : Swift.RawRepresentable {}
+extension MedalliaDXAFlutter.Consent : Swift.Equatable {}
+extension MedalliaDXAFlutter.Consent : Swift.Hashable {}
+extension MedalliaDXAFlutter.PlatformType : Swift.Equatable {}
+extension MedalliaDXAFlutter.PlatformType : Swift.Hashable {}
+extension MedalliaDXAFlutter.MaskAutomatic : Swift.Equatable {}
+extension MedalliaDXAFlutter.MaskAutomatic : Swift.Hashable {}
+extension MedalliaDXAFlutter.MaskView : Swift.Equatable {}
+extension MedalliaDXAFlutter.MaskView : Swift.Hashable {}
