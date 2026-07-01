@@ -1,0 +1,1 @@
+For release notes see [Medallia documentation](https://developer.medallia.com/medallia-dxa/docs/changelog-1).

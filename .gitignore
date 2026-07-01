@@ -1,0 +1,23 @@
+.DS_Store
+.dart_tool/
+
+.packages
+.pub/
+
+build/
+pubspec.lock
+
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+.gitlab/
+
+.gradle/*
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Avoid ignore Gradle wrappper properties
+!gradle-wrapper.properties
